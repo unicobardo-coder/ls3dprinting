@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LS 3D Printing - Stampa 3D su Misura & Spedizioni</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            500: '#10b981',
+                            600: '#059669',
+                            400: '#34d399',
+                            900: '#064e3b',
+                        },
+                        accent: {
+                            500: '#06b6d4',
+                            400: '#22d3ee',
+                        },
+                        dark: {
+                            bg: '#090d16',
+                            card: '#111827',
+                            border: '#1f2937',
+                            surface: '#151e32'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-black">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-gray-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-mono font-black text-black text-xl shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                    LS
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-tight group-hover:text-brand-400 transition-colors">LS 3D PRINTING</span>
+                    <span class="text-xs text-gray-400 font-mono tracking-wider">CREATIVITÀ & PROTOTIPAZIONE</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-300">
+                <a href="#prodotti" class="hover:text-brand-400 transition-colors">Prodotti</a>
+                <a href="#traccia" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button onclick="openAdminModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-mono border border-gray-700 transition-all">
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-400"></i> Area Admin
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative py-16 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6">
+                <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
+            </span>
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
+                Dai Forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
+                Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
+            </p>
+        </div>
+    </section>
+
+    <!-- Sezione Catalogo Prodotti -->
+    <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Catalogo Creazioni 3D</h2>
+                    <p class="text-gray-400 text-sm">Sfoglia i nostri modelli pronti per l'ordine immediato.</p>
+                </div>
+            </div>
+
+            <!-- Grid Prodotti -->
+            <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Caricato via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Traccia Spedizione per il Cliente -->
+    <section id="traccia" class="py-16">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
+                        <i data-lucide="package-search" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Traccia il tuo Ordine</h2>
+                        <p class="text-xs text-gray-400">Inserisci il codice ordine per verificare lo stato di spedizione</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="track-input" placeholder="Es. LS-8921" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono text-sm uppercase focus:border-brand-500 focus:outline-none">
+                    <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm rounded-xl transition-all">
+                        Cerca
+                    </button>
+                </div>
+
+                <div id="track-result" class="hidden border-t border-gray-800 pt-6"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Admin (Login & Gestione Completa) -->
+    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Login Admin Form -->
+            <div id="admin-login-view">
+                <div class="text-center mb-6">
+                    <div class="w-12 h-12 bg-brand-500/10 border border-brand-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 text-brand-400">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Accesso Riservato Admin</h3>
+                    <p class="text-gray-400 text-sm mt-1">Gestione Prodotti, Edizione & Spedizioni</p>
+                </div>
+                
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-sm mx-auto">
+                    <div>
+                        <label class="block text-xs font-mono text-gray-300 mb-1">Username</label>
+                        <input type="text" id="admin-username" required placeholder="admin" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-gray-300 mb-1">Password</label>
+                        <input type="password" id="admin-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div id="login-error" class="text-red-400 text-xs text-center hidden">Credenziali non valide!</div>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all shadow-lg shadow-brand-500/20">
+                        Accedi al Pannello
+                    </button>
+                    <p class="text-xs text-gray-500 text-center font-mono pt-2">Credenziali predefinite: admin / ls3d2026</p>
+                </form>
+            </div>
+
+            <!-- Pannello Gestione Admin -->
+            <div id="admin-panel-view" class="hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-gray-800 gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-brand-500 animate-pulse"></div>
+                        <h3 class="text-xl font-bold text-white">Dashboard LS 3D Printing</h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportData()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-mono text-brand-400 border border-gray-700 rounded-lg flex items-center gap-1">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Esporta Backup JSON
+                        </button>
+                        <label class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-mono text-gray-300 border border-gray-700 rounded-lg cursor-pointer flex items-center gap-1">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Importa Backup
+                            <input type="file" id="import-file" onchange="importData(event)" accept=".json" class="hidden">
+                        </label>
+                        <button onclick="adminLogout()" class="text-xs font-mono text-red-400 hover:underline ml-2">Logout</button>
+                    </div>
+                </div>
+
+                <!-- Tabs Admin -->
+                <div class="flex gap-4 border-b border-gray-800 mb-6">
+                    <button onclick="switchAdminTab('shipments')" id="tab-btn-shipments" class="pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-400">
+                        🚚 Gestione Spedizioni
+                    </button>
+                    <button onclick="switchAdminTab('products')" id="tab-btn-products" class="pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white">
+                        📦 Catalogo & Inserimento
+                    </button>
+                </div>
+
+                <!-- TAB 1: GESTIONE SPEDIZIONI -->
+                <div id="admin-tab-shipments">
+                    <h4 class="text-sm font-bold text-gray-300 mb-3 font-mono">Ordini e Spedizioni Attive</h4>
+                    <div id="admin-shipments-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-2"></div>
+                </div>
+
+                <!-- TAB 2: GESTIONE PRODOTTI -->
+                <div id="admin-tab-products" class="hidden">
+                    <form onsubmit="handleSaveProduct(event)" class="space-y-4 mb-8 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                        <div class="flex items-center justify-between">
+                            <h4 id="form-title" class="text-sm font-bold text-brand-400 uppercase tracking-wider font-mono">Aggiungi Nuovo Prodotto</h4>
+                            <button type="button" onclick="resetProductForm()" id="cancel-edit-btn" class="text-xs text-gray-400 hover:text-white underline hidden">Annulla Modifica</button>
+                        </div>
+                        <input type="hidden" id="edit-prod-id">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                            <select id="new-prod-category" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                                <option value="funzionale">Fermlibri</option>
+                                <option value="decorativo">Halloween</option>
+                                <option value="prototipi">Natale</option>
+                            </select>
+                            <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                            <input type="text" id="new-prod-time" required placeholder="Tempo Stampa (es. 4h)" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                            <input type="text" id="new-prod-material" required placeholder="Materiale (es. PLA+)" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                            <input type="text" id="new-prod-image" required placeholder="URL Immagine o Link Drive" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                        </div>
+                        <textarea id="new-prod-desc" rows="2" required placeholder="Descrizione prodotto" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+                        
+                        <button type="submit" id="save-prod-btn" class="w-full py-2.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all">
+                            + Salva Prodotto nel Catalogo
+                        </button>
+                    </form>
+
+                    <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic Script -->
+    <script>
+        const defaultProducts = [
+            {
+                id: 1,
+                title: "Fermalibri Cyber Geometry",
+                category: "decorativo",
+                price: 34.90,
+                time: "8h",
+                material: "PLA+ Nero & Ciano",
+                image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
+                desc: "Design geometrico futurista a reticolo con logo LS 3D Printing e finitura bicolore."
+            },
+            {
+                id: 2,
+                title: "Supporto Headset Ergonomico",
+                category: "funzionale",
+                price: 24.90,
+                time: "4.5h",
+                material: "PLA+ High Speed",
+                image: "https://images.unsplash.com/photo-1593121925328-369ecb7612d0?w=600&auto=format&fit=crop&q=80",
+                desc: "Design minimalista per cuffie da studio/gaming con gestione integrata dei cavi."
+            }
+        ];
+
+        const defaultOrders = [
+            {
+                id: "LS-8921",
+                customer: "Marco Rossi",
+                phone: "+393331234567",
+                address: "Via Roma 15, Milano",
+                items: "Fermalibri Cyber Geometry",
+                status: "Spedito",
+                courier: "BRT Express",
+                tracking: "BRT987654321IT"
+            }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('ls3d_products')) || defaultProducts;
+        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || defaultOrders;
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map(p => `
+                <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="relative h-48 overflow-hidden bg-gray-900">
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md text-[10px] font-mono text-brand-400 border border-brand-500/30 uppercase">${p.category}</span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-400 transition-colors">${p.title}</h3>
+                            <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.desc}</p>
+                            <div class="flex items-center gap-4 text-xs font-mono text-gray-400 mb-4">
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5 text-brand-400"></i> ${p.time}</span>
+                                <span class="flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-accent-400"></i> ${p.material}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 pt-0 border-t border-gray-800/50 mt-auto flex items-center justify-between">
+                        <span class="text-xl font-mono font-bold text-white">€${p.price.toFixed(2)}</span>
+                        <a href="https://api.whatsapp.com/send?phone=&text=Ciao!%20Vorrei%20ordinare%20il%20prodotto:%20${encodeURIComponent(p.title)}" target="_blank" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-xs flex items-center gap-1.5 transition-all">
+                            Ordina via WhatsApp
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function trackOrder() {
+            const code = document.getElementById('track-input').value.trim().toUpperCase();
+            const res = document.getElementById('track-result');
+            const found = orders.find(o => o.id.toUpperCase() === code);
+
+            res.classList.remove('hidden');
+            if(found) {
+                res.innerHTML = `
+                    <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-mono text-xs text-gray-400">ID Ordine: <strong class="text-white">${found.id}</strong></span>
+                            <span class="px-2.5 py-1 rounded-md text-xs font-bold font-mono bg-brand-500/20 text-brand-400 border border-brand-500/30">${found.status}</span>
+                        </div>
+                        <div class="text-sm font-bold text-white">${found.items}</div>
+                        <div class="grid grid-cols-2 gap-2 text-xs font-mono text-gray-400 pt-2 border-t border-gray-800">
+                            <div>Corriere: <span class="text-gray-200">${found.courier}</span></div>
+                            <div>Tracking: <span class="text-brand-400">${found.tracking}</span></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                res.innerHTML = `<div class="text-red-400 text-xs font-mono text-center">Nessun ordine trovato con questo codice.</div>`;
+            }
+        }
+
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            if(document.getElementById('admin-username').value === 'admin' && document.getElementById('admin-password').value === 'ls3d2026') {
+                document.getElementById('admin-login-view').classList.add('hidden');
+                document.getElementById('admin-panel-view').classList.remove('hidden');
+                renderAdminShipments();
+                renderAdminProductsList();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function adminLogout() {
+            document.getElementById('admin-panel-view').classList.add('hidden');
+            document.getElementById('admin-login-view').classList.remove('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            if(tab === 'shipments') {
+                document.getElementById('admin-tab-shipments').classList.remove('hidden');
+                document.getElementById('admin-tab-products').classList.add('hidden');
+                document.getElementById('tab-btn-shipments').className = "pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-400";
+                document.getElementById('tab-btn-products').className = "pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white";
+            } else {
+                document.getElementById('admin-tab-shipments').classList.add('hidden');
+                document.getElementById('admin-tab-products').classList.remove('hidden');
+                document.getElementById('tab-btn-products').className = "pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-400";
+                document.getElementById('tab-btn-shipments').className = "pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white";
+            }
+        }
+
+        function renderAdminShipments() {
+            const list = document.getElementById('admin-shipments-list');
+            list.innerHTML = orders.map((o, idx) => `
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-bold text-brand-400">${o.id} - ${o.customer}</span>
+                        <select onchange="updateOrderStatus(${idx}, this.value)" class="bg-gray-800 border border-gray-700 text-xs rounded-lg px-2 py-1 text-white font-mono">
+                            <option value="In Elaborazione" ${o.status==='In Elaborazione'?'selected':''}>In Elaborazione</option>
+                            <option value="Stampa in Corso" ${o.status==='Stampa in Corso'?'selected':''}>Stampa in Corso</option>
+                            <option value="Spedito" ${o.status==='Spedito'?'selected':''}>Spedito</option>
+                            <option value="Consegnato" ${o.status==='Consegnato'?'selected':''}>Consegnato</option>
+                        </select>
+                    </div>
+                    <div class="text-xs text-gray-300">Articoli: ${o.items} | Indirizzo: ${o.address}</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-gray-800">
+                        <input type="text" value="${o.courier}" onchange="updateOrderCourier(${idx}, this.value)" placeholder="Corriere" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white">
+                        <input type="text" value="${o.tracking}" onchange="updateOrderTracking(${idx}, this.value)" placeholder="Codice Tracking" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white">
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function updateOrderStatus(idx, val) { orders[idx].status = val; saveOrders(); }
+        function updateOrderCourier(idx, val) { orders[idx].courier = val; saveOrders(); }
+        function updateOrderTracking(idx, val) { orders[idx].tracking = val; saveOrders(); }
+        function saveOrders() { localStorage.setItem('ls3d_orders', JSON.stringify(orders)); }
+
+        // Gestione Aggiunta / Edizione Prodotto
+        function handleSaveProduct(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit-prod-id').value;
+
+            const prodData = {
+                id: editId ? parseInt(editId) : Date.now(),
+                title: document.getElementById('new-prod-title').value,
+                category: document.getElementById('new-prod-category').value,
+                price: parseFloat(document.getElementById('new-prod-price').value),
+                time: document.getElementById('new-prod-time').value,
+                material: document.getElementById('new-prod-material').value,
+                image: document.getElementById('new-prod-image').value,
+                desc: document.getElementById('new-prod-desc').value
+            };
+
+            if(editId) {
+                const idx = products.findIndex(p => p.id === parseInt(editId));
+                if(idx !== -1) products[idx] = prodData;
+            } else {
+                products.unshift(prodData);
+            }
+
+            localStorage.setItem('ls3d_products', JSON.stringify(products));
+            renderProducts();
+            renderAdminProductsList();
+            resetProductForm();
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if(!p) return;
+
+            document.getElementById('edit-prod-id').value = p.id;
+            document.getElementById('new-prod-title').value = p.title;
+            document.getElementById('new-prod-category').value = p.category;
+            document.getElementById('new-prod-price').value = p.price;
+            document.getElementById('new-prod-time').value = p.time;
+            document.getElementById('new-prod-material').value = p.material;
+            document.getElementById('new-prod-image').value = p.image;
+            document.getElementById('new-prod-desc').value = p.desc;
+
+            document.getElementById('form-title').innerText = "Modifica Prodotto Esistente";
+            document.getElementById('save-prod-btn').innerText = "Aggiorna Prodotto";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        }
+
+        function resetProductForm() {
+            document.getElementById('edit-prod-id').value = "";
+            document.getElementById('form-title').innerText = "Aggiungi Nuovo Prodotto";
+            document.getElementById('save-prod-btn').innerText = "+ Salva Prodotto nel Catalogo";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.querySelectorAll('#admin-tab-products form input, #admin-tab-products form textarea').forEach(i => i.value = "");
+        }
+
+        function deleteProduct(id) {
+            if(confirm('Eliminare questo prodotto dal catalogo?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('ls3d_products', JSON.stringify(products));
+                renderProducts();
+                renderAdminProductsList();
+            }
+        }
+
+        function renderAdminProductsList() {
+            const list = document.getElementById('admin-products-list');
+            list.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between p-3 bg-gray-800 rounded-lg text-xs">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image}" class="w-8 h-8 rounded object-cover">
+                        <div>
+                            <div class="font-bold text-white">${p.title}</div>
+                            <div class="text-gray-400 font-mono">€${p.price.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="editProduct(${p.id})" class="p-1.5 text-brand-400 hover:bg-gray-700 rounded">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteProduct(${p.id})" class="p-1.5 text-red-400 hover:bg-red-500/20 rounded">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Esportazione e Importazione Dati (Backup)
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ products, orders }, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `ls3d_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(e) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(event) {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if(parsed.products) {
+                        products = parsed.products;
+                        localStorage.setItem('ls3d_products', JSON.stringify(products));
+                    }
+                    if(parsed.orders) {
+                        orders = parsed.orders;
+                        localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+                    }
+                    renderProducts();
+                    renderAdminProductsList();
+                    renderAdminShipments();
+                    alert('Backup ripristinato con successo!');
+                } catch(err) {
+                    alert('Errore nel caricamento del file di backup.');
+                }
+            };
+            fileReader.readAsText(e.target.files[0]);
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
