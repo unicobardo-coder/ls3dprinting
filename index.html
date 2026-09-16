@@ -91,123 +91,185 @@
     <!-- Content Wrapper per Navigazione Pagine -->
     <div id="main-content">
 
-        <!-- Hero Section -->
-        <section id="hero-section" class="relative py-16 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6">
-                    <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
-                </span>
-                <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
-                    Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
-                </h1>
-                <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
-                    Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
-                </p>
-            </div>
-        </section>
-
-        <!-- Sezione Catalogo Prodotti e Filtri -->
-        <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white mb-2">Catalogo Creazioni 3D</h2>
-                        <p class="text-gray-400 text-sm">Sfoglia le nostre creazioni, filtra per categoria e aggiungi direttamente al carrello.</p>
-                    </div>
+        <!-- VISTA HOME / CATALOGO COMPLETO -->
+        <div id="home-view">
+            <!-- Hero Section -->
+            <section id="hero-section" class="relative py-16 overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6">
+                        <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
+                    </span>
+                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
+                        Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
+                    </h1>
+                    <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
+                        Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
+                    </p>
                 </div>
+            </section>
 
-                <!-- Barra dei Filtri Categoria -->
-                <div id="category-filters" class="flex flex-wrap gap-2 mb-8">
-                    <!-- Popolato via JS -->
-                </div>
-
-                <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Caricato via JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Sezione Form Richiesta Info -->
-        <section id="info" class="py-16 bg-dark-bg">
-            <div class="max-w-3xl mx-auto px-4">
-                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
-                            <i data-lucide="mail" class="w-6 h-6"></i>
-                        </div>
+            <!-- Sezione Catalogo Prodotti e Filtri -->
+            <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                         <div>
-                            <h2 class="text-xl font-bold text-white">Richiedi Informazioni o Preventivo</h2>
-                            <p class="text-xs text-gray-400">Compila il modulo per un preventivo personalizzato</p>
+                            <h2 class="text-2xl font-bold text-white mb-2">Catalogo Creazioni 3D</h2>
+                            <p class="text-gray-400 text-sm">Sfoglia le nostre creazioni, filtra per categoria e aggiungi direttamente al carrello.</p>
                         </div>
                     </div>
 
-                    <form onsubmit="handleContactSubmit(event)" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-mono text-gray-300 mb-1">Nome e Cognome</label>
-                                <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
+                    <!-- Barra dei Filtri Categoria -->
+                    <div id="category-filters" class="flex flex-wrap gap-2 mb-8">
+                        <!-- Popolato via JS -->
+                    </div>
+
+                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Caricato via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione Form Richiesta Info -->
+            <section id="info" class="py-16 bg-dark-bg">
+                <div class="max-w-3xl mx-auto px-4">
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
+                                <i data-lucide="mail" class="w-6 h-6"></i>
                             </div>
                             <div>
-                                <label class="block text-xs font-mono text-gray-300 mb-1">Email / Telefono</label>
-                                <input type="text" id="info-contact" required placeholder="mario@email.it o 333..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
+                                <h2 class="text-xl font-bold text-white">Richiedi Informazioni o Preventivo</h2>
+                                <p class="text-xs text-gray-400">Compila il modulo per un preventivo personalizzato</p>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-mono text-gray-300 mb-1">Tipo di Servizio</label>
-                            <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                                <option value="Preventivo Personalizzato">Preventivo Stampa 3D Personalizzata</option>
-                                <option value="Informazioni Prodotto">Informazioni su Prodotto in Catalogo</option>
-                                <option value="Prototipazione">Prototipazione Tecnica</option>
-                                <option value="Altro">Altro</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-mono text-gray-300 mb-1">Messaggio / Dettagli Progetto</label>
-                            <textarea id="info-message" rows="4" required placeholder="Descrivi la tua richiesta..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
-                        </div>
-                        <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2">
-                            <i data-lucide="send" class="w-4 h-4"></i> Invia Richiesta via WhatsApp
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
 
-        <!-- Sezione Traccia Spedizioni -->
-        <section id="traccia" class="py-16 bg-dark-surface/20 border-t border-gray-800/80">
-            <div class="max-w-3xl mx-auto px-4">
-                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
-                            <i data-lucide="package-search" class="w-6 h-6"></i>
+                        <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-mono text-gray-300 mb-1">Nome e Cognome</label>
+                                    <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-mono text-gray-300 mb-1">Email / Telefono</label>
+                                    <input type="text" id="info-contact" required placeholder="mario@email.it o 333..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-mono text-gray-300 mb-1">Tipo di Servizio</label>
+                                <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
+                                    <option value="Preventivo Personalizzato">Preventivo Stampa 3D Personalizzata</option>
+                                    <option value="Informazioni Prodotto">Informazioni su Prodotto in Catalogo</option>
+                                    <option value="Prototipazione">Prototipazione Tecnica</option>
+                                    <option value="Altro">Altro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-mono text-gray-300 mb-1">Messaggio / Dettagli Progetto</label>
+                                <textarea id="info-message" rows="4" required placeholder="Descrivi la tua richiesta..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i> Invia Richiesta via WhatsApp
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione Traccia Spedizioni -->
+            <section id="traccia" class="py-16 bg-dark-surface/20 border-t border-gray-800/80">
+                <div class="max-w-3xl mx-auto px-4">
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
+                                <i data-lucide="package-search" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-white">Traccia il tuo Ordine</h2>
+                                <p class="text-xs text-gray-400">Inserisci il codice ordine per verificare lo stato</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 class="text-xl font-bold text-white">Traccia il tuo Ordine</h2>
-                            <p class="text-xs text-gray-400">Inserisci il codice ordine per verificare lo stato</p>
+
+                        <div class="flex gap-2 mb-6">
+                            <input type="text" id="track-input" placeholder="Es. LS-8921" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono text-sm uppercase focus:border-brand-500 focus:outline-none">
+                            <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm rounded-xl transition-all">
+                                Cerca
+                            </button>
                         </div>
+
+                        <div id="track-result" class="hidden border-t border-gray-800 pt-6"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- VISTA DEDICATA: CHI SIAMO -->
+        <div id="chi-siamo-view" class="hidden py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header Sezione -->
+                <div class="text-center mb-12">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Ingegneria & Prototipazione
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+                        Chi Siamo — <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
+                    </h1>
+                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
+                        Passione per la tecnologia, cura del dettaglio geometrico e soluzioni di produzione additiva su misura.
+                    </p>
+                </div>
+
+                <!-- Card Descrizione Principale -->
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-10 shadow-2xl mb-12">
+                    <h2 class="text-2xl font-bold text-white mb-4">La Nostra Missione</h2>
+                    <p class="text-gray-300 leading-relaxed mb-6">
+                        LS 3D Printing nasce con l'obiettivo di trasformare concetti complessi, idee grafiche e modelli CAD in oggetti reali ad alta precisione. Combinando l'utilizzo di materiali tecnici avanzati (PLA+, PETG, TPU) e la modellazione 3D parametrica, realizziamo prototipi funzionali, elementi di arredo di design e accessori personalizzati.
+                    </p>
+                    <p class="text-gray-300 leading-relaxed">
+                        Ogni pezzo viene stampato, rifinito e verificato singolarmente prima della spedizione, garantendo una resistenza meccanica ottimale e una finitura estetica impeccabile.
+                    </p>
+                </div>
+
+                <!-- Griglia dei Punti di Forza -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
+                        <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Qualità Garantita</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Controlli tolleranza dimensione e finitura superficiale su ciascuna stampa effettuata.
+                        </p>
                     </div>
 
-                    <div class="flex gap-2 mb-6">
-                        <input type="text" id="track-input" placeholder="Es. LS-8921" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono text-sm uppercase focus:border-brand-500 focus:outline-none">
-                        <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm rounded-xl transition-all">
-                            Cerca
-                        </button>
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
+                        <div class="w-12 h-12 rounded-xl bg-accent-500/10 border border-accent-500/30 flex items-center justify-center text-accent-400 mb-4">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Design Su Misura</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Progettazione personalizzata su indicazione del cliente per progetti tecnici o estetici.
+                        </p>
                     </div>
 
-                    <div id="track-result" class="hidden border-t border-gray-800 pt-6"></div>
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
+                        <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
+                            <i data-lucide="truck" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Spedizioni Tracciabili</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Consegne veloci con corriere espresso e tracciamento in tempo reale direttamente dal sito.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pulsante di Ritorno -->
+                <div class="text-center">
+                    <button onclick="showPage('prodotti')" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-500/20">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna al Catalogo Prodotti
+                    </button>
                 </div>
             </div>
-        </section>
-
-        <!-- Sezione Chi Siamo -->
-        <section id="chi-siamo" class="py-16 bg-dark-bg hidden">
-            <div class="max-w-4xl mx-auto px-4">
-                <h1 class="text-3xl font-extrabold text-white mb-6">Chi Siamo - LS 3D Printing</h1>
-                <p class="text-gray-300 leading-relaxed mb-4">
-                    Siamo uno studio specializzato in prototipazione rapida, modellazione 3D e stampa ad alta precisione. Nati nel 2026, il nostro obiettivo è progettare e produrre componenti su misura e prodotti di design unici in 3D.
-                </p>
-            </div>
-        </section>
+        </div>
 
     </div>
 
@@ -497,6 +559,26 @@
         let selectedCategory = 'all';
         let cardImageIndexes = {};
         let uploadedImages = [];
+
+        // NAVIGAZIONE PAGINE
+        function showPage(pageId) {
+            const homeView = document.getElementById('home-view');
+            const chiSiamoView = document.getElementById('chi-siamo-view');
+
+            if (pageId === 'chi-siamo') {
+                homeView.classList.add('hidden');
+                chiSiamoView.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                chiSiamoView.classList.add('hidden');
+                homeView.classList.remove('hidden');
+                if (pageId !== 'home') {
+                    document.getElementById(pageId)?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        }
 
         // --- RENDER PRODOTTI E CAROUSEL ---
         function renderProducts() {
@@ -914,27 +996,6 @@
                 `;
             } else {
                 res.innerHTML = `<div class="text-red-400 text-xs font-mono text-center">Nessun ordine trovato con questo codice.</div>`;
-            }
-        }
-
-        function showPage(pageId) {
-            const sections = ['hero-section', 'prodotti', 'info', 'traccia', 'chi-siamo'];
-            
-            if(pageId === 'chi-siamo') {
-                sections.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.classList.add('hidden');
-                });
-                document.getElementById('chi-siamo').classList.remove('hidden');
-            } else {
-                sections.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.classList.remove('hidden');
-                });
-                document.getElementById('chi-siamo').classList.add('hidden');
-                if(pageId !== 'home') {
-                    document.getElementById(pageId)?.scrollIntoView({ behavior: 'smooth' });
-                }
             }
         }
 
