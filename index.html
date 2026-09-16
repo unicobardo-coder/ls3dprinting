@@ -56,7 +56,7 @@
     <!-- Header Navigation -->
     <header class="sticky top-0 z-40 glass-panel border-b border-gray-800/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-3 group">
+            <a href="#" onclick="showPage('home')" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-mono font-black text-black text-xl shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
                     LS
                 </div>
@@ -67,10 +67,10 @@
             </a>
 
             <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-300">
-                <a href="#prodotti" class="hover:text-brand-400 transition-colors">Prodotti</a>
-                <a href="#info" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
-                <a href="#traccia" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
-                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors">Chi siamo?</a>
+                <a href="#" onclick="showPage('prodotti')" class="hover:text-brand-400 transition-colors">Prodotti</a>
+                <a href="#" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors">Chi Siamo</a>
+                <a href="#" onclick="showPage('info')" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
+                <a href="#" onclick="showPage('traccia')" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -82,13 +82,13 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="relative py-16 overflow-hidden">
+    <section id="hero-section" class="relative py-16 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6">
                 <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
             </span>
             <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
-                Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
+                Dai Forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
             </h1>
             <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
                 Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
@@ -239,11 +239,9 @@
         </div>
     </section>
 
-<!-- Sezione Chi Siamo -->
+    <!-- Sezione Chi Siamo -->
     <section id="chi-siamo" class="py-16 bg-dark-bg hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
-            
-            <!-- Header Sezione -->
             <div class="text-center mb-12">
                 <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4">
                     <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Chi Siamo
@@ -255,8 +253,7 @@
                     Trasformiamo idee complesse in oggetti reali e funzionali, combinando competenze di ingegneria, creatività e tecnologie di produzione additiva all'avanguardia.
                 </p>
             </div>
-    
-            <!-- Griglia Punti di Forza -->
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 hover:border-brand-500/50 transition-all">
                     <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
@@ -267,7 +264,7 @@
                         Sviluppo di componenti meccanici, supporti e parti su misura con tolleranze elevate e materiali ad alte prestazioni.
                     </p>
                 </div>
-    
+
                 <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 hover:border-brand-500/50 transition-all">
                     <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
                         <i data-lucide="palette" class="w-5 h-5"></i>
@@ -277,7 +274,7 @@
                         Creazioni artistiche, accessori per la casa ed elementi d'arredo unici caratterizzati da geometrie moderne e finiture bicolore.
                     </p>
                 </div>
-    
+
                 <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 hover:border-brand-500/50 transition-all">
                     <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
                         <i data-lucide="shield-check" class="w-5 h-5"></i>
@@ -288,28 +285,21 @@
                     </p>
                 </div>
             </div>
-    
-            <!-- Box Descrittivo Approfondito -->
+
             <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
                 <div class="space-y-4 text-gray-300 text-sm leading-relaxed">
                     <h2 class="text-xl font-bold text-white mb-4">La Nostra Missione</h2>
                     <p>
                         <strong>LS 3D Printing</strong> nasce dall'esigenza di offrire un servizio di stampa 3D flessibile, preciso e orientato alla risoluzione di problemi reali. Che si tratti di sostituire un componente introvabile, realizzare un prototipo funzionale per un progetto tecnico o stampare un oggetto d'arredo personalizzato, curiamo ogni fase del processo: dalla scelta del filamento più adatto (PLA+, PETG, TPU) fino all'ottimizzazione del modello 3D.
                     </p>
-                    <p>
-                        Crediamo nella trasparenza, nel contatto diretto con il cliente e nella rapidità di consegna. Per questo offriamo sia l'acquisto diretto in catalogo che la possibilità di concordare personalizzazioni su misura in tempo reale via WhatsApp.
-                    </p>
                 </div>
-    
-                <!-- Call to Action finale -->
                 <div class="mt-8 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <span class="text-xs font-mono text-gray-400">Hai un progetto in mente o un file 3D da stampare?</span>
-                    <a href="#info" onclick="showPage('info')" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-xs flex items-center gap-2 transition-all">
+                    <button onclick="showPage('info')" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-xs flex items-center gap-2 transition-all">
                         <i data-lucide="message-square" class="w-4 h-4"></i> Richiedi un Preventivo
-                    </a>
+                    </button>
                 </div>
             </div>
-    
         </div>
     </section>
 
@@ -419,7 +409,7 @@
                             <input type="text" id="new-prod-preview-text" placeholder="Es. Design geometrico futurista bicolore..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
                         </div>
 
-                        <!-- Area Caricamento Immagini (Opzionale) -->
+                        <!-- Area Caricamento Immagini -->
                         <div>
                             <label class="block text-xs font-mono text-gray-400 mb-1">Foto del Prodotto (Trascina o Seleziona - Opzionale)</label>
                             <div class="border-2 border-dashed border-gray-700 hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer bg-gray-800/40 transition-all mb-3" id="drop-zone" onclick="document.getElementById('file-input').click()">
@@ -502,6 +492,34 @@
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || defaultProducts;
         let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || defaultOrders;
         let uploadedImages = [];
+
+        function showPage(pageId) {
+            const allSections = ['hero-section', 'prodotti', 'info', 'traccia', 'chi-siamo'];
+            
+            if (pageId === 'chi-siamo') {
+                allSections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                const chiSiamoEl = document.getElementById('chi-siamo');
+                if (chiSiamoEl) chiSiamoEl.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                allSections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && id !== 'chi-siamo') el.classList.remove('hidden');
+                });
+                const chiSiamoEl = document.getElementById('chi-siamo');
+                if (chiSiamoEl) chiSiamoEl.classList.add('hidden');
+                
+                if (pageId !== 'home') {
+                    const targetEl = document.getElementById(pageId);
+                    if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        }
 
         function renderProducts() {
             const grid = document.getElementById('products-grid');
@@ -606,7 +624,6 @@
             }
         }
 
-        // Drag & Drop Handlers
         const dropZone = document.getElementById('drop-zone');
         if(dropZone) {
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -766,7 +783,6 @@
             closeCheckoutModal();
             e.target.reset();
 
-            // Opzionale: Notifica automatica via WhatsApp al cliente/proprietario
             const waText = `Ciao LS 3D Printing!\nHo effettuato un nuovo ordine sul sito:\n- Codice: ${newOrder.id}\n- Prodotto: ${p.title}\n- Cliente: ${name}\n- Indirizzo: ${address}`;
             window.open(`https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(waText)}`, '_blank');
         }
@@ -1027,33 +1043,6 @@
                 }
             };
             fileReader.readAsText(e.target.files[0]);
-        }
-
-        populateCategoryDropdowns();
-        renderProducts();
-        <script>
-        // ... (tutto il codice JS esistente) ...
-
-        // AGGIUNGI QUI QUESTA FUNZIONE IN FONDO
-        function showPage(pageId) {
-            const sections = ['prodotti', 'info', 'traccia', 'chi-siamo'];
-            
-            if(pageId === 'chi-siamo') {
-                sections.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.classList.add('hidden');
-                });
-                document.getElementById('chi-siamo').classList.remove('hidden');
-            } else {
-                sections.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.classList.remove('hidden');
-                });
-                document.getElementById('chi-siamo').classList.add('hidden');
-                if(pageId !== 'home') {
-                    document.getElementById(pageId)?.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
         }
 
         populateCategoryDropdowns();
