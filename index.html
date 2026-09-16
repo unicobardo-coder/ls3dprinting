@@ -70,7 +70,7 @@
                 <a href="#prodotti" class="hover:text-brand-400 transition-colors">Prodotti</a>
                 <a href="#info" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
                 <a href="#traccia" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
-                <a href="#traccia" class="hover:text-brand-400 transition-colors">Chi siamo?</a>
+                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors">Chi siamo?</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -239,24 +239,80 @@
         </div>
     </section>
 
-    <!-- chi siamo -->
+<!-- Sezione Chi Siamo -->
     <section id="chi-siamo" class="py-16 bg-dark-bg hidden">
-        <div class="max-w-4xl mx-auto px-4">
-            <h1 class="text-3xl font-extrabold text-white mb-6">Chi Siamo - LS 3D Printing</h1>
-            <p class="text-gray-300 leading-relaxed mb-4">
-                Siamo uno studio specializzato in prototipazione rapida, modellazione 3D e stampa ad alta precisione. Nati nel 2026 il nostro obiettivo è disegnare e produrre stampati 3D.
-            </p>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            
+            <!-- Header Sezione -->
+            <div class="text-center mb-12">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Chi Siamo
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+                    Passione per il Design, <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">Precisione nella Stampa 3D</span>
+                </h1>
+                <p class="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">
+                    Trasformiamo idee complesse in oggetti reali e funzionali, combinando competenze di ingegneria, creatività e tecnologie di produzione additiva all'avanguardia.
+                </p>
+            </div>
+    
+            <!-- Griglia Punti di Forza -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 hover:border-brand-500/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Prototipazione Tecnica</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        Sviluppo di componenti meccanici, supporti e parti su misura con tolleranze elevate e materiali ad alte prestazioni.
+                    </p>
+                </div>
+    
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 hover:border-brand-500/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
+                        <i data-lucide="palette" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Design & Decorazione</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        Creazioni artistiche, accessori per la casa ed elementi d'arredo unici caratterizzati da geometrie moderne e finiture bicolore.
+                    </p>
+                </div>
+    
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 hover:border-brand-500/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Qualità Garantita</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        Ogni pezzo viene verificato singolarmente prima della spedizione, garantendo massima resistenza strutturale ed estetica impeccabile.
+                    </p>
+                </div>
+            </div>
+    
+            <!-- Box Descrittivo Approfondito -->
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <div class="space-y-4 text-gray-300 text-sm leading-relaxed">
+                    <h2 class="text-xl font-bold text-white mb-4">La Nostra Missione</h2>
+                    <p>
+                        <strong>LS 3D Printing</strong> nasce dall'esigenza di offrire un servizio di stampa 3D flessibile, preciso e orientato alla risoluzione di problemi reali. Che si tratti di sostituire un componente introvabile, realizzare un prototipo funzionale per un progetto tecnico o stampare un oggetto d'arredo personalizzato, curiamo ogni fase del processo: dalla scelta del filamento più adatto (PLA+, PETG, TPU) fino all'ottimizzazione del modello 3D.
+                    </p>
+                    <p>
+                        Crediamo nella trasparenza, nel contatto diretto con il cliente e nella rapidità di consegna. Per questo offriamo sia l'acquisto diretto in catalogo che la possibilità di concordare personalizzazioni su misura in tempo reale via WhatsApp.
+                    </p>
+                </div>
+    
+                <!-- Call to Action finale -->
+                <div class="mt-8 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <span class="text-xs font-mono text-gray-400">Hai un progetto in mente o un file 3D da stampare?</span>
+                    <a href="#info" onclick="showPage('info')" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-xs flex items-center gap-2 transition-all">
+                        <i data-lucide="message-square" class="w-4 h-4"></i> Richiedi un Preventivo
+                    </a>
+                </div>
+            </div>
+    
         </div>
     </section>
 
-<!-- Modal Admin -->
-<div id="admin-modal" class="fixed inset-0 z-50 ...">
-
-
-
-
-
-    
     <!-- Modal Admin -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -1002,9 +1058,6 @@
 
         populateCategoryDropdowns();
         renderProducts();
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
