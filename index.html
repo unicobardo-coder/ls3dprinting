@@ -239,6 +239,24 @@
         </div>
     </section>
 
+    <!-- chi siamo -->
+    <section id="chi-siamo" class="py-16 bg-dark-bg hidden">
+        <div class="max-w-4xl mx-auto px-4">
+            <h1 class="text-3xl font-extrabold text-white mb-6">Chi Siamo - LS 3D Printing</h1>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                Siamo uno studio specializzato in prototipazione rapida, modellazione 3D e stampa ad alta precisione. Nati nel 2026 il nostro obiettivo è disegnare e produrre stampati 3D.
+            </p>
+        </div>
+    </section>
+
+<!-- Modal Admin -->
+<div id="admin-modal" class="fixed inset-0 z-50 ...">
+
+
+
+
+
+    
     <!-- Modal Admin -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -957,6 +975,36 @@
 
         populateCategoryDropdowns();
         renderProducts();
+        <script>
+        // ... (tutto il codice JS esistente) ...
+
+        // AGGIUNGI QUI QUESTA FUNZIONE IN FONDO
+        function showPage(pageId) {
+            const sections = ['prodotti', 'info', 'traccia', 'chi-siamo'];
+            
+            if(pageId === 'chi-siamo') {
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('hidden');
+                });
+                document.getElementById('chi-siamo').classList.remove('hidden');
+            } else {
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.remove('hidden');
+                });
+                document.getElementById('chi-siamo').classList.add('hidden');
+                if(pageId !== 'home') {
+                    document.getElementById(pageId)?.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+
+        populateCategoryDropdowns();
+        renderProducts();
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
