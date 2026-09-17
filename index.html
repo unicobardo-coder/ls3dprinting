@@ -247,7 +247,7 @@
                             <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
                         </div>
                         <input type="text" id="new-prod-shortdesc" required placeholder="Descrizione Breve (Home)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
-                        
+                        <textarea id="new-prod-fulldesc" rows="3" placeholder="Descrizione Dettagliata (per i dettagli del prodotto)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white"></textarea>
                         <div>
                             <label class="block text-gray-400 mb-1">Categorie Multiple:</label>
                             <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
@@ -350,13 +350,13 @@
             const grid = document.getElementById('products-grid');
             const visible = products.filter(p => !p.hidden);
             const filtered = selectedCategory === "Tutti" ? visible : visible.filter(p => p.categories && p.categories.includes(selectedCategory));
-
+        
             grid.innerHTML = filtered.map(p => {
                 const imgs = (p.images && p.images.length > 0) ? p.images : [defaultImg];
                 const activeIndex = activeImageIndices[p.id] || 0;
                 const colors = p.colors || [];
                 const currentColor = selectedProductColors[p.id] || colors[0] || 'Standard';
-
+        
                 return `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
@@ -372,7 +372,8 @@
                                 ${(p.categories || []).map(c => `<span class="bg-gray-800 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-700">${c}</span>`).join('')}
                             </div>
                             <h3 class="text-lg font-bold text-white mb-1">${p.title}</h3>
-                            <p class="text-brand-400 text-xs font-semibold mb-4">${p.shortDesc || ''}</p>
+                            <p class="text-brand-400 text-xs font-semibold mb-2">${p.shortDesc || ''}</p>
+                            <p class="text-gray-400 text-xs mb-4">${p.desc || ''}</p>
                             ${colors.length > 0 ? `
                                 <div class="mb-4">
                                     <label class="block text-[10px] font-mono text-gray-400 mb-1">Seleziona Colore:</label>
@@ -616,6 +617,8 @@
             document.getElementById('new-prod-price').value = p.price;
             document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
             document.getElementById('new-prod-hidden').checked = p.hidden || false;
+            document.getElementById('new-prod-shortdesc').value = '';
+            document.getElementById('new-prod-fulldesc').value = ''; // Pulisce la descrizione dettagliata
             document.getElementById('btn-save-prod').innerText = "Aggiorna Prodotto";
 
             document.querySelectorAll('input[name="prod-categories"]').forEach(cb => cb.checked = p.categories && p.categories.includes(cb.value));
@@ -628,6 +631,8 @@
             document.getElementById('new-prod-title').value = '';
             document.getElementById('new-prod-price').value = '';
             document.getElementById('new-prod-shortdesc').value = '';
+            document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
+            document.getElementById('new-prod-fulldesc').value = p.desc || ''; // Riempie la descrizione dettagliata
             document.getElementById('new-prod-hidden').checked = false;
             document.getElementById('img-files-input').value = '';
             document.getElementById('btn-save-prod').innerText = "+ Salva Prodotto";
