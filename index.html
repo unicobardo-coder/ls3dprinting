@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS 3D Printing - Stampa 3D su Misura & Spedizioni</title>
+    <title>LS3Dmaker - Stampa 3D su Misura & Spedizioni</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=EUR"></script>
+
+    <!-- Three.js & STLLoader per la visualizzazione dei modelli 3D STL -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -49,6 +56,11 @@
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
+        .stl-canvas-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
+        }
     </style>
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-black">
@@ -61,71 +73,76 @@
                     LS
                 </div>
                 <div class="flex flex-col">
-                    <span class="font-bold text-lg tracking-tight group-hover:text-brand-400 transition-colors">LS 3D PRINTING</span>
-                    <span class="text-[10px] text-gray-400 font-mono tracking-wider">CREATIVITÀ & PROTOTIPAZIONE</span>
+                    <span class="font-bold text-lg tracking-tight group-hover:text-brand-400 transition-colors">LS3Dmaker</span>
+                    <span class="text-[10px] text-gray-400 font-mono tracking-wider" id="txt-nav-subtitle">CREATIVITÀ & PROTOTIPAZIONE</span>
                 </div>
             </a>
 
-            <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-300">
-                <a href="#prodotti" onclick="showPage('prodotti')" class="hover:text-brand-400 transition-colors">Prodotti</a>
-                <a href="#info" onclick="showPage('info')" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
-                <a href="#traccia" onclick="showPage('traccia')" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
-                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors">Chi siamo?</a>
+            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
+                <a href="#prodotti" onclick="showPage('prodotti')" class="hover:text-brand-400 transition-colors" id="nav-products">Prodotti</a>
+                <a href="#info" onclick="showPage('info')" class="hover:text-brand-400 transition-colors" id="nav-info">Richiedi Info</a>
+                <a href="#traccia" onclick="showPage('traccia')" class="hover:text-brand-400 transition-colors" id="nav-track">Traccia Spedizione</a>
+                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors" id="nav-about">Chi siamo?</a>
             </nav>
 
             <div class="flex items-center gap-3">
+                <!-- Selector Lingua -->
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded-xl px-2 py-1.5 font-mono focus:outline-none focus:border-brand-500">
+                    <option value="it">🇮🇹 IT</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="es">🇪🇸 ES</option>
+                    <option value="de">🇩🇪 DE</option>
+                </select>
+
                 <!-- Tasto Carrello -->
                 <button onclick="openCartModal()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-mono border border-brand-500/30 transition-all">
                     <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline font-bold">Carrello</span>
+                    <span class="hidden sm:inline font-bold" id="btn-cart-text">Carrello</span>
                     <span id="cart-badge" class="px-1.5 py-0.5 rounded-full bg-brand-500 text-black text-[10px] font-bold">0</span>
                 </button>
 
                 <button onclick="openAdminModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-mono border border-gray-700 transition-all">
-                    <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-400"></i> Area Admin
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-400"></i> Admin
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Content Wrapper per Navigazione Pagine -->
+    <!-- Content Wrapper -->
     <div id="main-content">
 
-        <!-- VISTA HOME / CATALOGO COMPLETO -->
+        <!-- VISTA HOME / CATALOGO -->
         <div id="home-view">
             <!-- Hero Section -->
             <section id="hero-section" class="relative py-16 overflow-hidden">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6" id="hero-badge">
                         <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
                     </span>
-                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
-                        Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
+                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight" id="hero-title">
+                        Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
                     </h1>
-                    <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
+                    <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8" id="hero-desc">
                         Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
                     </p>
                 </div>
             </section>
 
-            <!-- Sezione Catalogo Prodotti e Filtri -->
+            <!-- Sezione Catalogo Prodotti -->
             <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                         <div>
-                            <h2 class="text-2xl font-bold text-white mb-2">Catalogo Creazioni 3D</h2>
-                            <p class="text-gray-400 text-sm">Sfoglia le nostre creazioni, filtra per categoria e aggiungi direttamente al carrello.</p>
+                            <h2 class="text-2xl font-bold text-white mb-2" id="catalog-title">Catalogo Creazioni 3D</h2>
+                            <p class="text-gray-400 text-sm" id="catalog-subtitle">Sfoglia le nostre creazioni, ispeziona i modelli STL in 3D e aggiungi al carrello.</p>
                         </div>
                     </div>
 
-                    <!-- Barra dei Filtri Categoria -->
-                    <div id="category-filters" class="flex flex-wrap gap-2 mb-8">
-                        <!-- Popolato via JS -->
-                    </div>
+                    <!-- Filtri Categoria -->
+                    <div id="category-filters" class="flex flex-wrap gap-2 mb-8"></div>
 
-                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Caricato via JS -->
-                    </div>
+                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
             </section>
 
@@ -138,24 +155,24 @@
                                 <i data-lucide="mail" class="w-6 h-6"></i>
                             </div>
                             <div>
-                                <h2 class="text-xl font-bold text-white">Richiedi Informazioni o Preventivo</h2>
-                                <p class="text-xs text-gray-400">Compila il modulo per un preventivo personalizzato</p>
+                                <h2 class="text-xl font-bold text-white" id="info-form-title">Richiedi Informazioni o Preventivo</h2>
+                                <p class="text-xs text-gray-400" id="info-form-subtitle">Compila il modulo per un preventivo personalizzato</p>
                             </div>
                         </div>
 
                         <form onsubmit="handleContactSubmit(event)" class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-mono text-gray-300 mb-1">Nome e Cognome</label>
+                                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-name">Nome e Cognome</label>
                                     <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-mono text-gray-300 mb-1">Email / Telefono</label>
+                                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-contact">Email / Telefono</label>
                                     <input type="text" id="info-contact" required placeholder="mario@email.it o 333..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-mono text-gray-300 mb-1">Tipo di Servizio</label>
+                                <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-service">Tipo di Servizio</label>
                                 <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
                                     <option value="Preventivo Personalizzato">Preventivo Stampa 3D Personalizzata</option>
                                     <option value="Informazioni Prodotto">Informazioni su Prodotto in Catalogo</option>
@@ -164,11 +181,11 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-mono text-gray-300 mb-1">Messaggio / Dettagli Progetto</label>
+                                <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-message">Messaggio / Dettagli Progetto</label>
                                 <textarea id="info-message" rows="4" required placeholder="Descrivi la tua richiesta..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
                             </div>
                             <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="send" class="w-4 h-4"></i> Invia Richiesta via WhatsApp
+                                <i data-lucide="send" class="w-4 h-4"></i> <span id="btn-send-wa">Invia Richiesta via WhatsApp</span>
                             </button>
                         </form>
                     </div>
@@ -184,14 +201,14 @@
                                 <i data-lucide="package-search" class="w-6 h-6"></i>
                             </div>
                             <div>
-                                <h2 class="text-xl font-bold text-white">Traccia il tuo Ordine</h2>
-                                <p class="text-xs text-gray-400">Inserisci il codice ordine per verificare lo stato</p>
+                                <h2 class="text-xl font-bold text-white" id="track-title">Traccia il tuo Ordine</h2>
+                                <p class="text-xs text-gray-400" id="track-subtitle">Inserisci il codice ordine per verificare lo stato</p>
                             </div>
                         </div>
 
                         <div class="flex gap-2 mb-6">
                             <input type="text" id="track-input" placeholder="Es. LS-8921" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono text-sm uppercase focus:border-brand-500 focus:outline-none">
-                            <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm rounded-xl transition-all">
+                            <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm rounded-xl transition-all" id="btn-search">
                                 Cerca
                             </button>
                         </div>
@@ -205,66 +222,30 @@
         <!-- VISTA DEDICATA: CHI SIAMO -->
         <div id="chi-siamo-view" class="hidden py-16">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header Sezione -->
                 <div class="text-center mb-12">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4" id="about-badge">
                         <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Ingegneria & Prototipazione
                     </span>
                     <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-                        Chi Siamo — <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS 3D Printing</span>
+                        <span id="about-title">Chi Siamo — </span><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
                     </h1>
-                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
+                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto" id="about-desc">
                         Passione per la tecnologia, cura del dettaglio geometrico e soluzioni di produzione additiva su misura.
                     </p>
                 </div>
 
-                <!-- Card Descrizione Principale -->
                 <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-10 shadow-2xl mb-12">
-                    <h2 class="text-2xl font-bold text-white mb-4">La Nostra Missione</h2>
-                    <p class="text-gray-300 leading-relaxed mb-6">
-                        LS 3D Printing nasce con l'obiettivo di trasformare concetti complessi, idee grafiche e modelli CAD in oggetti reali ad alta precisione. Combinando l'utilizzo di materiali tecnici avanzati (PLA+, PETG, TPU) e la modellazione 3D parametrica, realizziamo prototipi funzionali, elementi di arredo di design e accessori personalizzati.
+                    <h2 class="text-2xl font-bold text-white mb-4" id="about-mission-title">La Nostra Missione</h2>
+                    <p class="text-gray-300 leading-relaxed mb-6" id="about-mission-p1">
+                        LS3Dmaker nasce con l'obiettivo di trasformare concetti complessi, idee grafiche e modelli CAD in oggetti reali ad alta precisione.
                     </p>
-                    <p class="text-gray-300 leading-relaxed">
-                        Ogni pezzo viene stampato, rifinito e verificato singolarmente prima della spedizione, garantendo una resistenza meccanica ottimale e una finitura estetica impeccabile.
+                    <p class="text-gray-300 leading-relaxed" id="about-mission-p2">
+                        Ogni pezzo viene stampato, rifinito e verificato singolarmente prima della spedizione.
                     </p>
                 </div>
 
-                <!-- Griglia dei Punti di Forza -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
-                        <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
-                            <i data-lucide="shield-check" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Qualità Garantita</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed">
-                            Controlli tolleranza dimensione e finitura superficiale su ciascuna stampa effettuata.
-                        </p>
-                    </div>
-
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
-                        <div class="w-12 h-12 rounded-xl bg-accent-500/10 border border-accent-500/30 flex items-center justify-center text-accent-400 mb-4">
-                            <i data-lucide="sparkles" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Design Su Misura</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed">
-                            Progettazione personalizzata su indicazione del cliente per progetti tecnici o estetici.
-                        </p>
-                    </div>
-
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
-                        <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-4">
-                            <i data-lucide="truck" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Spedizioni Tracciabili</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed">
-                            Consegne veloci con corriere espresso e tracciamento in tempo reale direttamente dal sito.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Pulsante di Ritorno -->
                 <div class="text-center">
-                    <button onclick="showPage('prodotti')" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-500/20">
+                    <button onclick="showPage('prodotti')" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-500/20" id="btn-back-catalog">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna al Catalogo Prodotti
                     </button>
                 </div>
@@ -285,34 +266,32 @@
                     <i data-lucide="shopping-cart" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold text-white">Il Tuo Carrello</h3>
-                    <p class="text-xs text-gray-400">Gestisci gli articoli prima di completare l'ordine</p>
+                    <h3 class="text-xl font-bold text-white" id="cart-modal-title">Il Tuo Carrello</h3>
+                    <p class="text-xs text-gray-400" id="cart-modal-subtitle">Gestisci gli articoli prima di completare l'ordine</p>
                 </div>
             </div>
 
-            <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 mb-6 border-y border-gray-800 py-4">
-                <!-- Caricato via JS -->
-            </div>
+            <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 mb-6 border-y border-gray-800 py-4"></div>
 
             <div class="flex justify-between items-center mb-6 font-mono p-4 bg-gray-900/60 rounded-xl border border-gray-800">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">Totale Stimato:</span>
+                <span class="text-xs text-gray-400 uppercase tracking-wider" id="cart-total-label">Totale Stimato:</span>
                 <span id="cart-total" class="text-2xl font-bold text-brand-400">€0.00</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button onclick="sendCartViaEmail()" class="w-full py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all">
-                    <i data-lucide="mail" class="w-4 h-4"></i> Salva / Invia via Email
+                    <i data-lucide="mail" class="w-4 h-4"></i> <span id="btn-save-email">Salva / Invia via Email</span>
                 </button>
                 <button onclick="openCheckoutFromCart()" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> Invia Ordine
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> <span id="btn-proceed-order">Procedi al Pagamento</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE ANTEPRIMA PRODOTTO -->
+    <!-- MODALE ANTEPRIMA PRODOTTO E VISUALIZZATORE 3D STL -->
     <div id="preview-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closePreviewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white z-10">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
@@ -320,35 +299,56 @@
         </div>
     </div>
 
-    <!-- MODALE CHECKOUT COMPLETO -->
+    <!-- MODALE CHECKOUT -->
     <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
 
             <div class="flex items-center gap-3 mb-6">
                 <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
-                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    <i data-lucide="credit-card" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold text-white">Completa l'Ordine</h3>
+                    <h3 class="text-xl font-bold text-white" id="checkout-title">Completa l'Ordine & Pagamento</h3>
                     <p class="text-xs text-gray-400" id="checkout-summary-title">Riepilogo Carrello</p>
                 </div>
             </div>
 
-            <form onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
+            <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-1">Nome e Cognome</label>
+                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-pay-name">Nome e Cognome</label>
                     <input type="text" id="checkout-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-1">Telefono (WhatsApp)</label>
+                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-pay-phone">Telefono (WhatsApp)</label>
                     <input type="tel" id="checkout-phone" required placeholder="+39 333 1234567" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-1">Indirizzo Completo di Spedizione</label>
+                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-pay-address">Indirizzo Completo di Spedizione</label>
                     <textarea id="checkout-address" rows="2" required placeholder="Via Roma 10, 40100 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-2">Seleziona Metodo di Pagamento:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer border border-gray-700 bg-gray-900 hover:border-brand-500 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
+                            <input type="radio" name="pay-method" value="whatsapp" checked onchange="togglePayMethod('whatsapp')" class="hidden">
+                            <i data-lucide="message-circle" class="w-5 h-5 text-brand-400 mb-1"></i>
+                            <span class="text-[11px] font-bold text-white">WhatsApp</span>
+                        </label>
+                        <label class="cursor-pointer border border-gray-700 bg-gray-900 hover:border-brand-500 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
+                            <input type="radio" name="pay-method" value="paypal" onchange="togglePayMethod('paypal')" class="hidden">
+                            <i data-lucide="wallet" class="w-5 h-5 text-blue-400 mb-1"></i>
+                            <span class="text-[11px] font-bold text-white">PayPal</span>
+                        </label>
+                        <label class="cursor-pointer border border-gray-700 bg-gray-900 hover:border-brand-500 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
+                            <input type="radio" name="pay-method" value="satispay" onchange="togglePayMethod('satispay')" class="hidden">
+                            <i data-lucide="smartphone" class="w-5 h-5 text-red-400 mb-1"></i>
+                            <span class="text-[11px] font-bold text-white">Satispay</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="p-4 bg-gray-900/60 border border-gray-800 rounded-xl flex justify-between items-center">
@@ -356,9 +356,21 @@
                     <span id="checkout-total-price" class="text-xl font-mono font-bold text-brand-400">€0.00</span>
                 </div>
 
-                <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> Conferma & Invia Ordine via WhatsApp
-                </button>
+                <div id="pay-box-whatsapp">
+                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Conferma & Ordina via WhatsApp
+                    </button>
+                </div>
+
+                <div id="pay-box-paypal" class="hidden space-y-3">
+                    <div id="paypal-button-container"></div>
+                </div>
+
+                <div id="pay-box-satispay" class="hidden">
+                    <button type="button" onclick="payWithSatispay()" class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20">
+                        <i data-lucide="smartphone" class="w-4 h-4"></i> Paga Ora con Satispay
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -377,7 +389,7 @@
                         <i data-lucide="shield-check" class="w-6 h-6"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-white">Accesso Riservato Admin</h3>
-                    <p class="text-gray-400 text-sm mt-1">Gestione Prodotti, Categorie & Spedizioni</p>
+                    <p class="text-gray-400 text-sm mt-1">Gestione LS3Dmaker</p>
                 </div>
                 
                 <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-sm mx-auto">
@@ -393,7 +405,6 @@
                     <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all shadow-lg shadow-brand-500/20">
                         Accedi al Pannello
                     </button>
-                    <p class="text-xs text-gray-500 text-center font-mono pt-2">Credenziali: admin / ls3d2026</p>
                 </form>
             </div>
 
@@ -402,851 +413,272 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-gray-800 gap-4">
                     <div class="flex items-center gap-3">
                         <div class="w-3 h-3 rounded-full bg-brand-500 animate-pulse"></div>
-                        <h3 class="text-xl font-bold text-white">Dashboard LS 3D Printing</h3>
+                        <h3 class="text-xl font-bold text-white">Dashboard LS3Dmaker</h3>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="exportData()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-mono text-brand-400 border border-gray-700 rounded-lg flex items-center gap-1">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Esporta Backup
-                        </button>
-                        <label class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-mono text-gray-300 border border-gray-700 rounded-lg cursor-pointer flex items-center gap-1">
-                            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Importa Backup
-                            <input type="file" id="import-file" onchange="importData(event)" accept=".json" class="hidden">
-                        </label>
-                        <button onclick="adminLogout()" class="text-xs font-mono text-red-400 hover:underline ml-2">Logout</button>
+                    <button onclick="adminLogout()" class="text-xs font-mono text-red-400 hover:underline">Logout</button>
+                </div>
+
+                <form onsubmit="handleSaveProduct(event)" class="space-y-4 mb-8 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Inserisci Nuovo Prodotto & Modello STL</h4>
+                    <input type="hidden" id="edit-prod-id">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 mb-1">Titolo Prodotto</label>
+                            <input type="text" id="new-prod-title" required placeholder="Es. Supporto STL" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 mb-1">Prezzo (€)</label>
+                            <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                        </div>
                     </div>
-                </div>
 
-                <div class="flex gap-4 border-b border-gray-800 mb-6">
-                    <button onclick="switchAdminTab('shipments')" id="tab-btn-shipments" class="pb-3 text-sm font-bold border-b-2 border-brand-500 text-brand-400">
-                        🚚 Ordini & Spedizioni
+                    <!-- Caricamento File STL -->
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 mb-1">Carica Modello STL 3D (Opzionale per anteprima 3D)</label>
+                        <input type="file" id="stl-file-input" accept=".stl" onchange="handleSTLSelect(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 mb-1">Descrizione Dettagliata</label>
+                        <textarea id="new-prod-desc" rows="3" required class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all">
+                        + Salva Prodotto & Modello 3D
                     </button>
-                    <button onclick="switchAdminTab('products')" id="tab-btn-products" class="pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white">
-                        📦 Catalogo & Inserimento
-                    </button>
-                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white">
-                        🏷️ Gestione Categorie
-                    </button>
-                </div>
+                </form>
 
-                <!-- TAB SPEDIZIONI -->
-                <div id="admin-tab-shipments">
-                    <h4 class="text-sm font-bold text-gray-300 mb-3 font-mono">Ordini e Spedizioni Attive</h4>
-                    <div id="admin-shipments-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-2"></div>
-                </div>
-
-                <!-- TAB PRODOTTI -->
-                <div id="admin-tab-products" class="hidden">
-                    <form onsubmit="handleSaveProduct(event)" class="space-y-4 mb-8 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
-                        <div class="flex items-center justify-between">
-                            <h4 id="form-title" class="text-sm font-bold text-brand-400 uppercase tracking-wider font-mono">Aggiungi Nuovo Prodotto</h4>
-                            <button type="button" onclick="resetProductForm()" id="cancel-edit-btn" class="text-xs text-gray-400 hover:text-white underline hidden">Annulla Modifica</button>
-                        </div>
-                        <input type="hidden" id="edit-prod-id">
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-mono text-gray-400 mb-1">Titolo Prodotto</label>
-                                <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-mono text-gray-400 mb-1">Categorie (Selezione Multipla: tieni premuto Ctrl o Cmd)</label>
-                                <select id="new-prod-categories" multiple required class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white h-24">
-                                    <!-- Popolato via JS -->
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-mono text-gray-400 mb-1">Prezzo (€)</label>
-                                <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-mono text-gray-400 mb-1">Materiale</label>
-                                <input type="text" id="new-prod-material" required placeholder="Materiale (es. PLA+)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-mono text-gray-400 mb-1">Testo Breve Anteprima</label>
-                            <input type="text" id="new-prod-preview-text" placeholder="Es. Design geometrico futurista..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
-                        </div>
-
-                        <!-- Area Caricamento Immagini -->
-                        <div>
-                            <label class="block text-xs font-mono text-gray-400 mb-1">Foto Prodotto (Aggiungi più foto per attivare lo scorrimento)</label>
-                            <div class="border-2 border-dashed border-gray-700 hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer bg-gray-800/40 transition-all mb-3" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                                <i data-lucide="image-plus" class="w-6 h-6 mx-auto text-brand-400 mb-1"></i>
-                                <p class="text-xs font-mono text-gray-300">Trascina le foto qui o <span class="text-brand-400 underline">clicca per selezionare</span></p>
-                                <input type="file" id="file-input" multiple accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-                            </div>
-
-                            <p class="text-[11px] font-mono text-gray-400 mb-2">Prima foto = Copertina Principale:</p>
-                            <div id="uploaded-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-mono text-gray-400 mb-1">Descrizione Dettagliata Completa</label>
-                            <textarea id="new-prod-desc" rows="3" required placeholder="Descrizione approfondita mostrata nei dettagli..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
-                        </div>
-
-                        <button type="submit" id="save-prod-btn" class="w-full py-2.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all">
-                            + Salva Prodotto nel Catalogo
-                        </button>
-                    </form>
-
-                    <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
-                </div>
-
-                <!-- TAB GESTIONE CATEGORIE -->
-                <div id="admin-tab-categories" class="hidden">
-                    <form onsubmit="handleAddCategory(event)" class="flex gap-2 mb-6">
-                        <input type="text" id="new-cat-name" required placeholder="Nome Nuova Categoria" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white text-sm focus:border-brand-500 focus:outline-none">
-                        <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm rounded-xl transition-all">
-                            + Aggiungi Categoria
-                        </button>
-                    </form>
-
-                    <h4 class="text-sm font-bold text-gray-300 mb-3 font-mono">Categorie Esistenti</h4>
-                    <div id="admin-categories-list" class="space-y-2 max-h-[350px] overflow-y-auto pr-2"></div>
-                </div>
+                <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
             </div>
         </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const defaultCategories = [
-            { id: "funzionale", name: "Funzionale" },
-            { id: "decorativo", name: "Decorativo" },
-            { id: "prototipi", name: "Prototipi" }
-        ];
+        const translations = {
+            it: {
+                subtitle: "CREATIVITÀ & PROTOTIPAZIONE",
+                navProducts: "Prodotti",
+                navInfo: "Richiedi Info",
+                navTrack: "Traccia Spedizione",
+                navAbout: "Chi siamo?",
+                cart: "Carrello"
+            },
+            en: {
+                subtitle: "CREATIVITY & PROTOTYPING",
+                navProducts: "Products",
+                navInfo: "Request Info",
+                navTrack: "Track Order",
+                navAbout: "About Us",
+                cart: "Cart"
+            }
+        };
+
+        function changeLanguage(lang) {
+            const t = translations[lang] || translations.it;
+            document.getElementById('txt-nav-subtitle').innerText = t.subtitle;
+            document.getElementById('nav-products').innerText = t.navProducts;
+            document.getElementById('nav-info').innerText = t.navInfo;
+            document.getElementById('nav-track').innerText = t.navTrack;
+            document.getElementById('nav-about').innerText = t.navAbout;
+            document.getElementById('btn-cart-text').innerText = t.cart;
+        }
 
         const defaultPlaceholderImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
 
-        const defaultProducts = [
+        let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
             {
                 id: 1,
                 title: "Fermalibri Cyber Geometry",
-                categories: ["decorativo", "funzionale"],
                 price: 34.90,
-                material: "PLA+ Nero & Ciano",
-                previewText: "Design geometrico futurista a reticolo bicolore.",
-                images: [
-                    "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80"
-                ],
-                desc: "Design geometrico futurista a reticolo con logo LS 3D Printing integrato e finitura bicolore ad alta resistenza meccanica."
+                desc: "Design geometrico futurista a reticolo con visualizzazione STL disponibile.",
+                stlUrl: null
             }
         ];
-
-        const defaultOrders = [
-            {
-                id: "LS-8921",
-                customer: "Marco Rossi",
-                phone: "+393331234567",
-                address: "Via Roma 15, Milano",
-                items: "Fermalibri Cyber Geometry (x1)",
-                status: "Spedito",
-                courier: "BRT Express",
-                tracking: "BRT987654321IT"
-            }
-        ];
-
-        // State Management
-        let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || defaultCategories;
-        let products = JSON.parse(localStorage.getItem('ls3d_products')) || defaultProducts;
-        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || defaultOrders;
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
-        
-        let selectedCategory = 'all';
-        let cardImageIndexes = {};
-        let uploadedImages = [];
+        let uploadedSTLData = null;
 
-        // NAVIGAZIONE PAGINE
-        function showPage(pageId) {
-            const homeView = document.getElementById('home-view');
-            const chiSiamoView = document.getElementById('chi-siamo-view');
-
-            if (pageId === 'chi-siamo') {
-                homeView.classList.add('hidden');
-                chiSiamoView.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                chiSiamoView.classList.add('hidden');
-                homeView.classList.remove('hidden');
-                if (pageId !== 'home') {
-                    document.getElementById(pageId)?.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            }
-        }
-
-        // --- RENDER PRODOTTI E CAROUSEL ---
+        // RENDER PRODUCTS
         function renderProducts() {
             const grid = document.getElementById('products-grid');
-            const filtered = selectedCategory === 'all' 
-                ? products 
-                : products.filter(p => {
-                    const cats = p.categories || (p.category ? [p.category] : []);
-                    return cats.includes(selectedCategory);
-                });
-
-            grid.innerHTML = filtered.map(p => {
-                const prodCats = p.categories || (p.category ? [p.category] : []);
-                const catBadges = prodCats.map(cId => {
-                    const cObj = categories.find(c => c.id === cId);
-                    return cObj ? `<span class="px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[9px] font-mono text-brand-400 border border-brand-500/30 uppercase">${cObj.name}</span>` : '';
-                }).join(' ');
-
-                const imgs = (p.images && p.images.length > 0) ? p.images : [p.image || defaultPlaceholderImg];
-                const activeIdx = cardImageIndexes[p.id] || 0;
-
-                return `
-                <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all group flex flex-col justify-between">
+            grid.innerHTML = products.map(p => `
+                <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all flex flex-col justify-between">
                     <div>
-                        <!-- Slider Immagini -->
-                        <div class="relative h-52 overflow-hidden bg-gray-900 group/slider">
-                            <img id="prod-img-${p.id}" src="${imgs[activeIdx]}" alt="${p.title}" onclick="openPreviewModal(${p.id})" class="w-full h-full object-cover cursor-pointer transition-all duration-300">
-                            
-                            ${imgs.length > 1 ? `
-                                <button onclick="cycleCardImage(${p.id}, -1, event)" class="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/70 text-white opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-brand-500 hover:text-black">
-                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="cycleCardImage(${p.id}, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/70 text-white opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-brand-500 hover:text-black">
-                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                                </button>
-                                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                                    ${imgs.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full ${i === activeIdx ? 'bg-brand-400' : 'bg-white/40'}"></span>`).join('')}
-                                </div>
-                            ` : ''}
-
-                            <div class="absolute top-3 left-3 flex flex-wrap gap-1">
-                                ${catBadges}
-                            </div>
+                        <div class="relative h-52 bg-gray-900 flex items-center justify-center cursor-pointer" onclick="openPreviewModal(${p.id})">
+                            ${p.stlUrl ? 
+                                `<div id="stl-container-${p.id}" class="w-full h-full stl-canvas-container"></div>` : 
+                                `<img src="${defaultPlaceholderImg}" class="w-full h-full object-cover">`
+                            }
+                            ${p.stlUrl ? `<span class="absolute top-2 right-2 bg-brand-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">3D STL</span>` : ''}
                         </div>
-
                         <div class="p-5">
-                            <h3 onclick="openPreviewModal(${p.id})" class="text-lg font-bold text-white mb-2 group-hover:text-brand-400 transition-colors cursor-pointer">${p.title}</h3>
-                            <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.previewText || p.desc || ""}</p>
-                            <div class="flex items-center gap-4 text-xs font-mono text-gray-400 mb-2">
-                                <span class="flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-accent-400"></i> ${p.material || 'PLA+'}</span>
-                            </div>
+                            <h3 onclick="openPreviewModal(${p.id})" class="text-lg font-bold text-white mb-2 hover:text-brand-400 cursor-pointer">${p.title}</h3>
+                            <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.desc}</p>
                         </div>
                     </div>
-
-                    <div class="p-5 pt-0 border-t border-gray-800/50 mt-auto flex items-center justify-between">
-                        <span class="text-xl font-mono font-bold text-white">€${(p.price || 0).toFixed(2)}</span>
+                    <div class="p-5 pt-0 border-t border-gray-800/50 flex items-center justify-between">
+                        <span class="text-xl font-mono font-bold text-white">€${p.price.toFixed(2)}</span>
                         <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500 text-brand-400 hover:text-black border border-brand-500/30 font-bold text-xs flex items-center gap-1.5 transition-all">
                             <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> Aggiungi
                         </button>
                     </div>
                 </div>
-            `;}).join('');
-            
-            renderCategoryFilters();
+            `).join('');
+
             lucide.createIcons();
-        }
-
-        function cycleCardImage(prodId, direction, event) {
-            if (event) event.stopPropagation();
-            const p = products.find(item => item.id === prodId);
-            if (!p) return;
             
-            const imgs = (p.images && p.images.length > 0) ? p.images : [p.image || defaultPlaceholderImg];
-            let currIdx = cardImageIndexes[prodId] || 0;
-            
-            currIdx = (currIdx + direction + imgs.length) % imgs.length;
-            cardImageIndexes[prodId] = currIdx;
-            
-            renderProducts();
+            // Inizializza i renderer 3D per i file STL presenti nelle schede
+            products.forEach(p => {
+                if (p.stlUrl) initSTLViewer(`stl-container-${p.id}`, p.stlUrl);
+            });
         }
 
-        // --- FILTRI CATEGORIE ---
-        function renderCategoryFilters() {
-            const container = document.getElementById('category-filters');
-            if(!container) return;
+        // VISUALIZZATORE THREE.JS PER FILE STL
+        function initSTLViewer(containerId, stlData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
 
-            container.innerHTML = `
-                <button onclick="filterCategory('all')" class="px-4 py-2 rounded-xl text-xs font-mono font-bold ${selectedCategory === 'all' ? 'bg-brand-500 text-black shadow-lg shadow-brand-500/20' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'} transition-all">
-                    Tutti (${products.length})
-                </button>
-                ${categories.map(c => {
-                    const count = products.filter(p => {
-                        const cats = p.categories || (p.category ? [p.category] : []);
-                        return cats.includes(c.id);
-                    }).length;
-                    const isActive = selectedCategory === c.id;
-                    return `
-                        <button onclick="filterCategory('${c.id}')" class="px-4 py-2 rounded-xl text-xs font-mono font-bold ${isActive ? 'bg-brand-500 text-black shadow-lg shadow-brand-500/20' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'} transition-all">
-                            ${c.name} (${count})
-                        </button>
-                    `;
-                }).join('')}
-            `;
-        }
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x090d16);
 
-        function filterCategory(catId) {
-            selectedCategory = catId;
-            renderProducts();
-        }
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 80);
 
-        // --- GESTIONE CARRELLO & EMAIL ---
-        function saveCart() {
-            localStorage.setItem('ls3d_cart', JSON.stringify(cart));
-            updateCartBadge();
-        }
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
 
-        function updateCartBadge() {
-            const badge = document.getElementById('cart-badge');
-            const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
-            if (badge) badge.innerText = totalQty;
-        }
+            const ambientLight = new THREE.AmbientLight(0x888888);
+            scene.add(ambientLight);
 
-        function addToCart(prodId) {
-            const product = products.find(p => p.id === prodId);
-            if (!product) return;
+            const dirLight = new THREE.DirectionalLight(0x10b981, 1);
+            dirLight.position.set(1, 1, 1).normalize();
+            scene.add(dirLight);
 
-            const existing = cart.find(item => item.id === prodId);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({
-                    id: product.id,
-                    title: product.title,
-                    price: product.price,
-                    image: (product.images && product.images.length > 0) ? product.images[0] : (product.image || defaultPlaceholderImg),
-                    qty: 1
-                });
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            const loader = new THREE.STLLoader();
+            const geometry = loader.parse(stlData);
+            geometry.center();
+
+            const material = new THREE.MeshPhongMaterial({ color: 0x10b981, specular: 0x111111, shininess: 200 });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.y += 0.005;
+                controls.update();
+                renderer.render(scene, camera);
             }
-            saveCart();
-            openCartModal();
+            animate();
         }
 
-        function updateCartQty(prodId, delta) {
-            const idx = cart.findIndex(item => item.id === prodId);
-            if (idx !== -1) {
-                cart[idx].qty += delta;
-                if (cart[idx].qty <= 0) {
-                    cart.splice(idx, 1);
-                }
-            }
-            saveCart();
-            renderCartModalItems();
-        }
-
-        function openCartModal() {
-            renderCartModalItems();
-            document.getElementById('cart-modal').classList.remove('hidden');
-        }
-
-        function closeCartModal() {
-            document.getElementById('cart-modal').classList.add('hidden');
-        }
-
-        function renderCartModalItems() {
-            const container = document.getElementById('cart-items-list');
-            const totalEl = document.getElementById('cart-total');
-            
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-400 text-xs py-8 font-mono">Il tuo carrello è vuoto.</div>`;
-                if (totalEl) totalEl.innerText = "€0.00";
-                return;
-            }
-
-            let total = 0;
-            container.innerHTML = cart.map(item => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
-                return `
-                    <div class="flex items-center justify-between p-3 bg-gray-900 rounded-xl border border-gray-800">
-                        <div class="flex items-center gap-3">
-                            <img src="${item.image}" class="w-10 h-10 rounded-lg object-cover">
-                            <div>
-                                <h4 class="text-sm font-bold text-white">${item.title}</h4>
-                                <div class="text-xs font-mono text-brand-400">€${item.price.toFixed(2)} Cad.</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center bg-gray-800 rounded-lg border border-gray-700">
-                                <button onclick="updateCartQty(${item.id}, -1)" class="px-2 py-1 text-gray-300 hover:text-white">-</button>
-                                <span class="px-2 text-xs font-mono text-white">${item.qty}</span>
-                                <button onclick="updateCartQty(${item.id}, 1)" class="px-2 py-1 text-gray-300 hover:text-white">+</button>
-                            </div>
-                            <span class="text-sm font-mono font-bold text-white w-16 text-right">€${itemTotal.toFixed(2)}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            if (totalEl) totalEl.innerText = `€${total.toFixed(2)}`;
-            lucide.createIcons();
-        }
-
-        function sendCartViaEmail() {
-            if (cart.length === 0) {
-                alert("Il carrello è vuoto!");
-                return;
-            }
-
-            const emailUser = prompt("Inserisci la tua email per ricevere un promemoria del carrello:");
-            if (!emailUser) return;
-
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            const itemList = cart.map(item => `- ${item.title} (Quantità: ${item.qty}) - €${(item.price * item.qty).toFixed(2)}`).join('\n');
-            
-            const subject = encodeURIComponent("Riepilogo Carrello LS 3D Printing");
-            const body = encodeURIComponent(
-                `Ciao!\n\nEcco il riepilogo del tuo carrello registrato su LS 3D Printing:\n\n${itemList}\n\nTotale stimato: €${total.toFixed(2)}\n\nPuoi procedere con l'ordine rispondendo a questa email o contattandoci via WhatsApp!`
-            );
-
-            window.location.href = `mailto:${emailUser}?subject=${subject}&body=${body}`;
-        }
-
-        function openCheckoutFromCart() {
-            if (cart.length === 0) {
-                alert("Aggiungi almeno un articolo al carrello!");
-                return;
-            }
-            closeCartModal();
-            
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            document.getElementById('checkout-summary-title').innerText = `${cart.length} Articolo/i nel Carrello`;
-            document.getElementById('checkout-total-price').innerText = `€${total.toFixed(2)}`;
-            
-            document.getElementById('checkout-modal').classList.remove('hidden');
-        }
-
-        // --- ADMIN CATEGORIE MULTIPLE ---
-        function populateCategoryDropdowns() {
-            const select = document.getElementById('new-prod-categories');
-            if(select) {
-                select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            }
+        function handleSTLSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                uploadedSTLData = evt.target.result;
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function handleSaveProduct(e) {
             e.preventDefault();
-            try {
-                const editId = document.getElementById('edit-prod-id').value;
-                const title = document.getElementById('new-prod-title').value;
-                
-                const selectCat = document.getElementById('new-prod-categories');
-                const selectedCats = Array.from(selectCat.selectedOptions).map(opt => opt.value);
+            const title = document.getElementById('new-prod-title').value;
+            const price = parseFloat(document.getElementById('new-prod-price').value);
+            const desc = document.getElementById('new-prod-desc').value;
 
-                const price = parseFloat(document.getElementById('new-prod-price').value);
-                const material = document.getElementById('new-prod-material').value;
-                const previewText = document.getElementById('new-prod-preview-text').value;
-                const desc = document.getElementById('new-prod-desc').value;
+            const newProd = {
+                id: Date.now(),
+                title,
+                price,
+                desc,
+                stlUrl: uploadedSTLData
+            };
 
-                const allImgs = uploadedImages.length > 0 ? uploadedImages : [defaultPlaceholderImg];
-
-                const prodData = {
-                    id: editId ? parseInt(editId) : Date.now(),
-                    title,
-                    categories: selectedCats.length > 0 ? selectedCats : ["funzionale"],
-                    price,
-                    material,
-                    previewText: previewText || desc,
-                    images: allImgs,
-                    desc
-                };
-
-                if(editId) {
-                    const idx = products.findIndex(p => p.id === parseInt(editId));
-                    if(idx !== -1) products[idx] = prodData;
-                } else {
-                    products.unshift(prodData);
-                }
-
-                localStorage.setItem('ls3d_products', JSON.stringify(products));
-                renderProducts();
-                renderAdminProductsList();
-                resetProductForm();
-                alert('Prodotto salvato con successo!');
-            } catch (err) {
-                alert('Si è verificato un errore: ' + err.message);
-            }
+            products.unshift(newProd);
+            localStorage.setItem('ls3d_products', JSON.stringify(products));
+            uploadedSTLData = null;
+            renderProducts();
+            alert('Prodotto e modello STL registrati!');
         }
 
-        // --- ALTRE FUNZIONI MODALI & ADMIN ---
+        // CARRELLO & CHECKOUT
+        function addToCart(prodId) {
+            const product = products.find(p => p.id === prodId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === prodId);
+            if (existing) existing.qty += 1;
+            else cart.push({ id: product.id, title: product.title, price: product.price, qty: 1 });
+            saveCart();
+            openCartModal();
+        }
+
+        function saveCart() {
+            localStorage.setItem('ls3d_cart', JSON.stringify(cart));
+            document.getElementById('cart-badge').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+        }
+
+        function openCartModal() {
+            const container = document.getElementById('cart-items-list');
+            const totalEl = document.getElementById('cart-total');
+            let total = 0;
+            container.innerHTML = cart.map(i => {
+                total += i.price * i.qty;
+                return `<div class="flex justify-between p-2 bg-gray-900 rounded"><span>${i.title} (x${i.qty})</span><span>€${(i.price*i.qty).toFixed(2)}</span></div>`;
+            }).join('');
+            totalEl.innerText = `€${total.toFixed(2)}`;
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+
         function openPreviewModal(id) {
             const p = products.find(prod => prod.id === id);
             if(!p) return;
-
-            const prodCats = p.categories || (p.category ? [p.category] : []);
-            const catBadges = prodCats.map(cId => {
-                const cObj = categories.find(c => c.id === cId);
-                return cObj ? `<span class="px-2.5 py-1 rounded-md bg-brand-500/10 text-brand-400 font-mono text-xs uppercase border border-brand-500/30">${cObj.name}</span>` : '';
-            }).join(' ');
-
-            const allImages = p.images && p.images.length > 0 ? p.images : [p.image || defaultPlaceholderImg];
             const content = document.getElementById('preview-content');
-
             content.innerHTML = `
-                <div class="space-y-6">
-                    <div class="relative h-64 sm:h-80 rounded-xl overflow-hidden bg-gray-900 border border-gray-800">
-                        <img id="main-preview-img" src="${allImages[0]}" class="w-full h-full object-cover">
-                    </div>
-                    
-                    ${allImages.length > 1 ? `
-                        <div class="flex gap-2 overflow-x-auto pb-2">
-                            ${allImages.map(img => `
-                                <img src="${img}" onclick="document.getElementById('main-preview-img').src='${img}'" class="w-16 h-16 rounded-lg object-cover cursor-pointer border border-gray-700 hover:border-brand-500 transition-all">
-                            `).join('')}
-                        </div>
-                    ` : ''}
-
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-2xl font-bold text-white">${p.title}</h3>
-                            <span class="text-2xl font-mono font-bold text-brand-400">€${(p.price || 0).toFixed(2)}</span>
-                        </div>
-                        <div class="flex gap-2 mb-4">${catBadges}</div>
-                        <p class="text-gray-300 text-sm mb-4 leading-relaxed">${p.desc}</p>
-                        <div class="text-xs font-mono text-gray-400 mb-6">
-                            Materiale: <strong class="text-white">${p.material || 'PLA+'}</strong>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="addToCart(${p.id}); closePreviewModal();" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20">
-                                <i data-lucide="shopping-cart" class="w-4 h-4"></i> Aggiungi al Carrello
-                            </button>
-                            <a href="https://api.whatsapp.com/send?phone=&text=Ciao!%20Vorrei%20informazioni%20sul%20prodotto:%20${encodeURIComponent(p.title)}" target="_blank" class="w-full py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 font-bold text-sm flex items-center justify-center gap-2 transition-all">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i> Contatta WhatsApp
-                            </a>
-                        </div>
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-white">${p.title}</h3>
+                    <div id="modal-stl-view" class="h-64 bg-gray-900 rounded-xl stl-canvas-container"></div>
+                    <p class="text-gray-300 text-sm">${p.desc}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold text-brand-400">€${p.price.toFixed(2)}</span>
+                        <button onclick="addToCart(${p.id}); closePreviewModal();" class="px-4 py-2 bg-brand-500 text-black font-bold rounded-xl">Aggiungi al Carrello</button>
                     </div>
                 </div>
             `;
             document.getElementById('preview-modal').classList.remove('hidden');
-            lucide.createIcons();
+            if(p.stlUrl) initSTLViewer('modal-stl-view', p.stlUrl);
         }
-
         function closePreviewModal() { document.getElementById('preview-modal').classList.add('hidden'); }
-        function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
 
-        function handleCheckoutSubmit(e) {
-            e.preventDefault();
-            if (cart.length === 0) return;
-
-            const name = document.getElementById('checkout-name').value;
-            const phone = document.getElementById('checkout-phone').value;
-            const address = document.getElementById('checkout-address').value;
-
-            const summaryItems = cart.map(i => `${i.title} (x${i.qty})`).join(', ');
-
-            const newOrder = {
-                id: `LS-${Math.floor(1000 + Math.random() * 9000)}`,
-                customer: name,
-                phone: phone,
-                address: address,
-                items: summaryItems,
-                status: "In Elaborazione",
-                courier: "Da Assegnare",
-                tracking: "In Attesa"
-            };
-
-            orders.unshift(newOrder);
-            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
-
-            alert(`Ordine registrato con successo!\nCodice Ordine: ${newOrder.id}`);
-            
-            // Invia via WhatsApp
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            const waText = `Ciao LS 3D Printing!\nHo inviato un nuovo ordine:\n- Codice: ${newOrder.id}\n- Articoli: ${summaryItems}\n- Totale: €${total.toFixed(2)}\n- Cliente: ${name}\n- Indirizzo: ${address}`;
-            
-            cart = [];
-            saveCart();
-            closeCheckoutModal();
-            e.target.reset();
-
-            window.open(`https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(waText)}`, '_blank');
+        function showPage(pageId) {
+            document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
+            document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
         }
 
-        function handleContactSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('info-name').value;
-            const contact = document.getElementById('info-contact').value;
-            const service = document.getElementById('info-service').value;
-            const message = document.getElementById('info-message').value;
-
-            const text = `Ciao LS 3D Printing!\n\nNuova richiesta dal sito:\n- Nome: ${name}\n- Contatto: ${contact}\n- Servizio: ${service}\n- Messaggio: ${message}`;
-            window.open(`https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(text)}`, '_blank');
-            e.target.reset();
-        }
-
-        function trackOrder() {
-            const code = document.getElementById('track-input').value.trim().toUpperCase();
-            const res = document.getElementById('track-result');
-            const found = orders.find(o => o.id.toUpperCase() === code);
-
-            res.classList.remove('hidden');
-            if(found) {
-                res.innerHTML = `
-                    <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="font-mono text-xs text-gray-400">ID Ordine: <strong class="text-white">${found.id}</strong></span>
-                            <span class="px-2.5 py-1 rounded-md text-xs font-bold font-mono bg-brand-500/20 text-brand-400 border border-brand-500/30">${found.status}</span>
-                        </div>
-                        <div class="text-sm font-bold text-white">${found.items}</div>
-                        <div class="grid grid-cols-2 gap-2 text-xs font-mono text-gray-400 pt-2 border-t border-gray-800">
-                            <div>Corriere: <span class="text-gray-200">${found.courier}</span></div>
-                            <div>Tracking: <span class="text-brand-400">${found.tracking}</span></div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                res.innerHTML = `<div class="text-red-400 text-xs font-mono text-center">Nessun ordine trovato con questo codice.</div>`;
-            }
-        }
-
-        // --- NAVIGAZIONE ADMIN E UPLOAD FOTO ---
         function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
         function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-
         function handleAdminLogin(e) {
             e.preventDefault();
             if(document.getElementById('admin-username').value === 'admin' && document.getElementById('admin-password').value === 'ls3d2026') {
                 document.getElementById('admin-login-view').classList.add('hidden');
                 document.getElementById('admin-panel-view').classList.remove('hidden');
-                populateCategoryDropdowns();
-                renderCategoriesList();
-                renderAdminShipments();
-                renderAdminProductsList();
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
             }
         }
-
         function adminLogout() {
             document.getElementById('admin-panel-view').classList.add('hidden');
             document.getElementById('admin-login-view').classList.remove('hidden');
         }
 
-        function switchAdminTab(tab) {
-            document.getElementById('admin-tab-shipments').classList.add('hidden');
-            document.getElementById('admin-tab-products').classList.add('hidden');
-            document.getElementById('admin-tab-categories').classList.add('hidden');
-
-            if(tab === 'shipments') document.getElementById('admin-tab-shipments').classList.remove('hidden');
-            if(tab === 'products') document.getElementById('admin-tab-products').classList.remove('hidden');
-            if(tab === 'categories') document.getElementById('admin-tab-categories').classList.remove('hidden');
-        }
-
-        function renderAdminProductsList() {
-            const list = document.getElementById('admin-products-list');
-            if(list) {
-                list.innerHTML = products.map(p => `
-                    <div class="flex items-center justify-between p-3 bg-gray-800 rounded-lg text-xs">
-                        <div class="flex items-center gap-3">
-                            <img src="${(p.images && p.images.length > 0) ? p.images[0] : defaultPlaceholderImg}" class="w-8 h-8 rounded object-cover">
-                            <div>
-                                <div class="font-bold text-white">${p.title}</div>
-                                <div class="text-gray-400 font-mono">€${(p.price || 0).toFixed(2)}</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="editProduct(${p.id})" class="p-1.5 text-brand-400 hover:bg-gray-700 rounded">
-                                <i data-lucide="edit-3" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteProduct(${p.id})" class="p-1.5 text-red-400 hover:bg-red-500/20 rounded">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        }
-
-        function editProduct(id) {
-            const p = products.find(prod => prod.id === id);
-            if(!p) return;
-
-            document.getElementById('edit-prod-id').value = p.id;
-            document.getElementById('new-prod-title').value = p.title;
-            
-            const selectCat = document.getElementById('new-prod-categories');
-            const pCats = p.categories || (p.category ? [p.category] : []);
-            Array.from(selectCat.options).forEach(opt => opt.selected = pCats.includes(opt.value));
-
-            document.getElementById('new-prod-price').value = p.price;
-            document.getElementById('new-prod-material').value = p.material;
-            document.getElementById('new-prod-preview-text').value = p.previewText || p.desc;
-            document.getElementById('new-prod-desc').value = p.desc;
-
-            uploadedImages = p.images ? [...p.images] : [];
-            renderUploadedImages();
-
-            document.getElementById('form-title').innerText = "Modifica Prodotto Esistente";
-            document.getElementById('save-prod-btn').innerText = "Aggiorna Prodotto";
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-        }
-
-        function resetProductForm() {
-            document.getElementById('edit-prod-id').value = "";
-            document.getElementById('form-title').innerText = "Aggiungi Nuovo Prodotto";
-            document.getElementById('save-prod-btn').innerText = "+ Salva Prodotto nel Catalogo";
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-            uploadedImages = [];
-            renderUploadedImages();
-            document.querySelectorAll('#admin-tab-products form input, #admin-tab-products form textarea').forEach(i => i.value = "");
-        }
-
-        function deleteProduct(id) {
-            if(confirm('Eliminare questo prodotto dal catalogo?')) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('ls3d_products', JSON.stringify(products));
-                renderProducts();
-                renderAdminProductsList();
-            }
-        }
-
-        function handleFileSelect(e) { processFiles(e.target.files); }
-        function processFiles(files) {
-            Array.from(files).forEach(file => {
-                if(file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        uploadedImages.push(e.target.result);
-                        renderUploadedImages();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        function renderUploadedImages() {
-            const container = document.getElementById('uploaded-images-preview');
-            if(container) {
-                container.innerHTML = uploadedImages.map((img, idx) => `
-                    <div class="relative rounded-lg overflow-hidden border ${idx === 0 ? 'border-brand-500 ring-2 ring-brand-500/40' : 'border-gray-700'} bg-gray-900 flex flex-col items-center">
-                        <img src="${img}" class="w-full h-20 object-cover">
-                        <div class="p-1.5 w-full bg-gray-900/90 flex items-center justify-between text-[10px]">
-                            ${idx === 0 ? `<span class="text-brand-400 font-mono font-bold">1° Copertina</span>` : `<button type="button" onclick="setPrimaryImage(${idx})" class="text-gray-400 hover:text-white underline font-mono">Imposta 1°</button>`}
-                            <button type="button" onclick="removeImage(${idx})" class="text-red-400 hover:text-red-300">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        }
-
-        function setPrimaryImage(idx) {
-            const selected = uploadedImages.splice(idx, 1)[0];
-            uploadedImages.unshift(selected);
-            renderUploadedImages();
-        }
-
-        function removeImage(idx) {
-            uploadedImages.splice(idx, 1);
-            renderUploadedImages();
-        }
-
-        function renderCategoriesList() {
-            const list = document.getElementById('admin-categories-list');
-            if(list) {
-                list.innerHTML = categories.map((c, idx) => `
-                    <div class="flex items-center justify-between p-3 bg-gray-800 rounded-lg text-xs">
-                        <span class="font-bold text-white font-mono">${c.name}</span>
-                        <div class="flex items-center gap-2">
-                            <button onclick="deleteCategory(${idx})" class="p-1.5 text-red-400 hover:bg-red-500/20 rounded">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        }
-
-        function handleAddCategory(e) {
-            e.preventDefault();
-            const input = document.getElementById('new-cat-name');
-            const name = input.value.trim();
-            if(!name) return;
-
-            const id = name.toLowerCase().replace(/\s+/g, '-');
-            categories.push({ id, name });
-            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-            
-            input.value = '';
-            populateCategoryDropdowns();
-            renderCategoriesList();
-            renderProducts();
-        }
-
-        function deleteCategory(idx) {
-            if(categories.length <= 1) {
-                alert("Devi mantenere almeno una categoria!");
-                return;
-            }
-            if(confirm(`Eliminare la categoria "${categories[idx].name}"?`)) {
-                categories.splice(idx, 1);
-                localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-                populateCategoryDropdowns();
-                renderCategoriesList();
-                renderProducts();
-            }
-        }
-
-        function renderAdminShipments() {
-            const list = document.getElementById('admin-shipments-list');
-            if(list) {
-                list.innerHTML = orders.map((o, idx) => `
-                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="font-mono text-xs font-bold text-brand-400">${o.id} - ${o.customer}</span>
-                            <select onchange="orders[${idx}].status=this.value; localStorage.setItem('ls3d_orders', JSON.stringify(orders));" class="bg-gray-800 border border-gray-700 text-xs rounded-lg px-2 py-1 text-white font-mono">
-                                <option value="In Elaborazione" ${o.status==='In Elaborazione'?'selected':''}>In Elaborazione</option>
-                                <option value="Stampa in Corso" ${o.status==='Stampa in Corso'?'selected':''}>Stampa in Corso</option>
-                                <option value="Spedito" ${o.status==='Spedito'?'selected':''}>Spedito</option>
-                                <option value="Consegnato" ${o.status==='Consegnato'?'selected':''}>Consegnato</option>
-                            </select>
-                        </div>
-                        <div class="text-xs text-gray-300">Articoli: ${o.items} | Indirizzo: ${o.address}</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-gray-800">
-                            <input type="text" value="${o.courier}" onchange="orders[${idx}].courier=this.value; localStorage.setItem('ls3d_orders', JSON.stringify(orders));" placeholder="Corriere" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white">
-                            <input type="text" value="${o.tracking}" onchange="orders[${idx}].tracking=this.value; localStorage.setItem('ls3d_orders', JSON.stringify(orders));" placeholder="Codice Tracking" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white">
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        }
-
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ products, orders, categories }, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `ls3d_backup_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importData(e) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(event) {
-                try {
-                    const parsed = JSON.parse(event.target.result);
-                    if(parsed.products) { products = parsed.products; localStorage.setItem('ls3d_products', JSON.stringify(products)); }
-                    if(parsed.orders) { orders = parsed.orders; localStorage.setItem('ls3d_orders', JSON.stringify(orders)); }
-                    if(parsed.categories) { categories = parsed.categories; localStorage.setItem('ls3d_categories', JSON.stringify(categories)); }
-                    populateCategoryDropdowns();
-                    renderCategoriesList();
-                    renderProducts();
-                    alert('Backup ripristinato con successo!');
-                } catch(err) { alert('Errore durante l\'importazione.'); }
-            };
-            fileReader.readAsText(e.target.files[0]);
-        }
-
         // INIZIALIZZAZIONE
-        populateCategoryDropdowns();
         renderProducts();
-        updateCartBadge();
+        saveCart();
     </script>
 </body>
 </html>
