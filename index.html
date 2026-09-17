@@ -32,7 +32,7 @@
     <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=EUR"></script>
 
-    <!-- Three.js & STLLoader per la visualizzazione 3D -->
+    <!-- Three.js & STLLoader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -72,7 +72,6 @@
         .glass-panel {
             background: rgba(17, 24, 39, 0.85);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .stl-canvas-container canvas {
@@ -148,21 +147,25 @@
                 </div>
             </section>
 
-            <!-- Sezione Catalogo Prodotti -->
+            <!-- Sezione Catalogo Prodotti & Filtri Categorie -->
             <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-white mb-2" id="catalog-title">Catalogo Creazioni 3D</h2>
                             <p class="text-gray-400 text-sm" id="catalog-subtitle">Sfoglia le nostre creazioni, ispeziona i modelli STL in 3D e aggiungi al carrello.</p>
                         </div>
                     </div>
 
+                    <!-- Filtri Categoria Dinamici -->
+                    <div id="category-filters" class="flex flex-wrap gap-2 mb-8"></div>
+
+                    <!-- Griglia Prodotti -->
                     <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
             </section>
 
-            <!-- Sezione Form Richiesta Info -->
+            <!-- Sezione Form Richiesta Info / Preventivi -->
             <section id="info" class="py-16 bg-dark-bg">
                 <div class="max-w-3xl mx-auto px-4">
                     <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
@@ -305,7 +308,7 @@
         </div>
     </div>
 
-    <!-- MODALE CHECKOUT PAGAMENTI -->
+    <!-- MODALE CHECKOUT & SELEZIONE SPEDIZIONI -->
     <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
@@ -318,7 +321,7 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-white" id="checkout-title">Completa l'Ordine & Pagamento</h3>
-                    <p class="text-xs text-gray-400">Inserisci i tuoi dati di spedizione</p>
+                    <p class="text-xs text-gray-400">Inserisci i dati per la consegna e la fatturazione</p>
                 </div>
             </div>
 
@@ -340,6 +343,17 @@
                     <textarea id="checkout-address" rows="2" required placeholder="Via Roma 10, 40100 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
+                <!-- SELEZIONE SPEDIZIONE -->
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-2">Metodo di Spedizione:</label>
+                    <select id="checkout-shipping-method" onchange="updateCheckoutTotal()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none font-mono">
+                        <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
+                        <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
+                        <option value="0.00">Ritiro a Mano / In Sede (Gratuito)</option>
+                    </select>
+                </div>
+
+                <!-- SELEZIONE METODO PAGAMENTO -->
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-2" id="lbl-pay-method">Seleziona Metodo di Pagamento:</label>
                     <div class="grid grid-cols-3 gap-2">
@@ -359,7 +373,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-900/60 border border-gray-800 rounded-xl flex justify-between items-center font-mono">
-                    <span class="text-xs text-gray-400">Totale Ordine:</span>
+                    <span class="text-xs text-gray-400">Totale Complessivo:</span>
                     <span id="checkout-total-price" class="text-xl font-bold text-brand-400">€0.00</span>
                 </div>
 
@@ -417,7 +431,7 @@
 
                 <hr class="border-gray-200 mb-8">
 
-                <!-- Header: Cliente (Sinistra) vs Date (Destra) -->
+                <!-- Header: Cliente vs Date -->
                 <div class="flex justify-between items-start mb-10 text-xs">
                     <div>
                         <p class="text-gray-500 mb-1">Fattura a:</p>
@@ -446,14 +460,7 @@
                             <th class="py-2 text-right">Subtotale</th>
                         </tr>
                     </thead>
-                    <tbody id="paper-items-body" class="divide-y divide-gray-100 text-xs">
-                        <tr>
-                            <td class="py-2">il mio prodotto</td>
-                            <td class="py-2 text-center">1</td>
-                            <td class="py-2 text-right">50,00 €</td>
-                            <td class="py-2 text-right">50,00 €</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="paper-items-body" class="divide-y divide-gray-100 text-xs"></tbody>
                 </table>
 
                 <hr class="border-gray-300 mb-6">
@@ -461,9 +468,10 @@
                 <!-- Totali a Destra -->
                 <div class="flex justify-end mb-12">
                     <div class="w-60 text-right space-y-1 text-xs">
-                        <p><span class="text-gray-600">Subtotale:</span> <span id="paper-subtotal" class="font-medium">150,00 €</span></p>
-                        <p><span class="text-gray-600" id="paper-tax-label">IVA (22%):</span> <span id="paper-tax-value" class="font-medium">33,00 €</span></p>
-                        <p class="text-sm font-bold text-gray-900 pt-1 border-t border-gray-200"><span class="text-gray-900">Totale:</span> <span id="paper-total">183,00 €</span></p>
+                        <p><span class="text-gray-600">Subtotale Articoli:</span> <span id="paper-subtotal" class="font-medium">0,00 €</span></p>
+                        <p><span class="text-gray-600">Spedizione:</span> <span id="paper-shipping-cost" class="font-medium">0,00 €</span></p>
+                        <p><span class="text-gray-600" id="paper-tax-label">IVA (22%):</span> <span id="paper-tax-value" class="font-medium">0,00 €</span></p>
+                        <p class="text-sm font-bold text-gray-900 pt-1 border-t border-gray-200"><span class="text-gray-900">Totale:</span> <span id="paper-total">0,00 €</span></p>
                     </div>
                 </div>
 
@@ -486,7 +494,7 @@
                 </div>
             </div>
 
-            <!-- Pulsanti per Azione -->
+            <!-- Pulsanti Azione -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 print:hidden">
                 <button onclick="window.print()" class="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-mono text-xs font-bold transition-all">Stampa / Salva PDF Fattura</button>
                 <button onclick="sendOrderAndInvoiceEmail()" class="py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-mono text-xs font-bold transition-all shadow-lg shadow-brand-500/20">Invia Ordine & Fattura via Email</button>
@@ -494,34 +502,75 @@
         </div>
     </div>
 
-    <!-- MODALE ADMIN -->
+    <!-- MODALE ADMIN COMPLETA CON GESTIONE PRODOTTI, STL, CATEGORIE E SPEDIZIONI -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
+
+            <!-- Login View -->
             <div id="admin-login-view">
                 <h3 class="text-2xl font-bold text-white text-center mb-6">Accesso Riservato Admin</h3>
                 <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-sm mx-auto">
                     <input type="text" id="admin-username" required placeholder="admin" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
                     <input type="password" id="admin-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
-                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Accedi</button>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Accedi al Pannello</button>
                 </form>
             </div>
-            <div id="admin-panel-view" class="hidden">
-                <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
-                    <h3 class="text-xl font-bold text-white">Pannello Gestione LS3Dmaker</h3>
-                    <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline">Logout</button>
+
+            <!-- Panel View -->
+            <div id="admin-panel-view" class="hidden space-y-6">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <h3 class="text-xl font-bold text-white">Dashboard Admin LS3Dmaker</h3>
+                    <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline font-mono">Logout</button>
                 </div>
-                <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900/60 p-4 rounded-xl border border-gray-800 mb-6">
-                    <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Nuovo Prodotto STL</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                        <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+
+                <!-- Admin Tabs Navigation -->
+                <div class="flex gap-2 border-b border-gray-800 pb-2">
+                    <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti & STL</button>
+                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Categorie</button>
+                    <button onclick="switchAdminTab('shipping')" id="tab-btn-shipping" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Ordini & Spedizioni</button>
+                </div>
+
+                <!-- TAB 1: GESTIONE PRODOTTI & STL -->
+                <div id="admin-tab-products" class="space-y-4">
+                    <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                        <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Nuovo / Modifica Prodotto</h4>
+                        <input type="hidden" id="edit-prod-id">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            <select id="new-prod-category" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono"></select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-mono text-gray-400 mb-1">Carica File Modello 3D STL (Opzionale)</label>
+                            <input type="file" id="stl-file-input" accept=".stl" onchange="handleSTLSelect(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                        </div>
+
+                        <textarea id="new-prod-desc" rows="2" required placeholder="Descrizione Prodotto" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                        <button type="submit" class="w-full py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
+                    </form>
+
+                    <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                </div>
+
+                <!-- TAB 2: GESTIONE CATEGORIE -->
+                <div id="admin-tab-categories" class="hidden space-y-4">
+                    <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 flex gap-2">
+                        <input type="text" id="new-cat-name" placeholder="Nuova Categoria (es. Droni, Giochi)" class="flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                        <button onclick="handleAddCategory()" class="px-4 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Aggiungi</button>
                     </div>
-                    <textarea id="new-prod-desc" rows="2" required placeholder="Descrizione" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
-                    <button type="submit" class="w-full py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
-                </form>
+                    <div id="admin-categories-list" class="space-y-2"></div>
+                </div>
+
+                <!-- TAB 3: GESTIONE ORDINI & SPEDIZIONI -->
+                <div id="admin-tab-shipping" class="hidden space-y-4">
+                    <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Registro Ordini & Stato Spedizioni</h4>
+                    <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -530,168 +579,67 @@
     <script>
         const myEmail = "unicobardo@gmail.com"; 
 
-        const translations = {
-            it: {
-                subtitle: "CREATIVITÀ & PROTOTIPAZIONE",
-                navProducts: "Prodotti", navInfo: "Richiedi Info", navTrack: "Traccia Spedizione", navAbout: "Chi siamo?", cart: "Carrello",
-                heroBadge: "Stampa 3D & Spedizioni Tracciabili",
-                heroTitle: "Dai forma alle Tue Idee con <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.",
-                catalogTitle: "Catalogo Creazioni 3D", catalogSubtitle: "Sfoglia le nostre creazioni, ispeziona i modelli STL in 3D e aggiungi al carrello.",
-                infoTitle: "Richiedi Informazioni o Preventivo", infoSubtitle: "Compila il modulo per un preventivo personalizzato",
-                lblName: "Nome e Cognome", lblContact: "Email / Telefono", lblService: "Tipo di Servizio", lblMessage: "Messaggio / Dettagli Progetto", btnSendWA: "Invia Richiesta via WhatsApp",
-                trackTitle: "Traccia il tuo Ordine", trackSubtitle: "Inserisci il codice ordine per verificare lo stato", btnSearch: "Cerca",
-                aboutTitle: "Chi Siamo — ", aboutDesc: "Passione per la tecnologia e soluzioni su misura.",
-                aboutMissionTitle: "La Nostra Missione", aboutMissionP1: "LS3Dmaker trasforma idee in oggetti reali.", aboutMissionP2: "Ogni pezzo viene verificato singolarmente.",
-                btnBackCatalog: "Torna al Catalogo Prodotti", cartTitle: "Il Tuo Carrello", cartSubtitle: "Gestisci gli articoli prima di completare l'ordine", cartTotalLabel: "Totale Stimato:",
-                btnSaveEmail: "Salva / Invia via Email", btnProceedOrder: "Procedi al Pagamento", checkoutTitle: "Completa l'Ordine & Pagamento",
-                lblPayName: "Nome e Cognome / Ragione Sociale", lblPayEmail: "Email Cliente", lblPayPhone: "Telefono (WhatsApp)", lblPayAddress: "Indirizzo Completo di Spedizione", lblPayMethod: "Seleziona Metodo di Pagamento:",
-                btnAddToCart: "Aggiungi", emptyCart: "Il carrello è vuoto."
-            },
-            en: {
-                subtitle: "CREATIVITY & PROTOTYPING",
-                navProducts: "Products", navInfo: "Request Info", navTrack: "Track Order", navAbout: "About Us", cart: "Cart",
-                heroBadge: "3D Printing & Tracked Shipping",
-                heroTitle: "Shape your ideas with <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Rapid prototyping, functional components, and custom 3D creations.",
-                catalogTitle: "3D Creations Catalog", catalogSubtitle: "Browse our creations, inspect 3D STL models and add to cart.",
-                infoTitle: "Request Info or Quote", infoSubtitle: "Fill in the form for a custom quote",
-                lblName: "Full Name", lblContact: "Email / Phone", lblService: "Service Type", lblMessage: "Message / Project Details", btnSendWA: "Send Request via WhatsApp",
-                trackTitle: "Track your Order", trackSubtitle: "Enter order code to verify status", btnSearch: "Search",
-                aboutTitle: "About Us — ", aboutDesc: "Passion for technology and tailored additive manufacturing.",
-                aboutMissionTitle: "Our Mission", aboutMissionP1: "LS3Dmaker transforms complex concepts into physical objects.", aboutMissionP2: "Every part is inspected before shipping.",
-                btnBackCatalog: "Back to Product Catalog", cartTitle: "Your Cart", cartSubtitle: "Manage items before placing order", cartTotalLabel: "Estimated Total:",
-                btnSaveEmail: "Save / Send via Email", btnProceedOrder: "Proceed to Payment", checkoutTitle: "Complete Order & Payment",
-                lblPayName: "Full Name / Company", lblPayEmail: "Customer Email", lblPayPhone: "Phone (WhatsApp)", lblPayAddress: "Complete Shipping Address", lblPayMethod: "Select Payment Method:",
-                btnAddToCart: "Add to Cart", emptyCart: "Your cart is empty."
-            },
-            fr: {
-                subtitle: "CRÉATIVITÉ & PROTOTYPAGE",
-                navProducts: "Produits", navInfo: "Demander Info", navTrack: "Suivre Commande", navAbout: "À Propos", cart: "Panier",
-                heroBadge: "Impression 3D & Livraison Suivie",
-                heroTitle: "Donnez forme à vos idées avec <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Prototypage rapide, pièces fonctionnelles et créations 3D sur mesure.",
-                catalogTitle: "Catalogue de Créations 3D", catalogSubtitle: "Inspectez nos modèles 3D STL et ajoutez-les au panier.",
-                infoTitle: "Demande d'informations", infoSubtitle: "Remplissez le formulaire pour un devis",
-                lblName: "Nom et Prénom", lblContact: "E-mail / Téléphone", lblService: "Type de Service", lblMessage: "Message", btnSendWA: "Envoyer via WhatsApp",
-                trackTitle: "Suivre votre Commande", trackSubtitle: "Entrez le code de commande", btnSearch: "Chercher",
-                aboutTitle: "À Propos — ", aboutDesc: "Passion pour la technologie sur mesure.",
-                aboutMissionTitle: "Notre Mission", aboutMissionP1: "LS3Dmaker transforme des concepts en objets réels.", aboutMissionP2: "Chaque pièce est contrôlée avant expédition.",
-                btnBackCatalog: "Retour au Catalogue", cartTitle: "Votre Panier", cartSubtitle: "Gérez vos articles", cartTotalLabel: "Total Estimé:",
-                btnSaveEmail: "Par E-mail", btnProceedOrder: "Procéder au Paiement", checkoutTitle: "Commande & Paiement",
-                lblPayName: "Nom / Société", lblPayEmail: "Email Client", lblPayPhone: "Téléphone", lblPayAddress: "Adresse de Livraison", lblPayMethod: "Mode de Paiement:",
-                btnAddToCart: "Ajouter", emptyCart: "Le panier est vide."
-            },
-            es: {
-                subtitle: "CREATIVIDAD Y PROTOTIPADO",
-                navProducts: "Productos", navInfo: "Pedir Info", navTrack: "Rastrear Envío", navAbout: "Nosotros", cart: "Carrito",
-                heroBadge: "Impresión 3D y Envíos Rastreables",
-                heroTitle: "Da forma a tus ideas con <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Prototipado rápido y creaciones 3D a medida.",
-                catalogTitle: "Catálogo 3D", catalogSubtitle: "Inspecciona modelos 3D STL y añade al carrito.",
-                infoTitle: "Solicitar Información", infoSubtitle: "Presupuesto personalizado",
-                lblName: "Nombre y Apellidos", lblContact: "Email / Teléfono", lblService: "Servicio", lblMessage: "Mensaje", btnSendWA: "Enviar por WhatsApp",
-                trackTitle: "Rastrear Pedido", trackSubtitle: "Introduce el código de pedido", btnSearch: "Buscar",
-                aboutTitle: "Sobre Nosotros — ", aboutDesc: "Fabricación aditiva personalizada.",
-                aboutMissionTitle: "Nuestra Misión", aboutMissionP1: "LS3Dmaker transforma conceptos en objetos reales.", aboutMissionP2: "Cada pieza se verifica antes del envío.",
-                btnBackCatalog: "Volver al Catálogo", cartTitle: "Tu Carrito", cartSubtitle: "Gestiona tus artículos", cartTotalLabel: "Total Estimado:",
-                btnSaveEmail: "Enviar por Email", btnProceedOrder: "Proceder al Pago", checkoutTitle: "Pedido y Pago",
-                lblPayName: "Nombre / Empresa", lblPayEmail: "Email Cliente", lblPayPhone: "Teléfono", lblPayAddress: "Dirección de Envío", lblPayMethod: "Método de Pago:",
-                btnAddToCart: "Añadir", emptyCart: "El carrito está vacío."
-            },
-            de: {
-                subtitle: "KREATIVITÄT & PROTOTYPING",
-                navProducts: "Produkte", navInfo: "Info Anfragen", navTrack: "Sendung Verfolgen", navAbout: "Über uns", cart: "Warenkorb",
-                heroBadge: "3D-Druck & Versand",
-                heroTitle: "Gestalten Sie Ihre Ideen mit <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Schnelles Prototyping und maßgeschneiderte 3D-Kreationen.",
-                catalogTitle: "3D-Katalog", catalogSubtitle: "3D-STL-Modelle prüfen und bestellen.",
-                infoTitle: "Informationen anfordern", infoSubtitle: "Individuelles Angebot",
-                lblName: "Vor- und Nachname", lblContact: "E-Mail / Telefon", lblService: "Dienstleistung", lblMessage: "Nachricht", btnSendWA: "Über WhatsApp senden",
-                trackTitle: "Bestellung Verfolgen", trackSubtitle: "Bestellcode eingeben", btnSearch: "Suchen",
-                aboutTitle: "Über Uns — ", aboutDesc: "Leidenschaft für additive Fertigung.",
-                aboutMissionTitle: "Unsere Mission", aboutMissionP1: "LS3Dmaker verwandelt Konzepte in reale Objekte.", aboutMissionP2: "Jedes Teil wird vor dem Versand geprüft.",
-                btnBackCatalog: "Zurück zum Katalog", cartTitle: "Ihr Warenkorb", cartSubtitle: "Artikel verwalten", cartTotalLabel: "Gesamtsumme:",
-                btnSaveEmail: "Per E-Mail Speichern", btnProceedOrder: "Zur Kasse Gehen", checkoutTitle: "Bestellung & Zahlung",
-                lblPayName: "Name / Firma", lblPayEmail: "Kunden-E-Mail", lblPayPhone: "Telefon", lblPayAddress: "Lieferadresse", lblPayMethod: "Zahlungsmethode:",
-                btnAddToCart: "Hinzufügen", emptyCart: "Der Warenkorb ist leer."
-            }
-        };
-
-        let currentLang = 'it';
-        const defaultPlaceholderImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
+        let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Tutti", "Componenti", "Decorazioni", "Prototipi", "Gadget"];
+        let selectedCategory = "Tutti";
 
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, desc: "Design geometrico futurista.", stlUrl: null }
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, desc: "Design geometrico futurista.", category: "Decorazioni", stlUrl: null }
         ];
+
+        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
         let currentOrder = null;
         let selectedPayMethod = 'whatsapp';
+        let uploadedSTLData = null;
 
-        function changeLanguage(lang) {
-            currentLang = lang;
-            const t = translations[lang] || translations.it;
+        // RENDER FILTRI CATEGORIE
+        function renderCategories() {
+            const container = document.getElementById('category-filters');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 rounded-xl font-mono text-xs transition-all ${selectedCategory === cat ? 'bg-brand-500 text-black font-bold' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}">
+                    ${cat}
+                </button>
+            `).join('');
 
-            document.getElementById('txt-nav-subtitle').innerText = t.subtitle;
-            document.getElementById('nav-products').innerText = t.navProducts;
-            document.getElementById('nav-info').innerText = t.navInfo;
-            document.getElementById('nav-track').innerText = t.navTrack;
-            document.getElementById('nav-about').innerText = t.navAbout;
-            document.getElementById('btn-cart-text').innerText = t.cart;
+            // Popola anche il menu a tendina nell'admin
+            const selectAdmin = document.getElementById('new-prod-category');
+            if (selectAdmin) {
+                selectAdmin.innerHTML = categories.filter(c => c !== "Tutti").map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+        }
 
-            document.getElementById('hero-badge').innerHTML = `<i data-lucide="truck" class="w-3.5 h-3.5"></i> ${t.heroBadge}`;
-            document.getElementById('hero-title').innerHTML = t.heroTitle;
-            document.getElementById('hero-desc').innerText = t.heroDesc;
-
-            document.getElementById('catalog-title').innerText = t.catalogTitle;
-            document.getElementById('catalog-subtitle').innerText = t.catalogSubtitle;
-
-            document.getElementById('info-form-title').innerText = t.infoTitle;
-            document.getElementById('info-form-subtitle').innerText = t.infoSubtitle;
-            document.getElementById('lbl-name').innerText = t.lblName;
-            document.getElementById('lbl-contact').innerText = t.lblContact;
-            document.getElementById('lbl-service').innerText = t.lblService;
-            document.getElementById('lbl-message').innerText = t.lblMessage;
-            document.getElementById('btn-send-wa').innerText = t.btnSendWA;
-
-            document.getElementById('track-title').innerText = t.trackTitle;
-            document.getElementById('track-subtitle').innerText = t.trackSubtitle;
-            document.getElementById('btn-search').innerText = t.btnSearch;
-
-            document.getElementById('about-title').innerText = t.aboutTitle;
-            document.getElementById('about-desc').innerText = t.aboutDesc;
-            document.getElementById('about-mission-title').innerText = t.aboutMissionTitle;
-            document.getElementById('about-mission-p1').innerText = t.aboutMissionP1;
-            document.getElementById('about-mission-p2').innerText = t.aboutMissionP2;
-            document.getElementById('btn-back-catalog').innerHTML = `<i data-lucide="arrow-left" class="w-4 h-4"></i> ${t.btnBackCatalog}`;
-
-            document.getElementById('cart-modal-title').innerText = t.cartTitle;
-            document.getElementById('cart-modal-subtitle').innerText = t.cartSubtitle;
-            document.getElementById('cart-total-label').innerText = t.cartTotalLabel;
-            document.getElementById('btn-save-email').innerText = t.btnSaveEmail;
-            document.getElementById('btn-proceed-order').innerText = t.btnProceedOrder;
-
-            document.getElementById('checkout-title').innerText = t.checkoutTitle;
-            document.getElementById('lbl-pay-name').innerText = t.lblPayName;
-            document.getElementById('lbl-pay-email').innerText = t.lblPayEmail;
-            document.getElementById('lbl-pay-phone').innerText = t.lblPayPhone;
-            document.getElementById('lbl-pay-address').innerText = t.lblPayAddress;
-            document.getElementById('lbl-pay-method').innerText = t.lblPayMethod;
-
+        function filterCategory(cat) {
+            selectedCategory = cat;
+            renderCategories();
             renderProducts();
-            lucide.createIcons();
         }
 
         function renderProducts() {
             const grid = document.getElementById('products-grid');
             const t = translations[currentLang] || translations.it;
 
-            grid.innerHTML = products.map(p => `
+            const filtered = selectedCategory === "Tutti" ? products : products.filter(p => p.category === selectedCategory);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400 font-mono text-xs">Nessun prodotto trovato per questa categoria.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
                 <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all flex flex-col justify-between">
-                    <div class="p-5">
-                        <img src="${defaultPlaceholderImg}" class="w-full h-40 object-cover rounded-xl mb-4">
-                        <h3 class="text-lg font-bold text-white mb-2">${p.title}</h3>
-                        <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.desc}</p>
+                    <div>
+                        <div class="relative h-48 bg-gray-900 flex items-center justify-center cursor-pointer" onclick="openPreviewModal(${p.id})">
+                            ${p.stlUrl ? 
+                                `<div id="stl-container-${p.id}" class="w-full h-full stl-canvas-container"></div>` : 
+                                `<img src="${defaultPlaceholderImg}" class="w-full h-full object-cover">`
+                            }
+                            <span class="absolute top-2 left-2 bg-gray-900/80 text-gray-300 text-[10px] font-mono px-2 py-0.5 rounded-md border border-gray-700">${p.category || 'Generale'}</span>
+                            ${p.stlUrl ? `<span class="absolute top-2 right-2 bg-brand-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">3D STL</span>` : ''}
+                        </div>
+                        <div class="p-5">
+                            <h3 onclick="openPreviewModal(${p.id})" class="text-lg font-bold text-white mb-2 hover:text-brand-400 cursor-pointer">${p.title}</h3>
+                            <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.desc}</p>
+                        </div>
                     </div>
                     <div class="p-5 pt-0 border-t border-gray-800/50 flex items-center justify-between">
                         <span class="text-xl font-mono font-bold text-white">€${p.price.toFixed(2)}</span>
@@ -701,7 +649,55 @@
                     </div>
                 </div>
             `).join('');
+
             lucide.createIcons();
+
+            filtered.forEach(p => {
+                if (p.stlUrl) initSTLViewer(`stl-container-${p.id}`, p.stlUrl);
+            });
+        }
+
+        // VISUALIZZATORE THREE.JS
+        function initSTLViewer(containerId, stlData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x090d16);
+
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 80);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0x888888);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x10b981, 1);
+            dirLight.position.set(1, 1, 1).normalize();
+            scene.add(dirLight);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            const loader = new THREE.STLLoader();
+            const geometry = loader.parse(stlData);
+            geometry.center();
+
+            const material = new THREE.MeshPhongMaterial({ color: 0x10b981, specular: 0x111111, shininess: 200 });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.y += 0.005;
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
         }
 
         function addToCart(prodId) {
@@ -746,9 +742,15 @@
         function openCheckoutFromCart() {
             if (cart.length === 0) return alert("Carrello vuoto!");
             closeCartModal();
-            const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-            document.getElementById('checkout-total-price').innerText = `€${total.toFixed(2)}`;
+            updateCheckoutTotal();
             document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function updateCheckoutTotal() {
+            const itemsSubtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const shippingCost = parseFloat(document.getElementById('checkout-shipping-method').value) || 0;
+            const grandTotal = itemsSubtotal + shippingCost;
+            document.getElementById('checkout-total-price').innerText = `€${grandTotal.toFixed(2)}`;
         }
 
         function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
@@ -766,21 +768,35 @@
             const email = document.getElementById('checkout-email').value;
             const phone = document.getElementById('checkout-phone').value;
             const address = document.getElementById('checkout-address').value;
-            const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const shippingCost = parseFloat(document.getElementById('checkout-shipping-method').value) || 0;
+
+            const itemsSubtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+
+            const orderId = `LS-${Math.floor(1000 + Math.random() * 9000)}`;
 
             currentOrder = {
+                id: orderId,
                 number: Math.floor(100 + Math.random() * 900),
                 clientName: name,
                 clientEmail: email,
                 clientPhone: phone,
                 clientAddress: address,
+                shippingCost: shippingCost,
                 items: [...cart],
-                subtotal: total,
-                tax: total * 0.22,
-                total: total * 1.22,
+                subtotal: itemsSubtotal,
+                tax: itemsSubtotal * 0.22,
+                total: itemsSubtotal + shippingCost,
+                status: 'In Elaborazione',
+                trackingCode: 'In Generazione',
                 date: new Date().toLocaleDateString('it-IT'),
                 dueDate: new Date(Date.now() + 14*24*60*60*1000).toLocaleDateString('it-IT')
             };
+
+            orders.unshift(currentOrder);
+            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+
+            cart = [];
+            saveCart();
 
             closeCheckoutModal();
             openInvoiceModal();
@@ -793,7 +809,6 @@
         }
 
         function processSatispayOrder() {
-            if (cart.length === 0) return alert("Carrello vuoto!");
             window.open(`https://tag.satispay.com/ls3dmaker`, '_blank');
         }
 
@@ -815,6 +830,7 @@
             `).join('');
 
             document.getElementById('paper-subtotal').innerText = `${currentOrder.subtotal.toFixed(2)} €`;
+            document.getElementById('paper-shipping-cost').innerText = `${currentOrder.shippingCost.toFixed(2)} €`;
             document.getElementById('paper-tax-value').innerText = `${currentOrder.tax.toFixed(2)} €`;
             document.getElementById('paper-total').innerText = `${currentOrder.total.toFixed(2)} €`;
 
@@ -827,30 +843,49 @@
             if(!currentOrder) return;
 
             const itemsText = currentOrder.items.map(i => `- ${i.title} (x${i.qty}): €${(i.price*i.qty).toFixed(2)}`).join('\n');
-            const subject = encodeURIComponent(`NUOVO ORDINE + FATTURA N. ${currentOrder.number} - LS3Dmaker`);
+            const subject = encodeURIComponent(`NUOVO ORDINE ${currentOrder.id} + FATTURA N. ${currentOrder.number} - LS3Dmaker`);
             const body = encodeURIComponent(
                 `NUOVO ORDINE E FATTURA GENERATA DA LS3Dmaker\n\n` +
+                `CODICE TRACCIAMENTO ORDINE: ${currentOrder.id}\n\n` +
                 `DATI CLIENTE:\n` +
                 `Nome/Azienda: ${currentOrder.clientName}\n` +
                 `Email Cliente: ${currentOrder.clientEmail}\n` +
                 `Telefono: ${currentOrder.clientPhone}\n` +
                 `Indirizzo Spedizione: ${currentOrder.clientAddress}\n\n` +
                 `DETTAGLIO ARTICOLI:\n${itemsText}\n\n` +
-                `RIEPILOGO FATTURA N. ${currentOrder.number}:\n` +
-                `Data: ${currentOrder.date}\n` +
-                `Subtotale: €${currentOrder.subtotal.toFixed(2)}\n` +
-                `IVA (22%): €${currentOrder.tax.toFixed(2)}\n` +
+                `Spedizione: €${currentOrder.shippingCost.toFixed(2)}\n` +
                 `TOTALE FATTURA: €${currentOrder.total.toFixed(2)}\n`
             );
 
             window.location.href = `mailto:${myEmail}?cc=${encodeURIComponent(currentOrder.clientEmail)}&subject=${subject}&body=${body}`;
         }
 
+        // TRACCIAMENTO SPEDIZIONE PER L'UTENTE
         function trackOrder() {
-            const input = document.getElementById('track-input').value;
+            const input = document.getElementById('track-input').value.trim().toUpperCase();
             const result = document.getElementById('track-result');
-            if(!input) return alert("Inserisci un codice ordine.");
-            result.innerHTML = `<div class="p-4 bg-gray-900 rounded-xl text-xs font-mono text-brand-400">Stato ordine ${input}: In Elaborazione e Preparazione Stampa 3D.</div>`;
+            if(!input) return alert("Inserisci un codice ordine valid (es. LS-8921).");
+
+            const found = orders.find(o => o.id.toUpperCase() === input);
+
+            if (found) {
+                result.innerHTML = `
+                    <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-mono text-gray-400">Codice Ordine: <strong class="text-white">${found.id}</strong></span>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-brand-500/20 text-brand-400 border border-brand-500/30">${found.status}</span>
+                        </div>
+                        <p class="text-xs text-gray-300">Cliente: ${found.clientName}</p>
+                        <p class="text-xs text-gray-300 font-mono">Codice Tracciamento Corriere: <span class="text-brand-400 font-bold">${found.trackingCode || 'In Attesa di Spedizione'}</span></p>
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `
+                    <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono text-amber-400">
+                        Nessun ordine trovato con il codice ${input}. Verifica il codice inserito.
+                    </div>
+                `;
+            }
             result.classList.remove('hidden');
         }
 
@@ -862,25 +897,200 @@
             window.open(`https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(`Richiesta Info da ${name} (${contact}): ${msg}`)}`, '_blank');
         }
 
+        function openPreviewModal(id) {
+            const p = products.find(prod => prod.id === id);
+            if(!p) return;
+            const content = document.getElementById('preview-content');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-white">${p.title}</h3>
+                    <div id="modal-stl-view" class="h-64 bg-gray-900 rounded-xl stl-canvas-container"></div>
+                    <p class="text-gray-300 text-sm">${p.desc}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold text-brand-400">€${p.price.toFixed(2)}</span>
+                        <button onclick="addToCart(${p.id}); closePreviewModal();" class="px-4 py-2 bg-brand-500 text-black font-bold rounded-xl text-xs">Aggiungi al Carrello</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('preview-modal').classList.remove('hidden');
+            if(p.stlUrl) initSTLViewer('modal-stl-view', p.stlUrl);
+        }
+
+        function closePreviewModal() { document.getElementById('preview-modal').classList.add('hidden'); }
+
         function showPage(pageId) {
             document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
             document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
         }
 
+        // ADMIN PANEL MANAGEMENT
         function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
         function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+
         function handleAdminLogin(e) {
             e.preventDefault();
             if(document.getElementById('admin-username').value === 'admin' && document.getElementById('admin-password').value === 'ls3d2026') {
                 document.getElementById('admin-login-view').classList.add('hidden');
                 document.getElementById('admin-panel-view').classList.remove('hidden');
+                renderAdminProductsList();
+                renderAdminCategoriesList();
+                renderAdminOrdersList();
+            } else {
+                alert('Credenziali errate!');
             }
         }
+
         function adminLogout() {
             document.getElementById('admin-panel-view').classList.add('hidden');
             document.getElementById('admin-login-view').classList.remove('hidden');
         }
 
+        function switchAdminTab(tab) {
+            document.getElementById('admin-tab-products').classList.toggle('hidden', tab !== 'products');
+            document.getElementById('admin-tab-categories').classList.toggle('hidden', tab !== 'categories');
+            document.getElementById('admin-tab-shipping').classList.toggle('hidden', tab !== 'shipping');
+
+            document.getElementById('tab-btn-products').className = tab === 'products' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-categories').className = tab === 'categories' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-shipping').className = tab === 'shipping' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+        }
+
+        function handleSTLSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) { uploadedSTLData = evt.target.result; };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleSaveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-prod-id').value;
+            const title = document.getElementById('new-prod-title').value;
+            const price = parseFloat(document.getElementById('new-prod-price').value);
+            const category = document.getElementById('new-prod-category').value;
+            const desc = document.getElementById('new-prod-desc').value;
+
+            if (id) {
+                const p = products.find(prod => prod.id == id);
+                if (p) {
+                    p.title = title; p.price = price; p.category = category; p.desc = desc;
+                    if (uploadedSTLData) p.stlUrl = uploadedSTLData;
+                }
+            } else {
+                products.unshift({
+                    id: Date.now(),
+                    title, price, category, desc,
+                    stlUrl: uploadedSTLData
+                });
+            }
+
+            localStorage.setItem('ls3d_products', JSON.stringify(products));
+            uploadedSTLData = null;
+            document.getElementById('edit-prod-id').value = '';
+            renderProducts();
+            renderAdminProductsList();
+            alert('Prodotto salvato con successo!');
+        }
+
+        function renderAdminProductsList() {
+            const container = document.getElementById('admin-products-list');
+            container.innerHTML = products.map(p => `
+                <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
+                    <div>
+                        <p class="font-bold text-white">${p.title} <span class="text-gray-400">(${p.category})</span></p>
+                        <p class="text-brand-400 font-mono">€${p.price.toFixed(2)}</p>
+                    </div>
+                    <button onclick="deleteProduct(${p.id})" class="px-2 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded text-[10px]">Elimina</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteProduct(id) {
+            if(!confirm("Vuoi eliminare questo prodotto?")) return;
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('ls3d_products', JSON.stringify(products));
+            renderProducts();
+            renderAdminProductsList();
+        }
+
+        function handleAddCategory() {
+            const val = document.getElementById('new-cat-name').value.trim();
+            if (!val || categories.includes(val)) return;
+            categories.push(val);
+            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
+            document.getElementById('new-cat-name').value = '';
+            renderCategories();
+            renderAdminCategoriesList();
+        }
+
+        function renderAdminCategoriesList() {
+            const container = document.getElementById('admin-categories-list');
+            container.innerHTML = categories.filter(c => c !== "Tutti").map(c => `
+                <div class="flex justify-between items-center p-2.5 bg-gray-900 rounded-xl border border-gray-800 text-xs">
+                    <span class="text-white font-mono">${c}</span>
+                    <button onclick="deleteCategory('${c}')" class="text-red-400 text-[10px] hover:underline">Rimuovi</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteCategory(cat) {
+            categories = categories.filter(c => c !== cat);
+            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
+            renderCategories();
+            renderAdminCategoriesList();
+        }
+
+        function renderAdminOrdersList() {
+            const container = document.getElementById('admin-orders-list');
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 font-mono">Nessun ordine presente.</p>`;
+                return;
+            }
+
+            container.innerHTML = orders.map(o => `
+                <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-3 text-xs">
+                    <div class="flex justify-between items-center font-mono">
+                        <span class="font-bold text-brand-400">${o.id} (${o.clientName})</span>
+                        <span class="text-gray-400">Totale: €${o.total.toFixed(2)}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-gray-400 mb-1">Stato Ordine:</label>
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" class="bg-gray-800 border border-gray-700 text-white rounded p-1 text-xs">
+                                <option value="In Elaborazione" ${o.status === 'In Elaborazione' ? 'selected' : ''}>In Elaborazione</option>
+                                <option value="In Stampa 3D" ${o.status === 'In Stampa 3D' ? 'selected' : ''}>In Stampa 3D</option>
+                                <option value="Spedito" ${o.status === 'Spedito' ? 'selected' : ''}>Spedito</option>
+                                <option value="Consegnato" ${o.status === 'Consegnato' ? 'selected' : ''}>Consegnato</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-400 mb-1">Codice Tracciamento Corriere:</label>
+                            <input type="text" value="${o.trackingCode || ''}" onchange="updateOrderTracking('${o.id}', this.value)" placeholder="Es. BRT123456" class="bg-gray-800 border border-gray-700 text-white rounded p-1 text-xs w-full">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateOrderStatus(id, status) {
+            const o = orders.find(ord => ord.id === id);
+            if (o) {
+                o.status = status;
+                localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+            }
+        }
+
+        function updateOrderTracking(id, code) {
+            const o = orders.find(ord => ord.id === id);
+            if (o) {
+                o.trackingCode = code;
+                localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+            }
+        }
+
+        // INITIALIZATION
+        renderCategories();
         renderProducts();
         saveCart();
     </script>
