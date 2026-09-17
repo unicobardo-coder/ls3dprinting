@@ -19,7 +19,8 @@
                 extend: {
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     colors: {
-                        brand: { 500: '#10b981', 600: '#059669', 400: '#34d399' },
+                        brand: { 500: '#10b981', 600: '#059669', 400: '#34d399', 900: '#064e3b' },
+                        accent: { 500: '#06b6d4', 400: '#22d3ee' },
                         dark: { bg: '#090d16', card: '#111827', surface: '#151e32' }
                     }
                 }
@@ -33,9 +34,19 @@
     <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
             <a href="#" onclick="showPage('home')" class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center font-mono font-black text-black text-xl">LS</div>
-                <span class="font-bold text-lg">LS3Dmaker</span>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-mono font-black text-black text-xl">LS</div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-tight">LS3Dmaker</span>
+                    <span class="text-[10px] text-gray-400 font-mono tracking-wider">CREATIVITÀ & PROTOTIPAZIONE</span>
+                </div>
             </a>
+
+            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
+                <a href="#prodotti" onclick="showPage('home')" class="hover:text-brand-400 transition-colors">Prodotti</a>
+                <a href="#info" onclick="showPage('home')" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
+                <a href="#traccia" onclick="showPage('home')" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
+                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors">Chi siamo?</a>
+            </nav>
 
             <div class="flex items-center gap-3">
                 <button onclick="openCartModal()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-mono border border-brand-500/30">
@@ -49,35 +60,108 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Filtri Categorie Multiple -->
-        <div class="mb-6">
-            <h2 class="text-xl font-bold mb-3">Filtra per Categorie</h2>
-            <div id="category-filters" class="flex flex-wrap gap-2"></div>
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- VISTA HOME / CATALOGO ORIGINALE -->
+        <div id="home-view">
+            <section class="py-16 text-center">
+                <div class="max-w-7xl mx-auto px-4">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6">
+                        <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
+                    </span>
+                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
+                        Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
+                    </h1>
+                    <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
+                        Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Sezione Catalogo & Filtri Categorie -->
+            <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-white mb-2">Catalogo Creazioni 3D</h2>
+                        <p class="text-gray-400 text-sm mb-4">Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello.</p>
+                        <div id="category-filters" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+            </section>
+
+            <!-- Sezione Richiesta Info -->
+            <section id="info" class="py-16 bg-dark-bg">
+                <div class="max-w-3xl mx-auto px-4">
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                        <h2 class="text-xl font-bold text-white mb-2">Richiedi Informazioni o Preventivo</h2>
+                        <p class="text-xs text-gray-400 mb-6">Compila il modulo per un preventivo personalizzato</p>
+                        <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <input type="text" id="info-name" required placeholder="Nome e Cognome" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm">
+                                <input type="text" id="info-contact" required placeholder="Email o Telefono" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm">
+                            </div>
+                            <textarea id="info-message" rows="4" required placeholder="Descrivi la tua richiesta..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm"></textarea>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm">Invia Richiesta via WhatsApp</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione Traccia Ordine -->
+            <section id="traccia" class="py-16 bg-dark-surface/20 border-t border-gray-800/80">
+                <div class="max-w-3xl mx-auto px-4 text-center">
+                    <h2 class="text-xl font-bold text-white mb-2">Traccia il tuo Ordine</h2>
+                    <p class="text-xs text-gray-400 mb-4">Inserisci il codice ordine per verificare lo stato</p>
+                    <div class="flex gap-2 max-w-md mx-auto">
+                        <input type="text" id="track-input" placeholder="Es. LS-8921" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono text-sm uppercase">
+                        <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 text-black font-bold text-sm rounded-xl">Cerca</button>
+                    </div>
+                    <div id="track-result" class="hidden mt-6 text-left max-w-md mx-auto"></div>
+                </div>
+            </section>
         </div>
 
-        <!-- Griglia Prodotti Home -->
-        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        <!-- VISTA CHI SIAMO ORIGINALE -->
+        <div id="chi-siamo-view" class="hidden py-16">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h1 class="text-4xl font-extrabold text-white mb-6">Chi Siamo — LS3Dmaker</h1>
+                <p class="text-gray-300 text-base leading-relaxed mb-8">
+                    LS3Dmaker nasce con l'obiettivo di trasformare concetti complessi, idee grafiche e modelli CAD in oggetti reali ad alta precisione. Ogni pezzo viene stampato, rifinito e verificato singolarmente prima della spedizione.
+                </p>
+                <button onclick="showPage('home')" class="px-6 py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Torna al Catalogo</button>
+            </div>
+        </div>
+
     </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p class="font-bold text-white">LS3Dmaker © 2026 - Tutti i diritti riservati</p>
+            <div class="flex gap-4 font-mono">
+                <a href="#" class="hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:underline">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-xl w-full p-6 relative">
             <button onclick="closeCartModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <h3 class="text-xl font-bold mb-4">Il Tuo Carrello</h3>
-            
             <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 mb-6 border-y border-gray-800 py-4"></div>
-
             <div class="flex justify-between items-center mb-6 font-mono p-4 bg-gray-900 rounded-xl">
                 <span class="text-xs text-gray-400 uppercase">Totale:</span>
                 <span id="cart-total" class="text-2xl font-bold text-brand-400">€0.00</span>
             </div>
-
             <button onclick="alert('Checkout avviato!')" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Procedi al Pagamento</button>
         </div>
     </div>
 
-    <!-- MODALE ADMIN: INCLUSO TASTO MODIFICA, CATEGORIE, SHORT DESC, FOTO E COLORI -->
+    <!-- MODALE ADMIN -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -85,79 +169,54 @@
 
             <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
                 <input type="hidden" id="edit-prod-id">
-                
                 <div class="grid grid-cols-2 gap-3">
                     <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                     <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                 </div>
-
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">Descrizione Breve (Visualizzata in Home):</label>
-                    <input type="text" id="new-prod-shortdesc" required placeholder="Es. Supporto ergonomico in PLA+" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    <label class="block text-xs text-gray-400 mb-1">Descrizione Breve (Home):</label>
+                    <input type="text" id="new-prod-shortdesc" required placeholder="Es. Design geometrico ad alta resistenza" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                 </div>
-
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">Seleziona Categorie Multiple:</label>
+                    <label class="block text-xs text-gray-400 mb-1">Categorie Multiple:</label>
                     <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
                 </div>
-
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">Seleziona Colori Disponibili:</label>
+                    <label class="block text-xs text-gray-400 mb-1">Colori Disponibili:</label>
                     <div id="admin-color-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
                 </div>
-
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">Carica Foto del Prodotto (Multiple):</label>
+                    <label class="block text-xs text-gray-400 mb-1">Foto del Prodotto (Multiple):</label>
                     <input type="file" id="img-files-input" accept="image/*" multiple onchange="handleMultipleImages(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                 </div>
-
                 <textarea id="new-prod-desc" placeholder="Descrizione Dettagliata" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
-
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
-                    <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo pubblico</label>
+                    <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo</label>
                 </div>
-
                 <div class="flex gap-2">
                     <button type="submit" id="btn-save-prod" class="flex-1 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
                     <button type="button" onclick="resetAdminForm()" class="px-4 py-2 bg-gray-800 text-gray-300 text-xs rounded-lg border border-gray-700">Annulla</button>
                 </div>
             </form>
-
             <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
         </div>
     </div>
 
     <script>
         const availableColors = [
-            { name: "Nero", hex: "#000000" },
-            { name: "Bianco", hex: "#ffffff" },
-            { name: "Verde Smeraldo", hex: "#10b981" },
-            { name: "Rosso", hex: "#ef4444" },
-            { name: "Blu", hex: "#3b82f6" },
-            { name: "Oro", hex: "#eab308" },
-            { name: "Argento", hex: "#9ca3af" }
+            { name: "Nero", hex: "#000000" }, { name: "Bianco", hex: "#ffffff" },
+            { name: "Verde Smeraldo", hex: "#10b981" }, { name: "Rosso", hex: "#ef4444" },
+            { name: "Blu", hex: "#3b82f6" }, { name: "Oro", hex: "#eab308" }, { name: "Argento", hex: "#9ca3af" }
         ];
 
         let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Componenti", "Decorazioni", "Prototipi", "Gadget"];
         let selectedCategory = "Tutti";
-
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
 
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { 
-                id: 1, 
-                title: "Fermalibri Cyber Geometry", 
-                price: 34.90, 
-                shortDesc: "Design geometrico ad alta resistenza per librerie e scrivanie.",
-                desc: "Realizzato con polimeri ad altissima risoluzione.", 
-                categories: ["Decorazioni", "Componenti"], 
-                images: [defaultImg],
-                colors: ["Nero", "Verde Smeraldo", "Argento"],
-                hidden: false 
-            }
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Dettagli tecnici avanzati.", categories: ["Decorazioni"], images: [defaultImg], colors: ["Nero", "Argento"], hidden: false }
         ];
-
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
         let uploadedImagesList = [];
         let activeImageIndices = {};
@@ -166,24 +225,21 @@
         function renderCategories() {
             const container = document.getElementById('category-filters');
             container.innerHTML = ['Tutti', ...categories].map(cat => `
-                <button onclick="filterCategory('${cat}')" class="px-3 py-1 rounded-xl text-xs font-mono ${selectedCategory === cat ? 'bg-brand-500 text-black font-bold' : 'bg-gray-800 text-gray-300'}">
+                <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 rounded-xl font-mono text-xs transition-all ${selectedCategory === cat ? 'bg-brand-500 text-black font-bold' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}">
                     ${cat}
                 </button>
             `).join('');
 
-            const selectAdminCats = document.getElementById('admin-category-checkboxes');
-            selectAdminCats.innerHTML = categories.map(c => `
+            document.getElementById('admin-category-checkboxes').innerHTML = categories.map(c => `
                 <label class="flex items-center gap-1.5 text-xs text-gray-300 bg-gray-900 px-2 py-1 rounded border border-gray-700 cursor-pointer">
                     <input type="checkbox" name="prod-categories" value="${c}" class="rounded text-brand-500"> ${c}
                 </label>
             `).join('');
 
-            const selectAdminColors = document.getElementById('admin-color-checkboxes');
-            selectAdminColors.innerHTML = availableColors.map(col => `
+            document.getElementById('admin-color-checkboxes').innerHTML = availableColors.map(col => `
                 <label class="flex items-center gap-1.5 text-xs text-gray-300 bg-gray-900 px-2 py-1 rounded border border-gray-700 cursor-pointer">
                     <input type="checkbox" name="prod-colors" value="${col.name}" class="rounded text-brand-500">
-                    <span class="w-3 h-3 rounded-full inline-block border border-gray-600" style="background-color: ${col.hex}"></span>
-                    ${col.name}
+                    <span class="w-3 h-3 rounded-full inline-block border border-gray-600" style="background-color: ${col.hex}"></span> ${col.name}
                 </label>
             `).join('');
         }
@@ -196,10 +252,8 @@
 
         function renderProducts() {
             const grid = document.getElementById('products-grid');
-            const visibleProducts = products.filter(p => !p.hidden);
-            const filtered = selectedCategory === "Tutti" 
-                ? visibleProducts 
-                : visibleProducts.filter(p => p.categories && p.categories.includes(selectedCategory));
+            const visible = products.filter(p => !p.hidden);
+            const filtered = selectedCategory === "Tutti" ? visible : visible.filter(p => p.categories && p.categories.includes(selectedCategory));
 
             grid.innerHTML = filtered.map(p => {
                 const imgs = (p.images && p.images.length > 0) ? p.images : [defaultImg];
@@ -210,7 +264,7 @@
                 return `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
-                            <div class="relative h-48 bg-gray-900 rounded-xl overflow-hidden mb-4 group">
+                            <div class="relative h-48 bg-gray-900 rounded-xl overflow-hidden mb-4">
                                 <img src="${imgs[activeIndex]}" class="w-full h-full object-cover">
                                 ${imgs.length > 1 ? `
                                     <button onclick="prevImage(${p.id}, ${imgs.length})" class="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/60 text-white rounded-full"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
@@ -218,31 +272,23 @@
                                     <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 px-2 py-0.5 rounded-full text-[10px] text-gray-300 font-mono">${activeIndex + 1}/${imgs.length}</div>
                                 ` : ''}
                             </div>
-
                             <div class="flex flex-wrap gap-1 mb-2">
                                 ${(p.categories || []).map(c => `<span class="bg-gray-800 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-700">${c}</span>`).join('')}
                             </div>
-
                             <h3 class="text-lg font-bold text-white mb-1">${p.title}</h3>
                             <p class="text-brand-400 text-xs font-semibold mb-4">${p.shortDesc || ''}</p>
-
                             ${colors.length > 0 ? `
                                 <div class="mb-4">
                                     <label class="block text-[10px] font-mono text-gray-400 mb-1">Seleziona Colore:</label>
                                     <div class="flex flex-wrap gap-1.5">
                                         ${colors.map(colName => {
                                             const colObj = availableColors.find(c => c.name === colName) || { hex: '#6b7280' };
-                                            const isSelected = currentColor === colName;
-                                            return `
-                                                <button onclick="selectColor(${p.id}, '${colName}')" title="${colName}" class="w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center ${isSelected ? 'border-brand-500 scale-110' : 'border-gray-700 opacity-70'}" style="background-color: ${colObj.hex}">
-                                                </button>
-                                            `;
+                                            return `<button onclick="selectColor(${p.id}, '${colName}')" title="${colName}" class="w-6 h-6 rounded-full border-2 transition-all ${currentColor === colName ? 'border-brand-500 scale-110' : 'border-gray-700 opacity-70'}" style="background-color: ${colObj.hex}"></button>`;
                                         }).join('')}
                                     </div>
                                 </div>
                             ` : ''}
                         </div>
-
                         <div class="flex items-center justify-between border-t border-gray-800 pt-4">
                             <span class="text-xl font-bold font-mono">€${p.price.toFixed(2)}</span>
                             <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500 text-black font-bold text-xs">+ Aggiungi</button>
@@ -254,17 +300,13 @@
         }
 
         function prevImage(prodId, total) {
-            const current = activeImageIndices[prodId] || 0;
-            activeImageIndices[prodId] = (current - 1 + total) % total;
+            activeImageIndices[prodId] = ((activeImageIndices[prodId] || 0) - 1 + total) % total;
             renderProducts();
         }
-
         function nextImage(prodId, total) {
-            const current = activeImageIndices[prodId] || 0;
-            activeImageIndices[prodId] = (current + 1) % total;
+            activeImageIndices[prodId] = ((activeImageIndices[prodId] || 0) + 1) % total;
             renderProducts();
         }
-
         function selectColor(prodId, colorName) {
             selectedProductColors[prodId] = colorName;
             renderProducts();
@@ -274,7 +316,6 @@
             const product = products.find(p => p.id === prodId);
             if (!product) return;
             const chosenColor = selectedProductColors[prodId] || (product.colors && product.colors[0]) || 'Standard';
-            
             const existing = cart.find(item => item.id === prodId && item.color === chosenColor);
             if (existing) existing.qty += 1;
             else cart.push({ id: product.id, title: `${product.title} (${chosenColor})`, price: product.price, color: chosenColor, qty: 1 });
@@ -283,10 +324,9 @@
         }
 
         function updateQuantity(index, delta) {
-            const item = cart[index];
-            if (!item) return;
-            item.qty += delta;
-            if (item.qty <= 0) cart.splice(index, 1);
+            if (!cart[index]) return;
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
             saveCart();
             openCartModal();
         }
@@ -305,7 +345,6 @@
         function openCartModal() {
             const container = document.getElementById('cart-items-list');
             const totalEl = document.getElementById('cart-total');
-
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center text-gray-400 text-xs py-4 font-mono">Il carrello è vuoto.</div>`;
                 totalEl.innerText = "€0.00";
@@ -315,19 +354,14 @@
                     total += i.price * i.qty;
                     return `
                         <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
-                            <div class="flex-1">
-                                <p class="font-bold text-white">${i.title}</p>
-                                <p class="text-brand-400 font-mono">€${i.price.toFixed(2)} Cad.</p>
-                            </div>
+                            <div><p class="font-bold text-white">${i.title}</p><p class="text-brand-400 font-mono">€${i.price.toFixed(2)} Cad.</p></div>
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center border border-gray-700 rounded-lg overflow-hidden bg-gray-800">
-                                    <button onclick="updateQuantity(${idx}, -1)" class="px-2.5 py-1 text-white hover:bg-gray-700 font-bold">-</button>
+                                    <button onclick="updateQuantity(${idx}, -1)" class="px-2.5 py-1 text-white font-bold">-</button>
                                     <span class="px-3 font-mono text-white font-bold">${i.qty}</span>
-                                    <button onclick="updateQuantity(${idx}, 1)" class="px-2.5 py-1 text-white hover:bg-gray-700 font-bold">+</button>
+                                    <button onclick="updateQuantity(${idx}, 1)" class="px-2.5 py-1 text-white font-bold">+</button>
                                 </div>
-                                <button onclick="removeFromCart(${idx})" class="p-1.5 text-red-400 hover:text-red-300">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
+                                <button onclick="removeFromCart(${idx})" class="p-1.5 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
                     `;
@@ -341,15 +375,10 @@
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
         function handleMultipleImages(e) {
-            const files = Array.from(e.target.files);
             uploadedImagesList = [];
-            let loaded = 0;
-            files.forEach(file => {
+            Array.from(e.target.files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(evt) {
-                    uploadedImagesList.push(evt.target.result);
-                    loaded++;
-                };
+                reader.onload = evt => uploadedImagesList.push(evt.target.result);
                 reader.readAsDataURL(file);
             });
         }
@@ -362,7 +391,6 @@
             const shortDesc = document.getElementById('new-prod-shortdesc').value;
             const desc = document.getElementById('new-prod-desc').value;
             const isHidden = document.getElementById('new-prod-hidden').checked;
-
             const selectedCats = Array.from(document.querySelectorAll('input[name="prod-categories"]:checked')).map(cb => cb.value);
             const selectedCols = Array.from(document.querySelectorAll('input[name="prod-colors"]:checked')).map(cb => cb.value);
 
@@ -377,8 +405,7 @@
                 products.unshift({
                     id: Date.now(), title, price, shortDesc, desc,
                     categories: selectedCats, colors: selectedCols, 
-                    images: uploadedImagesList.length > 0 ? uploadedImagesList : [defaultImg], 
-                    hidden: isHidden
+                    images: uploadedImagesList.length > 0 ? uploadedImagesList : [defaultImg], hidden: isHidden
                 });
             }
 
@@ -386,33 +413,23 @@
             resetAdminForm();
             renderProducts();
             renderAdminProductsList();
-            alert('Prodotto salvato con successo!');
+            alert('Prodotto salvato!');
         }
 
-        // Funzione per caricare i dati nel form di modifica
         function editProduct(id) {
             const p = products.find(prod => prod.id === id);
             if (!p) return;
-
             document.getElementById('edit-prod-id').value = p.id;
             document.getElementById('new-prod-title').value = p.title;
             document.getElementById('new-prod-price').value = p.price;
             document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
             document.getElementById('new-prod-desc').value = p.desc || '';
             document.getElementById('new-prod-hidden').checked = p.hidden || false;
-            document.getElementById('admin-form-title').innerText = "Modifica Prodotto (Admin)";
+            document.getElementById('admin-form-title').innerText = "Modifica Prodotto";
             document.getElementById('btn-save-prod').innerText = "Aggiorna Prodotto";
 
-            // Spunta le categorie salvate
-            document.querySelectorAll('input[name="prod-categories"]').forEach(cb => {
-                cb.checked = p.categories && p.categories.includes(cb.value);
-            });
-
-            // Spunta i colori salvati
-            document.querySelectorAll('input[name="prod-colors"]').forEach(cb => {
-                cb.checked = p.colors && p.colors.includes(cb.value);
-            });
-
+            document.querySelectorAll('input[name="prod-categories"]').forEach(cb => cb.checked = p.categories && p.categories.includes(cb.value));
+            document.querySelectorAll('input[name="prod-colors"]').forEach(cb => cb.checked = p.colors && p.colors.includes(cb.value));
             uploadedImagesList = p.images || [];
         }
 
@@ -432,19 +449,16 @@
         }
 
         function renderAdminProductsList() {
-            const container = document.getElementById('admin-products-list');
-            container.innerHTML = products.map(p => `
+            document.getElementById('admin-products-list').innerHTML = products.map(p => `
                 <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
                     <div>
                         <span class="font-bold text-white">${p.title}</span>
-                        ${p.hidden ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded">Nascosto</span>` : ''}
-                        <p class="text-gray-400 text-[10px]">${(p.categories || []).join(', ')} | Colori: ${(p.colors || []).join(', ')}</p>
+                        ${p.hidden ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] bg-amber-500/20 text-amber-400 rounded">Nascosto</span>` : ''}
+                        <p class="text-gray-400 text-[10px]">${(p.categories || []).join(', ')}</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="editProduct(${p.id})" class="px-2.5 py-1 bg-brand-500/20 text-brand-400 rounded text-[10px] border border-brand-500/30 font-bold">Modifica</button>
-                        <button onclick="toggleHideProduct(${p.id})" class="px-2.5 py-1 bg-gray-800 text-gray-300 rounded text-[10px] border border-gray-700">
-                            ${p.hidden ? 'Mostra' : 'Nascondi'}
-                        </button>
+                        <button onclick="editProduct(${p.id})" class="px-2.5 py-1 bg-brand-500/20 text-brand-400 rounded text-[10px] font-bold">Modifica</button>
+                        <button onclick="toggleHideProduct(${p.id})" class="px-2.5 py-1 bg-gray-800 text-gray-300 rounded text-[10px]">${p.hidden ? 'Mostra' : 'Nascondi'}</button>
                     </div>
                 </div>
             `).join('');
@@ -460,11 +474,12 @@
             }
         }
 
-        function openAdminModal() { 
-            renderCategories();
-            renderAdminProductsList();
-            document.getElementById('admin-modal').classList.remove('hidden'); 
+        function showPage(pageId) {
+            document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
+            document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
         }
+
+        function openAdminModal() { renderCategories(); renderAdminProductsList(); document.getElementById('admin-modal').classList.remove('hidden'); }
         function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
         renderCategories();
