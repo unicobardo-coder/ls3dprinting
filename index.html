@@ -121,13 +121,87 @@
                 <span class="text-xs text-gray-400 uppercase">Totale:</span>
                 <span id="cart-total" class="text-2xl font-bold text-brand-400">€0.00</span>
             </div>
-            <button onclick="alert('Checkout avviato!')" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Procedi al Pagamento</button>
+            <button onclick="openCheckout()" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Procedi al Checkout</button>
         </div>
     </div>
 
-    <!-- MODALE ADMIN CON LOGIN PROTETTO -->
+    <!-- MODALE CHECKOUT & FATTURA -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="text-xl font-bold mb-4">Completa l'Ordine e Fattura</h3>
+            <form onsubmit="processOrder(event)" class="space-y-3 text-xs">
+                <input type="text" id="chk-name" required placeholder="Nome e Cognome / Azienda" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+                <input type="email" id="chk-email" required placeholder="Email" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+                <input type="tel" id="chk-phone" required placeholder="Telefono" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+                <textarea id="chk-address" required rows="2" placeholder="Indirizzo completo di spedizione" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white"></textarea>
+                
+                <div>
+                    <label class="block text-gray-400 mb-1">Metodo di Spedizione:</label>
+                    <select id="chk-shipping" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white font-mono">
+                        <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
+                        <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
+                        <option value="0.00">Ritiro a Mano (Gratuito)</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" id="chk-gdpr" required class="rounded bg-gray-900 border-gray-700 text-brand-500">
+                    <label for="chk-gdpr" class="text-[11px] text-gray-400">Accetto la Privacy Policy e il trattamento dati.</label>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-brand-500 text-black font-bold rounded-lg mt-2">Conferma Ordine & Genera Fattura</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALE ANTEPRIMA FATTURA -->
+    <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <div id="invoice-paper" class="bg-white text-gray-900 p-8 rounded-xl font-sans text-xs">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-emerald-600">LS3Dmaker</h2>
+                        <p class="text-[10px] text-gray-500 font-mono">Stampa 3D & Prototipazione</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-sm" id="inv-number">Fattura n. 1/2026</p>
+                        <p class="text-gray-500" id="inv-date">Data: 17/09/2026</p>
+                    </div>
+                </div>
+                <div class="mb-6 border-b pb-4">
+                    <p class="text-gray-500">Intestato a:</p>
+                    <p class="font-bold" id="inv-client">[Nome]</p>
+                    <p class="text-gray-600" id="inv-address">[Indirizzo]</p>
+                </div>
+                <table class="w-full mb-6 text-left border-collapse">
+                    <thead>
+                        <tr class="border-b font-bold text-gray-700">
+                            <th class="py-1">Descrizione</th>
+                            <th class="py-1 text-center">Qt</th>
+                            <th class="py-1 text-right">Prezzo</th>
+                            <th class="py-1 text-right">Totale</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-items"></tbody>
+                </table>
+                <div class="text-right space-y-1 border-t pt-4 font-mono">
+                    <p>Subtotale: <span id="inv-sub">€0.00</span></p>
+                    <p>Spedizione: <span id="inv-ship">€0.00</span></p>
+                    <p class="font-bold text-sm text-black">Totale Complessivo: <span id="inv-tot">€0.00</span></p>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button onclick="window.print()" class="flex-1 py-2.5 bg-gray-800 text-white rounded-lg font-bold text-xs">Stampa / Salva PDF</button>
+                <button onclick="sendInvoiceEmail()" class="flex-1 py-2.5 bg-brand-500 text-black rounded-lg font-bold text-xs">Invia via Email</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE ADMIN CON GESTIONE PRODOTTI, CATEGORIE E ORDINI -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
 
             <!-- SCHERMATA LOGIN ADMIN -->
@@ -143,46 +217,69 @@
                 </form>
             </div>
 
-            <!-- PANNELLO DI CONTROLLO (Nascosto finché non si effettua il login) -->
+            <!-- PANNELLO DI CONTROLLO -->
             <div id="admin-panel-view" class="hidden space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h3 class="text-xl font-bold text-white" id="admin-form-title">Nuovo Prodotto (Admin)</h3>
+                    <h3 class="text-xl font-bold text-white">Dashboard Amministrazione</h3>
                     <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline font-mono">Logout</button>
                 </div>
 
-                <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900 p-4 rounded-xl border border-gray-800">
-                    <input type="hidden" id="edit-prod-id">
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                        <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                <!-- Tabs Navigazione Admin -->
+                <div class="flex gap-2 border-b border-gray-800 pb-2">
+                    <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti</button>
+                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Gestione Categorie</button>
+                    <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Ordini & Spedizioni</button>
+                </div>
+
+                <!-- TAB 1: PRODOTTI -->
+                <div id="admin-tab-products" class="space-y-4">
+                    <form onsubmit="handleSaveProduct(event)" class="space-y-3 bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs">
+                        <input type="hidden" id="edit-prod-id">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
+                            <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
+                        </div>
+                        <input type="text" id="new-prod-shortdesc" required placeholder="Descrizione Breve (Home)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
+                        
+                        <div>
+                            <label class="block text-gray-400 mb-1">Categorie Multiple:</label>
+                            <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1">Colori Disponibili:</label>
+                            <div id="admin-color-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1">Foto (Multiple):</label>
+                            <input type="file" id="img-files-input" accept="image/*" multiple onchange="handleMultipleImages(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
+                            <label for="new-prod-hidden" class="text-gray-300">Nascondi prodotto nel catalogo</label>
+                        </div>
+
+                        <div class="flex gap-2 pt-2">
+                            <button type="submit" id="btn-save-prod" class="flex-1 py-2 bg-brand-500 text-black font-bold rounded-lg">+ Salva Prodotto</button>
+                            <button type="button" onclick="resetAdminForm()" class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg border border-gray-700">Annulla</button>
+                        </div>
+                    </form>
+                    <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+
+                <!-- TAB 2: CATEGORIE -->
+                <div id="admin-tab-categories" class="hidden space-y-4">
+                    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex gap-2">
+                        <input type="text" id="new-cat-name" placeholder="Nuova categoria..." class="flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                        <button onclick="addNewCategory()" class="px-4 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Aggiungi</button>
                     </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Descrizione Breve (Home):</label>
-                        <input type="text" id="new-prod-shortdesc" required placeholder="Es. Design geometrico ad alta resistenza" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Categorie Multiple:</label>
-                        <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Colori Disponibili:</label>
-                        <div id="admin-color-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Foto del Prodotto (Multiple):</label>
-                        <input type="file" id="img-files-input" accept="image/*" multiple onchange="handleMultipleImages(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                    </div>
-                    <textarea id="new-prod-desc" placeholder="Descrizione Dettagliata" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
-                        <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo</label>
-                    </div>
-                    <div class="flex gap-2">
-                        <button type="submit" id="btn-save-prod" class="flex-1 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
-                        <button type="button" onclick="resetAdminForm()" class="px-4 py-2 bg-gray-800 text-gray-300 text-xs rounded-lg border border-gray-700">Annulla</button>
-                    </div>
-                </form>
-                <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                    <div id="admin-categories-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+
+                <!-- TAB 3: ORDINI & SPEDIZIONI -->
+                <div id="admin-tab-orders" class="hidden space-y-4">
+                    <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -202,6 +299,9 @@
             { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Dettagli tecnici avanzati.", categories: ["Decorazioni"], images: [defaultImg], colors: ["Nero", "Argento"], hidden: false }
         ];
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
+        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
+        let currentOrder = null;
+        let lastInvoiceNum = parseInt(localStorage.getItem('ls3d_invoice_num')) || 0;
         let uploadedImagesList = [];
         let activeImageIndices = {};
         let selectedProductColors = {};
@@ -357,26 +457,96 @@
         }
 
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        function openCheckout() { closeCartModal(); document.getElementById('checkout-modal').classList.remove('hidden'); }
+        function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
+
+        function processOrder(e) {
+            e.preventDefault();
+            lastInvoiceNum++;
+            localStorage.setItem('ls3d_invoice_num', lastInvoiceNum);
+
+            const shippingCost = parseFloat(document.getElementById('chk-shipping').value);
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+
+            currentOrder = {
+                id: `LS-${Math.floor(1000 + Math.random()*9000)}`,
+                number: `${lastInvoiceNum}/2026`,
+                name: document.getElementById('chk-name').value,
+                email: document.getElementById('chk-email').value,
+                phone: document.getElementById('chk-phone').value,
+                address: document.getElementById('chk-address').value,
+                shipping: shippingCost,
+                items: [...cart],
+                subtotal: subtotal,
+                total: subtotal + shippingCost,
+                status: "In Elaborazione",
+                tracking: "In Attesa"
+            };
+
+            orders.unshift(currentOrder);
+            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+            cart = [];
+            saveCart();
+            closeCheckoutModal();
+            openInvoiceModal();
+        }
+
+        function openInvoiceModal() {
+            if (!currentOrder) return;
+            document.getElementById('inv-number').innerText = `Fattura n. ${currentOrder.number}`;
+            document.getElementById('inv-client').innerText = currentOrder.name;
+            document.getElementById('inv-address').innerText = currentOrder.address;
+            document.getElementById('inv-sub').innerText = `€${currentOrder.subtotal.toFixed(2)}`;
+            document.getElementById('inv-ship').innerText = `€${currentOrder.shipping.toFixed(2)}`;
+            document.getElementById('inv-tot').innerText = `€${currentOrder.total.toFixed(2)}`;
+
+            let html = currentOrder.items.map(i => `
+                <tr class="border-b">
+                    <td class="py-1">${i.title}</td>
+                    <td class="py-1 text-center">${i.qty}</td>
+                    <td class="py-1 text-right">€${i.price.toFixed(2)}</td>
+                    <td class="py-1 text-right">€${(i.price * i.qty).toFixed(2)}</td>
+                </tr>
+            `).join('');
+            if(currentOrder.shipping > 0) {
+                html += `<tr class="border-b text-gray-500"><td class="py-1">Spedizione</td><td class="py-1 text-center">1</td><td class="py-1 text-right">€${currentOrder.shipping.toFixed(2)}</td><td class="py-1 text-right">€${currentOrder.shipping.toFixed(2)}</td></tr>`;
+            }
+            document.getElementById('inv-items').innerHTML = html;
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+        function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
+        function sendInvoiceEmail() {
+            if(!currentOrder) return;
+            window.location.href = `mailto:unicobardo@gmail.com?subject=Ordine ${currentOrder.id}&body=Invio ordine ${currentOrder.id} per ${currentOrder.name}`;
+        }
 
         function handleAdminLogin(e) {
             e.preventDefault();
-            const u = document.getElementById('admin-username').value;
-            const p = document.getElementById('admin-password').value;
-            if (u === 'admin' && p === 'ls3d2026') {
+            if (document.getElementById('admin-username').value === 'admin' && document.getElementById('admin-password').value === 'ls3d2026') {
                 document.getElementById('admin-login-view').classList.add('hidden');
                 document.getElementById('admin-panel-view').classList.remove('hidden');
                 renderCategories();
                 renderAdminProductsList();
+                renderAdminCategoriesList();
+                renderAdminOrdersList();
             } else {
-                alert('Credenziali errate! (Usa admin / ls3d2026)');
+                alert('Credenziali errate!');
             }
         }
 
         function adminLogout() {
             document.getElementById('admin-panel-view').classList.add('hidden');
             document.getElementById('admin-login-view').classList.remove('hidden');
-            document.getElementById('admin-username').value = '';
-            document.getElementById('admin-password').value = '';
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('admin-tab-products').classList.toggle('hidden', tab !== 'products');
+            document.getElementById('admin-tab-categories').classList.toggle('hidden', tab !== 'categories');
+            document.getElementById('admin-tab-orders').classList.toggle('hidden', tab !== 'orders');
+
+            document.getElementById('tab-btn-products').className = tab === 'products' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-categories').className = tab === 'categories' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-orders').className = tab === 'orders' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
         }
 
         function handleMultipleImages(e) {
@@ -394,7 +564,6 @@
             const title = document.getElementById('new-prod-title').value;
             const price = parseFloat(document.getElementById('new-prod-price').value);
             const shortDesc = document.getElementById('new-prod-shortdesc').value;
-            const desc = document.getElementById('new-prod-desc').value;
             const isHidden = document.getElementById('new-prod-hidden').checked;
             const selectedCats = Array.from(document.querySelectorAll('input[name="prod-categories"]:checked')).map(cb => cb.value);
             const selectedCols = Array.from(document.querySelectorAll('input[name="prod-colors"]:checked')).map(cb => cb.value);
@@ -402,13 +571,13 @@
             if (id) {
                 const p = products.find(prod => prod.id == id);
                 if (p) {
-                    p.title = title; p.price = price; p.shortDesc = shortDesc; p.desc = desc;
+                    p.title = title; p.price = price; p.shortDesc = shortDesc;
                     p.categories = selectedCats; p.colors = selectedCols; p.hidden = isHidden;
                     if(uploadedImagesList.length > 0) p.images = uploadedImagesList;
                 }
             } else {
                 products.unshift({
-                    id: Date.now(), title, price, shortDesc, desc,
+                    id: Date.now(), title, price, shortDesc,
                     categories: selectedCats, colors: selectedCols, 
                     images: uploadedImagesList.length > 0 ? uploadedImagesList : [defaultImg], hidden: isHidden
                 });
@@ -428,9 +597,7 @@
             document.getElementById('new-prod-title').value = p.title;
             document.getElementById('new-prod-price').value = p.price;
             document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
-            document.getElementById('new-prod-desc').value = p.desc || '';
             document.getElementById('new-prod-hidden').checked = p.hidden || false;
-            document.getElementById('admin-form-title').innerText = "Modifica Prodotto";
             document.getElementById('btn-save-prod').innerText = "Aggiorna Prodotto";
 
             document.querySelectorAll('input[name="prod-categories"]').forEach(cb => cb.checked = p.categories && p.categories.includes(cb.value));
@@ -443,10 +610,8 @@
             document.getElementById('new-prod-title').value = '';
             document.getElementById('new-prod-price').value = '';
             document.getElementById('new-prod-shortdesc').value = '';
-            document.getElementById('new-prod-desc').value = '';
             document.getElementById('new-prod-hidden').checked = false;
             document.getElementById('img-files-input').value = '';
-            document.getElementById('admin-form-title').innerText = "Nuovo Prodotto (Admin)";
             document.getElementById('btn-save-prod').innerText = "+ Salva Prodotto";
             uploadedImagesList = [];
             document.querySelectorAll('input[name="prod-categories"]').forEach(cb => cb.checked = false);
@@ -479,6 +644,62 @@
             }
         }
 
+        function addNewCategory() {
+            const name = document.getElementById('new-cat-name').value.trim();
+            if(!name || categories.includes(name)) return;
+            categories.push(name);
+            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
+            document.getElementById('new-cat-name').value = '';
+            renderCategories();
+            renderAdminCategoriesList();
+        }
+
+        function deleteCategory(cat) {
+            categories = categories.filter(c => c !== cat);
+            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
+            renderCategories();
+            renderAdminCategoriesList();
+        }
+
+        function renderAdminCategoriesList() {
+            document.getElementById('admin-categories-list').innerHTML = categories.map(c => `
+                <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono">
+                    <span class="text-white">${c}</span>
+                    <button onclick="deleteCategory('${c}')" class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-[10px]">Elimina</button>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminOrdersList() {
+            const container = document.getElementById('admin-orders-list');
+            if(orders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 font-mono">Nessun ordine presente.</p>`;
+                return;
+            }
+            container.innerHTML = orders.map(o => `
+                <div class="p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs space-y-2 font-mono">
+                    <div class="flex justify-between"><strong class="text-brand-400">${o.id} - ${o.name}</strong><span>€${o.total.toFixed(2)}</span></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="bg-gray-800 text-white rounded p-1">
+                            <option ${o.status==='In Elaborazione'?'selected':''}>In Elaborazione</option>
+                            <option ${o.status==='In Stampa 3D'?'selected':''}>In Stampa 3D</option>
+                            <option ${o.status==='Spedito'?'selected':''}>Spedito</option>
+                        </select>
+                        <input type="text" value="${o.tracking}" onchange="updateOrderTracking('${o.id}', this.value)" placeholder="Codice Tracking" class="bg-gray-800 text-white rounded p-1">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateOrderStatus(id, val) {
+            const o = orders.find(x => x.id === id);
+            if(o) { o.status = val; localStorage.setItem('ls3d_orders', JSON.stringify(orders)); }
+        }
+        function updateOrderTracking(id, val) {
+            const o = orders.find(x => x.id === id);
+            if(o) { o.tracking = val; localStorage.setItem('ls3d_orders', JSON.stringify(orders)); }
+        }
+
         function showPage(pageId) {
             document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
             document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
@@ -495,7 +716,5 @@
         renderProducts();
         saveCart();
     </script>
-</body>
-</html>
 </body>
 </html>
