@@ -6,7 +6,7 @@
     
     <!-- SEO & META TAGS -->
     <title>LS3Dmaker | Stampa 3D su Misura, Prototipazione & Modelli STL</title>
-    <meta name="description" content="LS3Dmaker è il tuo service di stampa 3D su misura, prototipazione rapida e modellazione CAD. Visualizza i modelli 3D STL e ordina online.">
+    <meta name="description" content="LS 3D maker è il tuo service di stampa 3D su misura, prototipazione rapida e modellazione CAD. Visualizza i modelli 3D STL e ordina online.">
     <meta name="keywords" content="stampa 3d, prototipazione rapida, modelli stl, ls3dmaker, service stampa 3d, modellazione cad, stampa 3d bologna">
     <meta name="author" content="LS3Dmaker">
     <meta name="robots" content="index, follow">
@@ -611,36 +611,29 @@
 
                 <!-- TAB 1: GESTIONE PRODOTTI -->
                 <div id="admin-tab-products" class="space-y-4">
-                    <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
-                        <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Nuovo / Modifica Prodotto</h4>
+                    <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
                         <input type="hidden" id="edit-prod-id">
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-2 gap-3">
                             <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                             <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            <select id="new-prod-category" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono"></select>
                         </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[11px] font-mono text-gray-400 mb-1">Carica Foto Prodotto (PNG/JPG)</label>
-                                <input type="file" id="img-file-input" accept="image/*" onchange="handleImageSelect(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-mono text-gray-400 mb-1">Oppure Inserisci URL Immagine</label>
-                                <input type="url" id="new-prod-imgurl" placeholder="https://..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
-                        </div>
-
+                    
+                        <!-- SELEZIONE CATEGORIE MULTIPLE (Tieni premuto Ctrl/Cmd per selezionarne più di una) -->
                         <div>
-                            <label class="block text-[11px] font-mono text-gray-400 mb-1">Carica Modello 3D STL (Opzionale)</label>
-                            <input type="file" id="stl-file-input" accept=".stl" onchange="handleSTLSelect(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            <label class="block text-xs text-gray-400 mb-1">Seleziona Categorie (CTRL + Click per selezione multipla):</label>
+                            <select id="new-prod-categories" multiple class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white h-24"></select>
                         </div>
-
-                        <textarea id="new-prod-desc" rows="2" required placeholder="Descrizione Dettagliata Prodotto" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                    
+                        <textarea id="new-prod-desc" placeholder="Descrizione" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                    
+                        <!-- OPZIONE PER NASCONDERE IL PRODOTTO -->
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
+                            <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo pubblico</label>
+                        </div>
+                    
                         <button type="submit" class="w-full py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
                     </form>
-
                     <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
 
@@ -960,28 +953,122 @@
             document.getElementById('cart-badge').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
         }
 
-        function openCartModal() {
-            const container = document.getElementById('cart-items-list');
-            const totalEl = document.getElementById('cart-total');
-            const t = translations[currentLang] || translations.it;
+        // --- 2. NUOVA FUNZIONE openCartModal() CON TASTI +, - E CESTINO ---
+function openCartModal() {
+    const container = document.getElementById('cart-items-list');
+    const totalEl = document.getElementById('cart-total');
 
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-400 text-xs py-8 font-mono">${t.emptyCart}</div>`;
-                totalEl.innerText = "€0.00";
-            } else {
-                let total = 0;
-                container.innerHTML = cart.map(i => {
-                    total += i.price * i.qty;
-                    return `<div class="flex justify-between p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
-                                <span class="font-bold text-white">${i.title} (x${i.qty})</span>
-                                <span class="font-mono font-bold text-brand-400">€${(i.price*i.qty).toFixed(2)}</span>
-                            </div>`;
-                }).join('');
-                totalEl.innerText = `€${total.toFixed(2)}`;
-            }
-            document.getElementById('cart-modal').classList.remove('hidden');
+    if (cart.length === 0) {
+        container.innerHTML = `<div class="text-center text-gray-400 text-xs py-4 font-mono">Il carrello è vuoto.</div>`;
+        totalEl.innerText = "€0.00";
+    } else {
+        let total = 0;
+        container.innerHTML = cart.map(i => {
+            total += i.price * i.qty;
+            return `
+                <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
+                    <div class="flex-1">
+                        <p class="font-bold text-white">${i.title}</p>
+                        <p class="text-brand-400 font-mono">€${i.price.toFixed(2)} Cad.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <!-- Tasti incremento e decremento quantità -->
+                        <div class="flex items-center border border-gray-700 rounded-lg overflow-hidden bg-gray-800">
+                            <button onclick="updateQuantity(${i.id}, -1)" class="px-2.5 py-1 text-white hover:bg-gray-700 font-bold">-</button>
+                            <span class="px-3 font-mono text-white font-bold">${i.qty}</span>
+                            <button onclick="updateQuantity(${i.id}, 1)" class="px-2.5 py-1 text-white hover:bg-gray-700 font-bold">+</button>
+                        </div>
+                        <!-- Tasto elimina singolo prodotto -->
+                        <button onclick="removeFromCart(${i.id})" class="p-1.5 text-red-400 hover:text-red-300" title="Rimuovi prodotto">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        totalEl.innerText = `€${total.toFixed(2)}`;
+    }
+    lucide.createIcons();
+    document.getElementById('cart-modal').classList.remove('hidden');
+}
+
+// --- 3. FUNZIONI DI SUPPORTO PER QUANTITÀ E RIMOZIONE ---
+function updateQuantity(prodId, delta) {
+    const item = cart.find(i => i.id === prodId);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+        removeFromCart(prodId);
+    } else {
+        saveCart();
+        openCartModal();
+    }
+}
+
+function removeFromCart(prodId) {
+    cart = cart.filter(i => i.id !== prodId);
+    saveCart();
+    openCartModal();
+}
+
+// --- 4. FUNZIONE SALVATAGGIO PRODOTTI CON CATEGORIE MULTIPLE E NASCONDI ---
+function handleSaveProduct(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-prod-id').value;
+    const title = document.getElementById('new-prod-title').value;
+    const price = parseFloat(document.getElementById('new-prod-price').value);
+    const desc = document.getElementById('new-prod-desc').value;
+    const isHidden = document.getElementById('new-prod-hidden').checked;
+
+    // Lettura delle opzioni multiple selezionate
+    const selectCat = document.getElementById('new-prod-categories');
+    const selectedCats = Array.from(selectCat.selectedOptions).map(opt => opt.value);
+
+    if (id) {
+        const p = products.find(prod => prod.id == id);
+        if (p) {
+            p.title = title; p.price = price; p.desc = desc;
+            p.categories = selectedCats; p.hidden = isHidden;
         }
+    } else {
+        products.unshift({
+            id: Date.now(), title, price, desc,
+            categories: selectedCats, hidden: isHidden
+        });
+    }
 
+    localStorage.setItem('ls3d_products', JSON.stringify(products));
+    renderProducts();
+    renderAdminProductsList();
+    alert('Prodotto salvato!');
+}
+
+// --- 5. VISUALIZZAZIONE E ALTERNANZA MOSTRA/NASCONDI NELL'ADMIN ---
+function renderAdminProductsList() {
+    const container = document.getElementById('admin-products-list');
+    container.innerHTML = products.map(p => `
+        <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
+            <div>
+                <span class="font-bold text-white">${p.title}</span>
+                ${p.hidden ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded">Nascosto</span>` : ''}
+                <p class="text-gray-400 text-[10px]">${(p.categories || []).join(', ')}</p>
+            </div>
+            <button onclick="toggleHideProduct(${p.id})" class="px-2 py-1 bg-gray-800 text-gray-300 rounded text-[10px] border border-gray-700">
+                ${p.hidden ? 'Mostra' : 'Nascondi'}
+            </button>
+        </div>
+    `).join('');
+}
+
+function toggleHideProduct(id) {
+    const p = products.find(prod => prod.id === id);
+    if (p) {
+        p.hidden = !p.hidden;
+        localStorage.setItem('ls3d_products', JSON.stringify(products));
+        renderProducts();
+        renderAdminProductsList();
+    }
+}
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
         function openCheckoutFromCart() {
