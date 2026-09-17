@@ -6,7 +6,7 @@
     
     <!-- SEO & META TAGS -->
     <title>LS3Dmaker | Stampa 3D su Misura, Prototipazione & Modelli STL</title>
-    <meta name="description" content="LS 3D maker è il tuo service di stampa 3D su misura, prototipazione rapida e modellazione CAD. Visualizza i modelli 3D STL e ordina online.">
+    <meta name="description" content="LS3Dmaker è il tuo service di stampa 3D su misura, prototipazione rapida e modellazione CAD. Visualizza i modelli 3D STL e ordina online.">
     <meta name="keywords" content="stampa 3d, prototipazione rapida, modelli stl, ls3dmaker, service stampa 3d, modellazione cad, stampa 3d bologna">
     <meta name="author" content="LS3Dmaker">
     <meta name="robots" content="index, follow">
@@ -37,7 +37,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-    <!-- IUBENDA COOKIE SOLUTION & PRIVACY POLICY (Sostituire 12345678 con il proprio ID Iubenda) -->
+    <!-- IUBENDA COOKIE SOLUTION & PRIVACY POLICY -->
     <script type="text/javascript">
     var _iub = _iub || [];
     _iub.csConfiguration = {
@@ -176,10 +176,7 @@
                         </div>
                     </div>
 
-                    <!-- Filtri Categoria Dinamici -->
                     <div id="category-filters" class="flex flex-wrap gap-2 mb-8"></div>
-
-                    <!-- Griglia Prodotti -->
                     <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
             </section>
@@ -211,11 +208,11 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-service">Tipo di Servizio</label>
-                                <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                                    <option value="Preventivo Personalizzato">Preventivo Stampa 3D Personalizzata</option>
-                                    <option value="Informazioni Prodotto">Informazioni su Prodotto in Catalogo</option>
-                                    <option value="Prototipazione">Prototipazione Tecnica</option>
-                                    <option value="Altro">Altro</option>
+                                <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none font-mono">
+                                    <option value="Preventivo Personalizzato" id="opt-service-1">Preventivo Stampa 3D Personalizzata</option>
+                                    <option value="Informazioni Prodotto" id="opt-service-2">Informazioni su Prodotto in Catalogo</option>
+                                    <option value="Prototipazione" id="opt-service-3">Prototipazione Tecnica</option>
+                                    <option value="Altro" id="opt-service-4">Altro</option>
                                 </select>
                             </div>
                             <div>
@@ -292,7 +289,7 @@
 
     </main>
 
-    <!-- FOOTER CON LINK IUBENDA PRIVACY & COOKIE POLICY -->
+    <!-- FOOTER CON PRIVACY & COOKIE POLICY -->
     <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
@@ -300,8 +297,8 @@
                 <p>Tutti i diritti riservati. P.IVA / C.F. IT12345678901</p>
             </div>
             <div class="flex gap-4 font-mono">
-                <a href="https://www.iubenda.com/privacy-policy/87654321" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe hover:underline" title="Privacy Policy">Privacy Policy</a>
-                <a href="https://www.iubenda.com/privacy-policy/87654321/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe hover:underline" title="Cookie Policy">Cookie Policy</a>
+                <a href="https://www.iubenda.com/privacy-policy/87654321" class="iubenda-white iubenda-noiframe iubenda-embed hover:underline" title="Privacy Policy">Privacy Policy</a>
+                <a href="https://www.iubenda.com/privacy-policy/87654321/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed hover:underline" title="Cookie Policy">Cookie Policy</a>
             </div>
         </div>
     </footer>
@@ -354,7 +351,7 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-white" id="checkout-title">Completa l'Ordine & Pagamento</h3>
-                    <p class="text-xs text-gray-400">Inserisci i dati per la consegna e la fatturazione</p>
+                    <p class="text-xs text-gray-400" id="checkout-subtitle">Inserisci i dati per la consegna e la fatturazione</p>
                 </div>
             </div>
 
@@ -376,15 +373,17 @@
                     <textarea id="checkout-address" rows="2" required placeholder="Via Roma 10, 40100 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
+                <!-- SELEZIONE SPEDIZIONE -->
                 <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-2">Metodo di Spedizione:</label>
+                    <label class="block text-xs font-mono text-gray-300 mb-2" id="lbl-shipping-select">Metodo di Spedizione:</label>
                     <select id="checkout-shipping-method" onchange="updateCheckoutTotal()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none font-mono">
-                        <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
-                        <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
-                        <option value="0.00">Ritiro a Mano / In Sede (Gratuito)</option>
+                        <option value="5.90" id="opt-ship-std">Spedizione Standard Tracciabile (€5.90)</option>
+                        <option value="9.90" id="opt-ship-exp">Spedizione Espressa 24/48h (€9.90)</option>
+                        <option value="0.00" id="opt-ship-pickup">Ritiro a Mano / In Sede (Gratuito)</option>
                     </select>
                 </div>
 
+                <!-- SELEZIONE PAGAMENTO -->
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-2" id="lbl-pay-method">Seleziona Metodo di Pagamento:</label>
                     <div class="grid grid-cols-3 gap-2">
@@ -403,14 +402,22 @@
                     </div>
                 </div>
 
+                <!-- CONSENSO GDPR OBBLIGATORIO -->
+                <div class="flex items-start gap-2 pt-2">
+                    <input type="checkbox" id="checkout-gdpr" required class="mt-1 rounded bg-gray-900 border-gray-700 text-brand-500 focus:ring-0">
+                    <label for="checkout-gdpr" class="text-[11px] text-gray-400 leading-tight" id="lbl-gdpr-text">
+                        Accetto l'Informativa sulla Privacy e autorizzo il trattamento dei dati personali per l'evasione dell'ordine.
+                    </label>
+                </div>
+
                 <div class="p-4 bg-gray-900/60 border border-gray-800 rounded-xl flex justify-between items-center font-mono">
-                    <span class="text-xs text-gray-400">Totale Complessivo:</span>
+                    <span class="text-xs text-gray-400" id="lbl-grand-total">Totale Complessivo:</span>
                     <span id="checkout-total-price" class="text-xl font-bold text-brand-400">€0.00</span>
                 </div>
 
                 <div id="box-pay-wa">
                     <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i> Conferma Ordine & Genera Fattura
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> <span id="btn-confirm-invoice">Conferma Ordine & Genera Fattura</span>
                     </button>
                 </div>
 
@@ -439,7 +446,7 @@
         </div>
     </div>
 
-    <!-- MODALE FATTURA -->
+    <!-- MODALE FATTURA MODEL INV24 -->
     <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white print:hidden">
@@ -461,28 +468,28 @@
 
                 <div class="flex justify-between items-start mb-10 text-xs">
                     <div>
-                        <p class="text-gray-500 mb-1">Fattura a:</p>
+                        <p class="text-gray-500 mb-1" id="lbl-inv-to">Fattura a:</p>
                         <p class="font-bold text-sm text-gray-900" id="paper-client-name">[Nome dell'azienda del cliente]</p>
                         <p class="text-gray-600" id="paper-client-address">[Indirizzo dell'azienda del cliente]</p>
                         <p class="text-gray-600">P.IVA/C.F.: <span id="paper-client-vat">[Numero P.IVA / Codice Fiscale]</span></p>
                     </div>
                     <div class="text-right space-y-1">
-                        <p><span class="text-gray-500">Data fattura:</span> <span id="paper-date" class="font-medium">17/09/2026</span></p>
-                        <p><span class="text-gray-500">Data di scadenza:</span> <span id="paper-due-date" class="font-medium">01/10/2026</span></p>
+                        <p><span class="text-gray-500" id="lbl-inv-date">Data fattura:</span> <span id="paper-date" class="font-medium">17/09/2026</span></p>
+                        <p><span class="text-gray-500" id="lbl-inv-due">Data di scadenza:</span> <span id="paper-due-date" class="font-medium">01/10/2026</span></p>
                     </div>
                 </div>
 
                 <div class="text-center my-8">
-                    <h2 class="text-2xl font-bold text-gray-900" id="paper-number">Fattura n. 560</h2>
+                    <h2 class="text-2xl font-bold text-gray-900" id="paper-number">Fattura n. 1/2026</h2>
                 </div>
 
                 <table class="w-full mb-8 text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-300 text-xs font-bold text-gray-900">
-                            <th class="py-2">Descrizione</th>
-                            <th class="py-2 text-center">Quantità</th>
-                            <th class="py-2 text-right">Prezzo</th>
-                            <th class="py-2 text-right">Subtotale</th>
+                            <th class="py-2" id="lbl-th-desc">Descrizione</th>
+                            <th class="py-2 text-center" id="lbl-th-qty">Quantità</th>
+                            <th class="py-2 text-right" id="lbl-th-price">Prezzo</th>
+                            <th class="py-2 text-right" id="lbl-th-sub">Subtotale</th>
                         </tr>
                     </thead>
                     <tbody id="paper-items-body" class="divide-y divide-gray-100 text-xs"></tbody>
@@ -492,10 +499,10 @@
 
                 <div class="flex justify-end mb-12">
                     <div class="w-60 text-right space-y-1 text-xs">
-                        <p><span class="text-gray-600">Subtotale Articoli:</span> <span id="paper-subtotal" class="font-medium">0,00 €</span></p>
-                        <p><span class="text-gray-600">Spedizione:</span> <span id="paper-shipping-cost" class="font-medium">0,00 €</span></p>
+                        <p><span class="text-gray-600" id="lbl-inv-sub">Subtotale Articoli:</span> <span id="paper-subtotal" class="font-medium">0,00 €</span></p>
+                        <p><span class="text-gray-600" id="lbl-inv-ship">Spedizione:</span> <span id="paper-shipping-cost" class="font-medium">0,00 €</span></p>
                         <p><span class="text-gray-600" id="paper-tax-label">IVA (22%):</span> <span id="paper-tax-value" class="font-medium">0,00 €</span></p>
-                        <p class="text-sm font-bold text-gray-900 pt-1 border-t border-gray-200"><span class="text-gray-900">Totale:</span> <span id="paper-total">0,00 €</span></p>
+                        <p class="text-sm font-bold text-gray-900 pt-1 border-t border-gray-200"><span class="text-gray-900" id="lbl-inv-tot">Totale:</span> <span id="paper-total">0,00 €</span></p>
                     </div>
                 </div>
 
@@ -518,17 +525,16 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 print:hidden">
-                <button onclick="window.print()" class="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-mono text-xs font-bold transition-all">Stampa / Salva PDF Fattura</button>
-                <button onclick="sendOrderAndInvoiceEmail()" class="py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-mono text-xs font-bold transition-all shadow-lg shadow-brand-500/20">Invia Ordine & Fattura via Email</button>
+                <button onclick="window.print()" class="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-mono text-xs font-bold transition-all" id="btn-print-inv">Stampa / Salva PDF Fattura</button>
+                <button onclick="sendOrderAndInvoiceEmail()" class="py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-mono text-xs font-bold transition-all shadow-lg shadow-brand-500/20" id="btn-email-inv">Invia Ordine & Fattura via Email</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE ADMIN COMPLETA CON TASTO "TORNA AL SITO", GESTIONE PRODOTTI, FOTO, STL, JSON & SPEDIZIONI -->
+    <!-- MODALE ADMIN COMPLETA CON TASTO "TORNA AL SITO" -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             
-            <!-- Tasto Chiudi X in alto -->
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors" title="Torna al sito">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
@@ -544,7 +550,6 @@
                     <input type="password" id="admin-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
                     <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Accedi al Pannello</button>
                     
-                    <!-- PULSANTE TORNA AL SITO NEL LOGIN -->
                     <button type="button" onclick="closeAdminModal()" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-mono transition-all flex items-center justify-center gap-2">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna alla Pagina Principale
                     </button>
@@ -556,7 +561,6 @@
                 <div class="flex flex-wrap justify-between items-center border-b border-gray-800 pb-4 gap-2">
                     <div class="flex items-center gap-3">
                         <h3 class="text-xl font-bold text-white">Dashboard Admin</h3>
-                        <!-- PULSANTE TORNA AL SITO NELLA DASHBOARD -->
                         <button onclick="closeAdminModal()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 text-xs font-mono font-bold flex items-center gap-1.5 transition-all">
                             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Torna al Sito
                         </button>
@@ -564,14 +568,14 @@
                     <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline font-mono">Logout</button>
                 </div>
 
-                <!-- Admin Tabs Navigation -->
+                <!-- Admin Tabs -->
                 <div class="flex gap-2 border-b border-gray-800 pb-2">
                     <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti & STL</button>
                     <button onclick="switchAdminTab('json')" id="tab-btn-json" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Import / Export JSON</button>
                     <button onclick="switchAdminTab('shipping')" id="tab-btn-shipping" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Ordini & Spedizioni</button>
                 </div>
 
-                <!-- TAB 1: GESTIONE PRODOTTI, FOTO & STL -->
+                <!-- TAB 1: GESTIONE PRODOTTI -->
                 <div id="admin-tab-products" class="space-y-4">
                     <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
                         <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Nuovo / Modifica Prodotto</h4>
@@ -606,11 +610,11 @@
                     <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
 
-                <!-- TAB 2: IMPORT / EXPORT JSON CON IMMAGINI -->
+                <!-- TAB 2: IMPORT / EXPORT JSON -->
                 <div id="admin-tab-json" class="hidden space-y-4">
                     <div class="bg-gray-900/60 p-5 rounded-xl border border-gray-800 space-y-4">
                         <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Gestione Backup Database (JSON)</h4>
-                        <p class="text-xs text-gray-300">Puoi scaricare l'intero catalogo dei prodotti (inclusi prezzi, foto in Base64 e modelli 3D) in formato `.json` oppure caricarne uno salvato in precedenza.</p>
+                        <p class="text-xs text-gray-300">Scarica l'intero catalogo dei prodotti (prezzi, foto e modelli 3D) in formato `.json` oppure ripristinalo da un file di backup.</p>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <button onclick="exportProductsJSON()" class="py-3 px-4 bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 rounded-xl font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all">
@@ -625,7 +629,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: GESTIONE ORDINI & SPEDIZIONI -->
+                <!-- TAB 3: GESTIONE SPEDIZIONI -->
                 <div id="admin-tab-shipping" class="hidden space-y-4">
                     <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Registro Ordini & Stato Spedizioni</h4>
                     <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
@@ -634,7 +638,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC & TRANSLATIONS -->
     <script>
         const myEmail = "unicobardo@gmail.com"; 
 
@@ -654,6 +658,8 @@
         let uploadedImageData = null;
         let uploadedSTLData = null;
 
+        let lastInvoiceNumber = parseInt(localStorage.getItem('ls3d_last_invoice_num')) || 0;
+
         const translations = {
             it: {
                 subtitle: "CREATIVITÀ & PROTOTIPAZIONE",
@@ -669,7 +675,13 @@
                 aboutMissionTitle: "La Nostra Missione", aboutMissionP1: "LS3Dmaker trasforma idee in oggetti reali.", aboutMissionP2: "Ogni pezzo viene verificato singolarmente.",
                 btnBackCatalog: "Torna al Catalogo Prodotti", cartTitle: "Il Tuo Carrello", cartSubtitle: "Gestisci gli articoli prima di completare l'ordine", cartTotalLabel: "Totale Stimato:",
                 btnSaveEmail: "Salva / Invia via Email", btnProceedOrder: "Procedi al Pagamento", checkoutTitle: "Completa l'Ordine & Pagamento",
-                lblPayName: "Nome e Cognome / Ragione Sociale", lblPayEmail: "Email Cliente", lblPayPhone: "Telefono (WhatsApp)", lblPayAddress: "Indirizzo Completo di Spedizione", lblPayMethod: "Seleziona Metodo di Pagamento:",
+                checkoutSubtitle: "Inserisci i dati per la consegna e la fatturazione",
+                lblPayName: "Nome e Cognome / Ragione Sociale", lblPayEmail: "Email Cliente", lblPayPhone: "Telefono (WhatsApp)", lblPayAddress: "Indirizzo Completo di Spedizione", 
+                lblShippingSelect: "Metodo di Spedizione:", optShipStd: "Spedizione Standard Tracciabile (€5.90)", optShipExp: "Spedizione Espressa 24/48h (€9.90)", optShipPickup: "Ritiro a Mano / In Sede (Gratuito)",
+                lblPayMethod: "Seleziona Metodo di Pagamento:", lblGdprText: "Accetto l'Informativa sulla Privacy e autorizzo il trattamento dei dati personali per l'evasione dell'ordine.",
+                lblGrandTotal: "Totale Complessivo:", btnConfirmInvoice: "Conferma Ordine & Genera Fattura",
+                lblInvTo: "Fattura a:", lblInvDate: "Data fattura:", lblInvDue: "Data di scadenza:", lblThDesc: "Descrizione", lblThQty: "Quantità", lblThPrice: "Prezzo", lblThSub: "Subtotale",
+                lblInvSub: "Subtotale Articoli:", lblInvShip: "Spedizione:", lblInvTot: "Totale:", btnPrintInv: "Stampa / Salva PDF Fattura", btnEmailInv: "Invia Ordine & Fattura via Email",
                 btnAddToCart: "Aggiungi", emptyCart: "Il carrello è vuoto."
             },
             en: {
@@ -686,8 +698,83 @@
                 aboutMissionTitle: "Our Mission", aboutMissionP1: "LS3Dmaker transforms complex concepts into physical objects.", aboutMissionP2: "Every part is inspected before shipping.",
                 btnBackCatalog: "Back to Product Catalog", cartTitle: "Your Cart", cartSubtitle: "Manage items before placing order", cartTotalLabel: "Estimated Total:",
                 btnSaveEmail: "Save / Send via Email", btnProceedOrder: "Proceed to Payment", checkoutTitle: "Complete Order & Payment",
-                lblPayName: "Full Name / Company", lblPayEmail: "Customer Email", lblPayPhone: "Phone (WhatsApp)", lblPayAddress: "Complete Shipping Address", lblPayMethod: "Select Payment Method:",
+                checkoutSubtitle: "Enter delivery and invoicing details",
+                lblPayName: "Full Name / Company", lblPayEmail: "Customer Email", lblPayPhone: "Phone (WhatsApp)", lblPayAddress: "Complete Shipping Address",
+                lblShippingSelect: "Shipping Method:", optShipStd: "Standard Tracked Shipping (€5.90)", optShipExp: "Express Shipping 24/48h (€9.90)", optShipPickup: "Local Pickup (Free)",
+                lblPayMethod: "Select Payment Method:", lblGdprText: "I accept the Privacy Policy and authorize personal data processing for order fulfillment.",
+                lblGrandTotal: "Grand Total:", btnConfirmInvoice: "Confirm Order & Generate Invoice",
+                lblInvTo: "Invoice to:", lblInvDate: "Invoice date:", lblInvDue: "Due date:", lblThDesc: "Description", lblThQty: "Quantity", lblThPrice: "Price", lblThSub: "Subtotal",
+                lblInvSub: "Items Subtotal:", lblInvShip: "Shipping:", lblInvTot: "Total:", btnPrintInv: "Print / Save PDF Invoice", btnEmailInv: "Send Order & Invoice via Email",
                 btnAddToCart: "Add to Cart", emptyCart: "Your cart is empty."
+            },
+            fr: {
+                subtitle: "CRÉATIVITÉ & PROTOTYPAGE",
+                navProducts: "Produits", navInfo: "Demander Info", navTrack: "Suivre Commande", navAbout: "À Propos", cart: "Panier",
+                heroBadge: "Impression 3D & Livraison Suivie",
+                heroTitle: "Donnez forme à vos idées avec <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
+                heroDesc: "Prototypage rapide, pièces fonctionnelles et créations 3D sur mesure.",
+                catalogTitle: "Catalogue de Créations 3D", catalogSubtitle: "Inspectez nos modèles 3D STL et ajoutez-les au panier.",
+                infoTitle: "Demande d'informations", infoSubtitle: "Remplissez le formulaire pour un devis",
+                lblName: "Nom et Prénom", lblContact: "E-mail / Téléphone", lblService: "Type de Service", lblMessage: "Message", btnSendWA: "Envoyer via WhatsApp",
+                trackTitle: "Suivre votre Commande", trackSubtitle: "Entrez le code de commande", btnSearch: "Chercher",
+                aboutTitle: "À Propos — ", aboutDesc: "Passion pour la technologie sur mesure.",
+                aboutMissionTitle: "Notre Mission", aboutMissionP1: "LS3Dmaker transforme des concepts en objets réels.", aboutMissionP2: "Chaque pièce est contrôlée avant expédition.",
+                btnBackCatalog: "Retour au Catalogue", cartTitle: "Votre Panier", cartSubtitle: "Gérez vos articles", cartTotalLabel: "Total Estimé:",
+                btnSaveEmail: "Par E-mail", btnProceedOrder: "Procéder au Paiement", checkoutTitle: "Commande & Paiement",
+                checkoutSubtitle: "Entrez les détails de livraison et facturation",
+                lblPayName: "Nom / Société", lblPayEmail: "Email Client", lblPayPhone: "Téléphone", lblPayAddress: "Adresse de Livraison",
+                lblShippingSelect: "Mode de Livraison:", optShipStd: "Livraison Standard (€5.90)", optShipExp: "Livraison Express (€9.90)", optShipPickup: "Retrait sur place (Gratuit)",
+                lblPayMethod: "Mode de Paiement:", lblGdprText: "J'accepte la politique de confidentialité pour le traitement de ma commande.",
+                lblGrandTotal: "Total Général:", btnConfirmInvoice: "Confirmer et Générer la Facture",
+                lblInvTo: "Facturé à:", lblInvDate: "Date facture:", lblInvDue: "Date d'échéance:", lblThDesc: "Description", lblThQty: "Quantité", lblThPrice: "Prix", lblThSub: "Sous-total",
+                lblInvSub: "Sous-total Articles:", lblInvShip: "Livraison:", lblInvTot: "Total:", btnPrintInv: "Imprimer / Enregistrer PDF", btnEmailInv: "Envoyer par E-mail",
+                btnAddToCart: "Ajouter", emptyCart: "Le panier est vide."
+            },
+            es: {
+                subtitle: "CREATIVIDAD Y PROTOTIPADO",
+                navProducts: "Productos", navInfo: "Pedir Info", navTrack: "Rastrear Envío", navAbout: "Nosotros", cart: "Carrito",
+                heroBadge: "Impresión 3D y Envíos Rastreables",
+                heroTitle: "Da forma a tus ideas con <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
+                heroDesc: "Prototipado rápido y creaciones 3D a medida.",
+                catalogTitle: "Catálogo 3D", catalogSubtitle: "Inspecciona modelos 3D STL y añade al carrito.",
+                infoTitle: "Solicitar Información", infoSubtitle: "Presupuesto personalizado",
+                lblName: "Nombre y Apellidos", lblContact: "Email / Teléfono", lblService: "Servicio", lblMessage: "Mensaje", btnSendWA: "Enviar por WhatsApp",
+                trackTitle: "Rastrear Pedido", trackSubtitle: "Introduce el código de pedido", btnSearch: "Buscar",
+                aboutTitle: "Sobre Nosotros — ", aboutDesc: "Fabricación aditiva personalizada.",
+                aboutMissionTitle: "Nuestra Misión", aboutMissionP1: "LS3Dmaker transforma conceptos en objetos reales.", aboutMissionP2: "Cada pieza se verifica antes del envío.",
+                btnBackCatalog: "Volver al Catálogo", cartTitle: "Tu Carrito", cartSubtitle: "Gestiona tus artículos", cartTotalLabel: "Total Estimado:",
+                btnSaveEmail: "Enviar por Email", btnProceedOrder: "Proceder al Pago", checkoutTitle: "Pedido y Pago",
+                checkoutSubtitle: "Introduce datos de envío y facturación",
+                lblPayName: "Nombre / Empresa", lblPayEmail: "Email Cliente", lblPayPhone: "Teléfono", lblPayAddress: "Dirección de Envío",
+                lblShippingSelect: "Método de Envío:", optShipStd: "Envío Estándar (€5.90)", optShipExp: "Envío Urgente 24/48h (€9.90)", optShipPickup: "Recogida Local (Gratis)",
+                lblPayMethod: "Método de Pago:", lblGdprText: "Acepto la Política de Privacidad para la gestión del pedido.",
+                lblGrandTotal: "Total General:", btnConfirmInvoice: "Confirmar Pedido y Factura",
+                lblInvTo: "Factura a:", lblInvDate: "Fecha factura:", lblInvDue: "Vencimiento:", lblThDesc: "Descripción", lblThQty: "Cantidad", lblThPrice: "Precio", lblThSub: "Subtotal",
+                lblInvSub: "Subtotal Artículos:", lblInvShip: "Envío:", lblInvTot: "Total:", btnPrintInv: "Imprimir / Guardar PDF", btnEmailInv: "Enviar Factura por Email",
+                btnAddToCart: "Añadir", emptyCart: "El carrito está vacío."
+            },
+            de: {
+                subtitle: "KREATIVITÄT & PROTOTYPING",
+                navProducts: "Produkte", navInfo: "Info Anfragen", navTrack: "Sendung Verfolgen", navAbout: "Über uns", cart: "Warenkorb",
+                heroBadge: "3D-Druck & Versand",
+                heroTitle: "Gestalten Sie Ihre Ideen mit <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
+                heroDesc: "Schnelles Prototyping und maßgeschneiderte 3D-Kreationen.",
+                catalogTitle: "3D-Katalog", catalogSubtitle: "3D-STL-Modelle prüfen und bestellen.",
+                infoTitle: "Informationen anfordern", infoSubtitle: "Individuelles Angebot",
+                lblName: "Vor- und Nachname", lblContact: "E-Mail / Telefon", lblService: "Dienstleistung", lblMessage: "Nachricht", btnSendWA: "Über WhatsApp senden",
+                trackTitle: "Bestellung Verfolgen", trackSubtitle: "Bestellcode eingeben", btnSearch: "Suchen",
+                aboutTitle: "Über Uns — ", aboutDesc: "Leidenschaft für additive Fertigung.",
+                aboutMissionTitle: "Unsere Mission", aboutMissionP1: "LS3Dmaker verwandelt Konzepte in reale Objekte.", aboutMissionP2: "Jedes Teil wird vor dem Versand geprüft.",
+                btnBackCatalog: "Zurück zum Katalog", cartTitle: "Ihr Warenkorb", cartSubtitle: "Artikel verwalten", cartTotalLabel: "Gesamtsumme:",
+                btnSaveEmail: "Per E-Mail Speichern", btnProceedOrder: "Zur Kasse Gehen", checkoutTitle: "Bestellung & Zahlung",
+                checkoutSubtitle: "Liefer- und Rechnungsdaten eingeben",
+                lblPayName: "Name / Firma", lblPayEmail: "Kunden-E-Mail", lblPayPhone: "Telefon", lblPayAddress: "Lieferadresse",
+                lblShippingSelect: "Versandart:", optShipStd: "Standardversand (€5.90)", optShipExp: "Expressversand (€9.90)", optShipPickup: "Selbstabholung (Kostenlos)",
+                lblPayMethod: "Zahlungsmethode:", lblGdprText: "Ich akzeptiere die Datenschutzbestimmungen zur Auftragsabwicklung.",
+                lblGrandTotal: "Gesamtsumme:", btnConfirmInvoice: "Bestellung Bestätigen & Rechnung",
+                lblInvTo: "Rechnung an:", lblInvDate: "Rechnungsdatum:", lblInvDue: "Fälligkeit:", lblThDesc: "Beschreibung", lblThQty: "Menge", lblThPrice: "Preis", lblThSub: "Zwischensumme",
+                lblInvSub: "Zwischensumme Artikel:", lblInvShip: "Versand:", lblInvTot: "Gesamtsumme:", btnPrintInv: "Drucken / PDF Speichern", btnEmailInv: "Rechnung Per E-Mail Senden",
+                btnAddToCart: "Hinzufügen", emptyCart: "Der Warenkorb ist leer."
             }
         };
 
@@ -729,6 +816,40 @@
             document.getElementById('about-mission-p1').innerText = t.aboutMissionP1;
             document.getElementById('about-mission-p2').innerText = t.aboutMissionP2;
             document.getElementById('btn-back-catalog').innerHTML = `<i data-lucide="arrow-left" class="w-4 h-4"></i> ${t.btnBackCatalog}`;
+
+            document.getElementById('cart-modal-title').innerText = t.cartTitle;
+            document.getElementById('cart-modal-subtitle').innerText = t.cartSubtitle;
+            document.getElementById('cart-total-label').innerText = t.cartTotalLabel;
+            document.getElementById('btn-save-email').innerText = t.btnSaveEmail;
+            document.getElementById('btn-proceed-order').innerText = t.btnProceedOrder;
+
+            document.getElementById('checkout-title').innerText = t.checkoutTitle;
+            document.getElementById('checkout-subtitle').innerText = t.checkoutSubtitle;
+            document.getElementById('lbl-pay-name').innerText = t.lblPayName;
+            document.getElementById('lbl-pay-email').innerText = t.lblPayEmail;
+            document.getElementById('lbl-pay-phone').innerText = t.lblPayPhone;
+            document.getElementById('lbl-pay-address').innerText = t.lblPayAddress;
+            document.getElementById('lbl-shipping-select').innerText = t.lblShippingSelect;
+            document.getElementById('opt-ship-std').innerText = t.optShipStd;
+            document.getElementById('opt-ship-exp').innerText = t.optShipExp;
+            document.getElementById('opt-ship-pickup').innerText = t.optShipPickup;
+            document.getElementById('lbl-pay-method').innerText = t.lblPayMethod;
+            document.getElementById('lbl-gdpr-text').innerText = t.lblGdprText;
+            document.getElementById('lbl-grand-total').innerText = t.lblGrandTotal;
+            document.getElementById('btn-confirm-invoice').innerText = t.btnConfirmInvoice;
+
+            document.getElementById('lbl-inv-to').innerText = t.lblInvTo;
+            document.getElementById('lbl-inv-date').innerText = t.lblInvDate;
+            document.getElementById('lbl-inv-due').innerText = t.lblInvDue;
+            document.getElementById('lbl-th-desc').innerText = t.lblThDesc;
+            document.getElementById('lbl-th-qty').innerText = t.lblThQty;
+            document.getElementById('lbl-th-price').innerText = t.lblThPrice;
+            document.getElementById('lbl-th-sub').innerText = t.lblThSub;
+            document.getElementById('lbl-inv-sub').innerText = t.lblInvSub;
+            document.getElementById('lbl-inv-ship').innerText = t.lblInvShip;
+            document.getElementById('lbl-inv-tot').innerText = t.lblInvTot;
+            document.getElementById('btn-print-inv').innerText = t.btnPrintInv;
+            document.getElementById('btn-email-inv').innerText = t.btnEmailInv;
 
             renderProducts();
             lucide.createIcons();
@@ -903,20 +1024,39 @@
 
         function processOrder(e) {
             e.preventDefault();
+
+            const gdprCheck = document.getElementById('checkout-gdpr');
+            if (gdprCheck && !gdprCheck.checked) {
+                alert("È necessario accettare l'Informativa sulla Privacy per proseguire.");
+                return;
+            }
+
             const name = document.getElementById('checkout-name').value;
             const email = document.getElementById('checkout-email').value;
             const phone = document.getElementById('checkout-phone').value;
             const address = document.getElementById('checkout-address').value;
-            const shippingCost = parseFloat(document.getElementById('checkout-shipping-method').value) || 0;
+            
+            const shippingSelect = document.getElementById('checkout-shipping-method');
+            const shippingCost = parseFloat(shippingSelect.value) || 0;
+            const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+
             const itemsSubtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
 
+            lastInvoiceNumber += 1;
+            localStorage.setItem('ls3d_last_invoice_num', lastInvoiceNumber);
+            const currentYear = new Date().getFullYear();
+            const invoiceFormattedNumber = `${lastInvoiceNumber}/${currentYear}`;
+
+            const orderId = `LS-${Math.floor(1000 + Math.random() * 9000)}`;
+
             currentOrder = {
-                id: `LS-${Math.floor(1000 + Math.random() * 9000)}`,
-                number: Math.floor(100 + Math.random() * 900),
+                id: orderId,
+                number: invoiceFormattedNumber,
                 clientName: name, clientEmail: email, clientPhone: phone, clientAddress: address,
-                shippingCost: shippingCost, items: [...cart], subtotal: itemsSubtotal,
+                shippingCost: shippingCost, shippingName: shippingText,
+                items: [...cart], subtotal: itemsSubtotal,
                 tax: itemsSubtotal * 0.22, total: itemsSubtotal + shippingCost,
-                status: 'In Elaborazione', trackingCode: 'In Generazione',
+                status: 'In Elaborazione', trackingCode: 'In Attesa di Spedizione',
                 date: new Date().toLocaleDateString('it-IT'), dueDate: new Date(Date.now() + 14*24*60*60*1000).toLocaleDateString('it-IT')
             };
 
@@ -932,13 +1072,14 @@
 
         function openInvoiceModal() {
             if(!currentOrder) return;
+
             document.getElementById('paper-number').innerText = `Fattura n. ${currentOrder.number}`;
             document.getElementById('paper-client-name').innerText = currentOrder.clientName;
             document.getElementById('paper-client-address').innerText = currentOrder.clientAddress;
             document.getElementById('paper-date').innerText = currentOrder.date;
             document.getElementById('paper-due-date').innerText = currentOrder.dueDate;
 
-            document.getElementById('paper-items-body').innerHTML = currentOrder.items.map(i => `
+            let itemsHTML = currentOrder.items.map(i => `
                 <tr>
                     <td class="py-2 font-medium">${i.title}</td>
                     <td class="py-2 text-center">${i.qty}</td>
@@ -946,6 +1087,19 @@
                     <td class="py-2 text-right">${(i.price * i.qty).toFixed(2)} €</td>
                 </tr>
             `).join('');
+
+            if (currentOrder.shippingCost > 0) {
+                itemsHTML += `
+                    <tr class="text-gray-600 bg-gray-50">
+                        <td class="py-2 font-medium">Servizio Spedizione / Consegna</td>
+                        <td class="py-2 text-center">1</td>
+                        <td class="py-2 text-right">${currentOrder.shippingCost.toFixed(2)} €</td>
+                        <td class="py-2 text-right">${currentOrder.shippingCost.toFixed(2)} €</td>
+                    </tr>
+                `;
+            }
+
+            document.getElementById('paper-items-body').innerHTML = itemsHTML;
 
             document.getElementById('paper-subtotal').innerText = `${currentOrder.subtotal.toFixed(2)} €`;
             document.getElementById('paper-shipping-cost').innerText = `${currentOrder.shippingCost.toFixed(2)} €`;
@@ -1002,7 +1156,6 @@
             result.classList.remove('hidden');
         }
 
-        // CARICAMENTO IMMAGINI E GESTIONE ADMIN
         function handleImageSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1052,7 +1205,6 @@
             alert('Prodotto salvato con successo!');
         }
 
-        // EXPORT & IMPORT JSON
         function exportProductsJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
             const downloadAnchor = document.createElement('a');
