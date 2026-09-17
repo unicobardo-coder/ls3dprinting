@@ -9,17 +9,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-       (function(){
-          emailjs.init("TUO_USER_ID_PUBLIC_KEY");
-       })();
-    </script>
-
-    <!-- File separato per i pagamenti -->
-    <script src="payment.js" defer></script>
-
     <script>
         tailwind.config = {
             theme: {
@@ -73,7 +62,6 @@
 
     <!-- Main Content -->
     <main id="main-content">
-        <!-- HOME VIEW -->
         <div id="home-view">
             <section class="py-8 text-center">
                 <div class="max-w-7xl mx-auto px-4">
@@ -83,13 +71,6 @@
                     <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-white leading-tight">
                         <span data-i18n="hero-title-1">Dai forma alle Tue Idee con</span> <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
                     </h1>
-                    
-                    <div class="max-w-3xl mx-auto bg-dark-card border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl mb-6">
-                        <p class="text-brand-400 font-mono text-xs uppercase tracking-widest mb-1" data-i18n="hero-box-title">Soluzioni Professionali di Stampa 3D</p>
-                        <p class="text-gray-200 text-sm sm:text-base font-medium leading-relaxed" data-i18n="hero-box-desc">
-                            Trasformiamo progetti digitali in oggetti reali ad alta precisione con materiali tecnici avanzati, finiture curate nei minimi dettagli e spedizioni rapide in tutta Italia.
-                        </p>
-                    </div>
                 </div>
             </section>
 
@@ -101,119 +82,17 @@
                             <h2 class="text-2xl font-bold text-white mb-1" data-i18n="catalog-title">Catalogo Creazioni 3D</h2>
                             <p class="text-gray-400 text-sm" data-i18n="catalog-subtitle">Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello.</p>
                         </div>
-                        
                         <div class="w-full sm:w-64">
-                            <label class="block text-xs font-mono text-gray-400 mb-1" data-i18n="filter-label">Filtra per Categoria:</label>
                             <select id="category-select" onchange="filterCategory(this.value)" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-brand-500 cursor-pointer">
-                                <option value="Tutti" data-i18n="all-categories">Tutti i prodotti</option>
+                                <option value="Tutti">Tutti i prodotti</option>
                             </select>
                         </div>
                     </div>
                     <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
                 </div>
             </section>
-
-            <!-- SEZIONE TRACCIA SPEDIZIONE -->
-            <section id="traccia-section" class="py-16 max-w-3xl mx-auto px-4">
-                <div class="bg-dark-card border border-gray-800 rounded-2xl p-8 shadow-2xl">
-                    <div class="text-center mb-6">
-                        <span class="text-brand-400 font-mono text-xs uppercase tracking-widest" data-i18n="track-tag">Monitoraggio Ordine</span>
-                        <h2 class="text-2xl font-bold text-white mt-1" data-i18n="track-title">Traccia la tua Spedizione o Stampa</h2>
-                        <p class="text-gray-400 text-xs mt-1" data-i18n="track-desc">Inserisci il codice ordine (es. LS-XXXX) ricevuto via email per verificare lo stato di lavorazione.</p>
-                    </div>
-                    <div class="flex gap-2 max-w-md mx-auto">
-                        <input type="text" id="track-input" placeholder="Es. LS-5821" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white text-xs font-mono focus:border-brand-500 focus:outline-none">
-                        <button onclick="trackOrder()" class="px-6 py-3 bg-brand-500 text-black font-bold text-xs rounded-xl hover:bg-brand-400" data-i18n="track-btn">Cerca</button>
-                    </div>
-                    <div id="track-result" class="mt-6 hidden p-4 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono space-y-2"></div>
-                </div>
-            </section>
-
-            <!-- MODULO PER RICHIEDERE INFORMAZIONI -->
-            <section id="info-section" class="py-16 max-w-3xl mx-auto px-4 border-t border-gray-800/80">
-                <div class="bg-dark-card border border-gray-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-                    <div class="text-center mb-8">
-                        <span class="text-brand-400 font-mono text-xs uppercase tracking-widest" data-i18n="info-tag">Assistenza & Preventivi su Misura</span>
-                        <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1" data-i18n="info-title">Richiedi Informazioni o un Progetto Custom</h2>
-                        <p class="text-gray-400 text-xs sm:text-sm mt-2" data-i18n="info-desc">Hai un file STL particolare o un'idea da realizzare? Compilaci il modulo, ti risponderemo rapidamente.</p>
-                    </div>
-
-                    <form onsubmit="handleInfoRequest(event)" class="space-y-4 text-xs">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-400 mb-1 font-mono" data-i18n="form-name">Nome e Cognome *</label>
-                                <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 mb-1 font-mono" data-i18n="form-email">Email di Contatto *</label>
-                                <input type="email" id="info-email" required placeholder="mario@example.com" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono" data-i18n="form-type">Tipo di Richiesta</label>
-                            <select id="info-type" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none font-mono">
-                                <option data-i18n="opt-1">Preventivo Stampa 3D Custom</option>
-                                <option data-i18n="opt-2">Informazioni su un Prodotto del Catalogo</option>
-                                <option data-i18n="opt-3">Assistenza Tecnica / File STL</option>
-                                <option data-i18n="opt-4">Altro</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono" data-i18n="form-msg">Messaggio / Dettagli Progetto *</label>
-                            <textarea id="info-msg" required rows="4" placeholder="Descrivi le dimensioni, il materiale desiderato o le tue necessità..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
-                        </div>
-                        <button type="submit" class="w-full py-3.5 bg-brand-500 text-black font-bold rounded-xl text-sm transition-transform hover:scale-[1.01]" data-i18n="form-submit">Invia Richiesta</button>
-                    </form>
-                </div>
-            </section>
-        </div>
-
-        <!-- CHI SIAMO VIEW -->
-        <div id="chi-siamo-view" class="hidden py-16">
-            <div class="max-w-5xl mx-auto px-4 space-y-16">
-                <div class="text-center space-y-4">
-                    <span class="px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono uppercase tracking-widest" data-i18n="about-tag">Innovazione & Passione</span>
-                    <h1 class="text-4xl sm:text-5xl font-extrabold text-white" data-i18n="about-title">Chi C'è Dietro LS3Dmaker</h1>
-                    <p class="text-gray-300 text-base sm:text-lg max-w-3xl mx-auto leading-relaxed" data-i18n="about-desc">
-                        Unendo competenza ingegneristica, precisione manifatturiera e passione per la prototipazione avanzata, diamo vita a oggetti reali partendo da semplici file digitali.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-3">
-                        <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center font-bold text-lg"><i data-lucide="cpu" class="w-5 h-5"></i></div>
-                        <h3 class="text-lg font-bold text-white" data-i18n="about-c1-title">Tecnologia Avanzata</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed" data-i18n="about-c1-desc">Utilizziamo stampanti di ultima generazione (come Bambu Lab) e polimeri tecnici selezionati per garantire resistenza, stabilità e finiture impeccabili.</p>
-                    </div>
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-3">
-                        <div class="w-10 h-10 rounded-xl bg-accent-500/10 text-accent-400 flex items-center justify-center font-bold text-lg"><i data-lucide="check-circle" class="w-5 h-5"></i></div>
-                        <h3 class="text-lg font-bold text-white" data-i18n="about-c2-title">Controllo Qualità</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed" data-i18n="about-c2-desc">Ogni singolo pezzo viene verificato, rifinito e testato singolarmente prima di essere imballato con cura e spedito in tutta Italia.</p>
-                    </div>
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-3">
-                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg"><i data-lucide="zap" class="w-5 h-5"></i></div>
-                        <h3 class="text-lg font-bold text-white" data-i18n="about-c3-title">Soluzioni Su Misura</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed" data-i18n="about-c3-desc">Che si tratti di un prototipo industriale, di un componente meccanico o di una decorazione di design, seguiamo il cliente passo dopo passo.</p>
-                    </div>
-                </div>
-
-                <div class="text-center pt-4">
-                    <button onclick="showPage('home')" class="px-8 py-3.5 rounded-xl bg-brand-500 text-black font-bold text-sm shadow-lg hover:bg-brand-400 transition-colors" data-i18n="about-back">Torna al Catalogo Prodotti</button>
-                </div>
-            </div>
         </div>
     </main>
-
-    <!-- FOOTER -->
-    <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-            <p class="font-bold text-white">LS3Dmaker © 2026</p>
-            <div class="flex gap-4 font-mono">
-                <a href="#" class="hover:underline">Privacy Policy</a>
-                <a href="#" class="hover:underline">Cookie Policy</a>
-            </div>
-        </div>
-    </footer>
 
     <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -222,311 +101,69 @@
             <h3 class="text-xl font-bold mb-4" data-i18n="cart-title">Il Tuo Carrello</h3>
             <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 mb-6 border-y border-gray-800 py-4"></div>
             <div class="flex justify-between items-center mb-6 font-mono p-4 bg-gray-900 rounded-xl">
-                <span class="text-xs text-gray-400 uppercase" data-i18n="cart-total-label">Totale:</span>
+                <span class="text-xs text-gray-400 uppercase">Totale:</span>
                 <span id="cart-total" class="text-2xl font-bold text-brand-400">€0.00</span>
             </div>
-            <button onclick="openCheckout()" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm" data-i18n="cart-checkout-btn">Procedi al Checkout</button>
+            <!-- Pulsante che porta alla pagina checkout.html -->
+            <button onclick="goToCheckout()" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm" data-i18n="cart-checkout-btn">Procedi al Checkout</button>
         </div>
     </div>
 
-    <!-- MODALE CHECKOUT -->
-    <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h3 class="text-xl font-bold mb-4">Checkout & Pagamento</h3>
-            <form onsubmit="processOrder(event)" class="space-y-3 text-xs">
-                <input type="text" id="chk-name" required placeholder="Nome e Cognome / Azienda" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
-                <input type="email" id="chk-email" required placeholder="Email (per ricezione fattura)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
-                <input type="tel" id="chk-phone" required placeholder="Telefono" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
-                <textarea id="chk-address" required rows="2" placeholder="Indirizzo completo di spedizione" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white"></textarea>
-                
-                <div>
-                    <label class="block text-gray-400 mb-1">Metodo di Spedizione:</label>
-                    <select id="chk-shipping" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white font-mono">
-                        <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
-                        <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
-                        <option value="0.00">Ritiro a Mano (Gratuito)</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="w-full py-3 bg-brand-500 text-black font-bold rounded-lg mt-4">Conferma e Procedi al Pagamento</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODALE FATTURA PDF -->
-    <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <div id="invoice-paper" class="bg-white text-gray-900 p-8 rounded-xl font-sans text-xs">
-                <div class="flex justify-between items-start mb-6 border-b pb-4">
-                    <div>
-                        <img src="logo.png" alt="Logo" class="h-14 object-contain mb-1">
-                        <p class="text-[10px] text-gray-500 font-mono">Stampa 3D & Prototipazione</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-sm" id="inv-number">Fattura n. 1/2026</p>
-                        <p class="text-gray-500" id="inv-date">Data: 17/09/2026</p>
-                    </div>
-                </div>
-                <div class="mb-6 border-b pb-4">
-                    <p class="text-gray-500">Intestato a:</p>
-                    <p class="font-bold" id="inv-client">[Nome]</p>
-                    <p class="text-gray-600" id="inv-address">[Indirizzo]</p>
-                    <p class="text-blue-600 font-mono text-[10px] mt-1">Metodo Pagamento: PayPal - Pagato</p>
-                </div>
-                <table class="w-full mb-6 text-left border-collapse">
-                    <thead>
-                        <tr class="border-b font-bold text-gray-700">
-                            <th class="py-1">Descrizione</th>
-                            <th class="py-1 text-center">Qt</th>
-                            <th class="py-1 text-right">Prezzo</th>
-                            <th class="py-1 text-right">Totale</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inv-items"></tbody>
-                </table>
-                <div class="text-right space-y-1 border-t pt-4 font-mono">
-                    <p>Subtotale: <span id="inv-sub">€0.00</span></p>
-                    <p>Spedizione: <span id="inv-ship">€0.00</span></p>
-                    <p class="font-bold text-sm text-black">Totale Complessivo: <span id="inv-tot">€0.00</span></p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <button onclick="window.print()" class="w-full py-2.5 bg-brand-500 text-black rounded-lg font-bold text-xs">Stampa / Salva PDF</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT GESTIONE LINGUE E APP -->
     <script>
-        const translations = {
-            it: {
-                "nav-products": "Prodotti", "nav-info": "Richiedi Info", "nav-track": "Traccia Spedizione", "nav-about": "Chi siamo?", "btn-cart": "Carrello",
-                "hero-tag": "Stampa 3D & Spedizioni Tracciabili", "hero-title-1": "Dai forma alle Tue Idee con",
-                "hero-box-title": "Soluzioni Professionali di Stampa 3D",
-                "hero-box-desc": "Trasformiamo progetti digitali in oggetti reali ad alta precisione con materiali tecnici avanzati, finiture curate nei minimi dettagli e spedizioni rapide in tutta Italia.",
-                "catalog-title": "Catalogo Creazioni 3D", "catalog-subtitle": "Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello.",
-                "filter-label": "Filtra per Categoria:", "all-categories": "Tutti i prodotti",
-                "track-tag": "Monitoraggio Ordine", "track-title": "Traccia la tua Spedizione o Stampa", "track-desc": "Inserisci il codice ordine (es. LS-XXXX) ricevuto via email per verificare lo stato di lavorazione.", "track-btn": "Cerca",
-                "info-tag": "Assistenza & Preventivi su Misura", "info-title": "Richiedi Informazioni o un Progetto Custom", "info-desc": "Hai un file STL particolare o un'idea da realizzare? Compilaci il modulo, ti risponderemo rapidamente.",
-                "form-name": "Nome e Cognome *", "form-email": "Email di Contatto *", "form-type": "Tipo di Richiesta",
-                "opt-1": "Preventivo Stampa 3D Custom", "opt-2": "Informazioni su un Prodotto del Catalogo", "opt-3": "Assistenza Tecnica / File STL", "opt-4": "Altro",
-                "form-msg": "Messaggio / Dettagli Progetto *", "form-submit": "Invia Richiesta",
-                "about-tag": "Innovazione & Passione", "about-title": "Chi C'è Dietro LS3Dmaker",
-                "about-desc": "Unendo competenza ingegneristica, precisione manifatturiera e passione per la prototipazione avanzata, diamo vita a oggetti reali partendo da semplici file digitali.",
-                "about-c1-title": "Tecnologia Avanzata", "about-c1-desc": "Utilizziamo stampanti di ultima generazione (come Bambu Lab) e polimeri tecnici selezionati per garantire resistenza, stabilità e finiture impeccabili.",
-                "about-c2-title": "Controllo Qualità", "about-c2-desc": "Ogni singolo pezzo viene verificato, rifinito e testato singolarmente prima di essere imballato con cura e spedito in tutta Italia.",
-                "about-c3-title": "Soluzioni Su Misura", "about-c3-desc": "Che si tratti di un prototipo industriale, di un componente meccanico o di una decorazione di design, seguiamo il cliente passo dopo passo.",
-                "about-back": "Torna al Catalogo Prodotti", "cart-title": "Il Tuo Carrello", "cart-total-label": "Totale:", "cart-checkout-btn": "Procedi al Checkout"
-            },
-            en: {
-                "nav-products": "Products", "nav-info": "Request Info", "nav-track": "Track Order", "nav-about": "About Us", "btn-cart": "Cart",
-                "hero-tag": "3D Printing & Tracked Shipping", "hero-title-1": "Bring Your Ideas to Life with",
-                "hero-box-title": "Professional 3D Printing Solutions",
-                "hero-box-desc": "We transform digital designs into high-precision real objects using advanced technical polymers, meticulous finishes, and fast shipping throughout Italy.",
-                "catalog-title": "3D Creations Catalog", "catalog-subtitle": "Browse our creations, choose colors and add to cart.",
-                "filter-label": "Filter by Category:", "all-categories": "All Products",
-                "track-tag": "Order Tracking", "track-title": "Track Your Shipment or Print", "track-desc": "Enter your order code (e.g. LS-XXXX) received via email to check processing status.", "track-btn": "Search",
-                "info-tag": "Custom Support & Quotes", "info-title": "Request Info or a Custom Project", "info-desc": "Got a special STL file or idea? Fill out the form, we will reply promptly.",
-                "form-name": "Full Name *", "form-email": "Contact Email *", "form-type": "Request Type",
-                "opt-1": "Custom 3D Printing Quote", "opt-2": "Catalog Product Info", "opt-3": "Technical Support / STL File", "opt-4": "Other",
-                "form-msg": "Message / Project Details *", "form-submit": "Send Request",
-                "about-tag": "Innovation & Passion", "about-title": "Behind LS3Dmaker",
-                "about-desc": "Combining engineering expertise, manufacturing precision, and a passion for advanced prototyping, we bring real objects to life from simple digital files.",
-                "about-c1-title": "Advanced Technology", "about-c1-desc": "We use next-gen printers (like Bambu Lab) and selected technical polymers to ensure strength, stability, and flawless finishes.",
-                "about-c2-title": "Quality Control", "about-c2-desc": "Every single piece is inspected, finished, and tested individually before being carefully packed and shipped across Italy.",
-                "about-c3-title": "Tailored Solutions", "about-c3-desc": "Whether it's an industrial prototype, a mechanical component, or designer decor, we guide the customer step by step.",
-                "about-back": "Back to Product Catalog", "cart-title": "Your Cart", "cart-total-label": "Total:", "cart-checkout-btn": "Proceed to Checkout"
-            },
-            fr: {
-                "nav-products": "Produits", "nav-info": "Infos", "nav-track": "Suivi de Commande", "nav-about": "À propos", "btn-cart": "Panier",
-                "hero-tag": "Impression 3D & Suivi", "hero-title-1": "Donnez vie à vos idées avec",
-                "hero-box-title": "Solutions Professionnelles d'Impression 3D",
-                "hero-box-desc": "Nous transformons des projets numériques en objets réels de haute précision avec des polymères techniques et des finitions soignées.",
-                "catalog-title": "Catalogue de Créations 3D", "catalog-subtitle": "Parcourez nos créations, choisissez les couleurs et ajoutez au panier.",
-                "filter-label": "Filtrer par Catégorie :", "all-categories": "Tous les produits",
-                "track-tag": "Suivi de Commande", "track-title": "Suivez votre Expédition ou Impression", "track-desc": "Entrez le code de commande (ex. LS-XXXX) reçu par e-mail.", "track-btn": "Chercher",
-                "info-tag": "Assistance & Devis sur Mesure", "info-title": "Demander des Infos ou un Projet Sur Mesure", "info-desc": "Vous avez un fichier STL ou une idée ? Remplissez le formulaire.",
-                "form-name": "Nom et Prénom *", "form-email": "E-mail de Contact *", "form-type": "Type de Demande",
-                "opt-1": "Devis Impression 3D Sur Mesure", "opt-2": "Infos Produit Catalogue", "opt-3": "Assistance Technique / Fichier STL", "opt-4": "Autre",
-                "form-msg": "Message / Détails du Projet *", "form-submit": "Envoyer la Demande",
-                "about-tag": "Innovation & Passion", "about-title": "Derrière LS3Dmaker",
-                "about-desc": "Alliant compétence en ingénierie et passion pour le prototypage, nous donnons vie à des objets réels à partir de fichiers numériques.",
-                "about-c1-title": "Technologie Avancée", "about-c1-desc": "Nous utilisons des imprimantes de dernière génération et des polymères techniques sélectionnés.",
-                "about-c2-title": "Contrôle Qualité", "about-c2-desc": "Chaque pièce est vérifiée et testée individuellement avant d'être expédiée.",
-                "about-c3-title": "Solutions Sur Mesure", "about-c3-desc": "Qu'il s'agisse d'un prototype industriel ou d'une décoration, nous vous accompagnons pas à pas.",
-                "about-back": "Retour au Catalogue", "cart-title": "Votre Panier", "cart-total-label": "Total :", "cart-checkout-btn": "Passer la commande"
-            },
-            es: {
-                "nav-products": "Productos", "nav-info": "Solicitar Info", "nav-track": "Seguir Envío", "nav-about": "Sobre nosotros", "btn-cart": "Carrito",
-                "hero-tag": "Impresión 3D & Envíos Seguimiento", "hero-title-1": "Da forma a tus ideas con",
-                "hero-box-title": "Soluciones Profesionales de Impresión 3D",
-                "hero-box-desc": "Transformamos diseños digitales en objetos reales de alta precisión con polímeros técnicos avanzados y envíos rápidos.",
-                "catalog-title": "Catálogo de Creaciones 3D", "catalog-subtitle": "Explora nuestras creaciones, elige colores y añade al carrito.",
-                "filter-label": "Filtrar por Categoría:", "all-categories": "Todos los productos",
-                "track-tag": "Seguimiento de Pedidos", "track-title": "Sigue tu Envío o Impresión", "track-desc": "Introduce el código de pedido (ej. LS-XXXX) para verificar el estado.", "track-btn": "Buscar",
-                "info-tag": "Soporte y Presupuestos a Medida", "info-title": "Solicitar Info o Proyecto Personalizado", "info-desc": "¿Tienes un archivo STL o idea? Rellena el formulario.",
-                "form-name": "Nombre y Apellidos *", "form-email": "Email de Contacto *", "form-type": "Tipo de Solicitud",
-                "opt-1": "Presupuesto Impresión 3D Personalizada", "opt-2": "Información de Producto", "opt-3": "Soporte Técnico / Archivo STL", "opt-4": "Otro",
-                "form-msg": "Mensaje / Detalles del Proyecto *", "form-submit": "Enviar Solicitud",
-                "about-tag": "Innovación & Pasión", "about-title": "Detrás de LS3Dmaker",
-                "about-desc": "Combinando experiencia en ingeniería y pasión por la prototipación, damos vida a objetos reales.",
-                "about-c1-title": "Tecnología Avanzada", "about-c1-desc": "Utilizamos impresoras de última generación y polímeros técnicos seleccionados.",
-                "about-c2-title": "Control de Calidad", "about-c2-desc": "Cada pieza se verifica y prueba individualmente antes de enviarse.",
-                "about-c3-title": "Soluciones a Medida", "about-c3-desc": "Ya sea un prototipo industrial o decoración, guiamos al cliente paso a paso.",
-                "about-back": "Volver al Catálogo", "cart-title": "Tu Carrito", "cart-total-label": "Total:", "cart-checkout-btn": "Proceder al Pago"
-            },
-            de: {
-                "nav-products": "Produkte", "nav-info": "Info anfordern", "nav-track": "Sendungsverfolgung", "nav-about": "Über uns", "btn-cart": "Warenkorb",
-                "hero-tag": "3D-Druck & Versand", "hero-title-1": "Verwirklichen Sie Ihre Ideen mit",
-                "hero-box-title": "Professionelle 3D-Drucklösungen",
-                "hero-box-desc": "Wir verwandeln digitale Entwürfe in hochpräzise reale Objekte mit fortschrittlichen technischen Polymeren.",
-                "catalog-title": "3D-Kreationskatalog", "catalog-subtitle": "Durchstöbern Sie unsere Kreationen, wählen Sie Farben und legen Sie sie in den Warenkorb.",
-                "filter-label": "Nach Kategorie filtern:", "all-categories": "Alle Produkte",
-                "track-tag": "Bestellverfolgung", "track-title": "Verfolgen Sie Ihre Sendung", "track-desc": "Geben Sie Ihren Bestellcode (z. B. LS-XXXX) ein.", "track-btn": "Suchen",
-                "info-tag": "Support & Maßgeschneiderte Angebote", "info-title": "Infos oder Projekt anfordern", "info-desc": "Haben Sie eine spezielle STL-Datei oder Idee? Füllen Sie das Formular aus.",
-                "form-name": "Vor- und Nachname *", "form-email": "Kontakt-E-Mail *", "form-type": "Art der Anfrage",
-                "opt-1": "Individuelles 3D-Druck-Angebot", "opt-2": "Produktinformationen", "opt-3": "Technischer Support / STL-Datei", "opt-4": "Anderes",
-                "form-msg": "Nachricht / Projektdetails *", "form-submit": "Anfrage senden",
-                "about-tag": "Innovation & Leidenschaft", "about-title": "Hinter LS3Dmaker",
-                "about-desc": "Durch die Verbindung von Ingenieurskunst und Leidenschaft für Prototypenbau erwecken wir digitale Dateien zum Leben.",
-                "about-c1-title": "Fortschrittliche Technologie", "about-c1-desc": "Wir verwenden Drucker der neuesten Generation und ausgewählte technische Polymere.",
-                "about-c2-title": "Qualitätskontrolle", "about-c2-desc": "Jedes Stück wird einzeln geprüft und getestet, bevor es versendet wird.",
-                "about-c3-title": "Maßgeschneiderte Lösungen", "about-c3-desc": "Ob Industrieprototyp oder Design-Dekoration, wir begleiten Sie Schritt für Schritt.",
-                "about-back": "Zurück zum Katalog", "cart-title": "Ihr Warenkorb", "cart-total-label": "Gesamt:", "cart-checkout-btn": "Zur Kasse"
-            }
-        };
-
-        let currentLang = 'it';
-
-        function changeLanguage(lang) {
-            currentLang = lang;
-            const t = translations[lang] || translations.it;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) el.innerText = t[key];
-            });
-            renderCategories();
-            renderProducts();
-        }
-
         let categories = ["Componenti", "Decorazioni", "Prototipi", "Gadget"];
         let selectedCategory = "Tutti";
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
-
-        // PRODOTTI DEFINITI DIRETTAMENTE NEL CODICE SORGENTE (Sincronizzati ovunque)
-        let defaultProducts = [
+        let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
             { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Realizzato con polimeri ad altissima risoluzione.", categories: ["Decorazioni"], images: [defaultImg], hidden: false }
         ];
-
-        let products = JSON.parse(localStorage.getItem('ls3d_products'));
-        if (!products) {
-            products = defaultProducts;
-            localStorage.setItem('ls3d_products', JSON.stringify(products));
-        }
-
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
-        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
-        let currentOrder = null;
-        let lastInvoiceNum = parseInt(localStorage.getItem('ls3d_invoice_num')) || 0;
-        let activeImageIndices = {};
 
         function renderCategories() {
-            const selectEl = document.getElementById('category-select');
-            const allText = currentLang === 'en' ? 'All Products' : currentLang === 'fr' ? 'Tous les produits' : currentLang === 'es' ? 'Todos los productos' : currentLang === 'de' ? 'Alle Produkte' : 'Tutti i prodotti';
-            selectEl.innerHTML = `<option value="Tutti">${allText}</option>` + categories.map(cat => `
-                <option value="${cat}" ${selectedCategory === cat ? 'selected' : ''}>${cat}</option>
-            `).join('');
+            document.getElementById('category-select').innerHTML = `<option value="Tutti">Tutti i prodotti</option>` + categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
         }
-
-        function filterCategory(cat) {
-            selectedCategory = cat;
-            renderProducts();
-        }
-
+        function filterCategory(cat) { selectedCategory = cat; renderProducts(); }
         function renderProducts() {
             const grid = document.getElementById('products-grid');
-            const visible = products.filter(p => !p.hidden);
-            const filtered = selectedCategory === "Tutti" ? visible : visible.filter(p => p.categories && p.categories.includes(selectedCategory));
-
-            let html = '';
-            for (let p of filtered) {
-                const imgs = (p.images && p.images.length > 0) ? p.images : [defaultImg];
-                const activeIndex = activeImageIndices[p.id] || 0;
-
-                html += `
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
-                        <div>
-                            <div class="relative h-48 bg-gray-900 rounded-xl overflow-hidden mb-4">
-                                <img src="${imgs[activeIndex]}" class="w-full h-full object-cover">
-                                ${imgs.length > 1 ? `
-                                    <button onclick="prevImage(${p.id}, ${imgs.length})" class="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/60 text-white rounded-full"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                    <button onclick="nextImage(${p.id}, ${imgs.length})" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/60 text-white rounded-full"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 px-2 py-0.5 rounded-full text-[10px] text-gray-300 font-mono">${activeIndex + 1}/${imgs.length}</div>
-                                ` : ''}
-                            </div>
-                            <div class="flex flex-wrap gap-1 mb-2">
-                                ${(p.categories || []).map(c => `<span class="bg-gray-800 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-700">${c}</span>`).join('')}
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-1">${p.title}</h3>
-                            <p class="text-brand-400 text-xs font-semibold mb-2">${p.shortDesc || ''}</p>
-                            <p class="text-gray-400 text-xs mb-4">${p.desc || ''}</p>
+            const filtered = selectedCategory === "Tutti" ? products.filter(p => !p.hidden) : products.filter(p => !p.hidden && p.categories?.includes(selectedCategory));
+            grid.innerHTML = filtered.map(p => `
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="h-48 bg-gray-900 rounded-xl overflow-hidden mb-4">
+                            <img src="${p.images?.[0] || defaultImg}" class="w-full h-full object-cover">
                         </div>
-                        <div class="flex items-center justify-between border-t border-gray-800 pt-4">
-                            <span class="text-xl font-bold font-mono">€${p.price.toFixed(2)}</span>
-                            <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500 text-black font-bold text-xs">+ Aggiungi</button>
-                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">${p.title}</h3>
+                        <p class="text-gray-400 text-xs mb-4">${p.shortDesc || ''}</p>
                     </div>
-                `;
-            }
-            grid.innerHTML = html;
+                    <div class="flex items-center justify-between border-t border-gray-800 pt-4">
+                        <span class="text-xl font-bold font-mono">€${p.price.toFixed(2)}</span>
+                        <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500 text-black font-bold text-xs">+ Aggiungi</button>
+                    </div>
+                </div>
+            `).join('');
             lucide.createIcons();
         }
-
-        function prevImage(prodId, total) {
-            activeImageIndices[prodId] = ((activeImageIndices[prodId] || 0) - 1 + total) % total;
-            renderProducts();
-        }
-        function nextImage(prodId, total) {
-            activeImageIndices[prodId] = ((activeImageIndices[prodId] || 0) + 1) % total;
-            renderProducts();
-        }
-
         function addToCart(prodId) {
-            const product = products.find(p => p.id === prodId);
-            if (!product) return;
-            const existing = cart.find(item => item.id === prodId);
-            if (existing) existing.qty += 1;
-            else cart.push({ id: product.id, title: product.title, price: product.price, qty: 1 });
-            saveCart();
-            openCartModal();
+            const p = products.find(x => x.id === prodId);
+            if (!p) return;
+            const ex = cart.find(x => x.id === prodId);
+            if (ex) ex.qty++; else cart.push({ id: p.id, title: p.title, price: p.price, qty: 1 });
+            saveCart(); openCartModal();
         }
-
-        function updateQuantity(index, delta) {
-            if (!cart[index]) return;
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) cart.splice(index, 1);
-            saveCart();
-            openCartModal();
+        function updateQuantity(idx, delta) {
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) cart.splice(idx, 1);
+            saveCart(); openCartModal();
         }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            saveCart();
-            openCartModal();
-        }
-
+        function removeFromCart(idx) { cart.splice(idx, 1); saveCart(); openCartModal(); }
         function saveCart() {
             localStorage.setItem('ls3d_cart', JSON.stringify(cart));
-            document.getElementById('cart-badge').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+            document.getElementById('cart-badge').innerText = cart.reduce((a, b) => a + b.qty, 0);
         }
-
         function openCartModal() {
             const container = document.getElementById('cart-items-list');
             const totalEl = document.getElementById('cart-total');
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-400 text-xs py-4 font-mono">Il carrello è vuoto.</div>`;
+                container.innerHTML = `<p class="text-center text-gray-400 text-xs py-4 font-mono">Il carrello è vuoto.</p>`;
                 totalEl.innerText = "€0.00";
             } else {
                 let total = 0;
@@ -534,127 +171,24 @@
                     total += i.price * i.qty;
                     return `
                         <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
-                            <div><p class="font-bold text-white">${i.title}</p><p class="text-brand-400 font-mono">€${i.price.toFixed(2)} Cad.</p></div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center border border-gray-700 rounded-lg overflow-hidden bg-gray-800">
-                                    <button onclick="updateQuantity(${idx}, -1)" class="px-2.5 py-1 text-white font-bold">-</button>
-                                    <span class="px-3 font-mono text-white font-bold">${i.qty}</span>
-                                    <button onclick="updateQuantity(${idx}, 1)" class="px-2.5 py-1 text-white font-bold">+</button>
-                                </div>
-                                <button onclick="removeFromCart(${idx})" class="p-1.5 text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div><p class="font-bold text-white">${i.title}</p><p class="text-brand-400 font-mono">€${i.price.toFixed(2)} x ${i.qty}</p></div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="updateQuantity(${idx}, -1)" class="px-2 bg-gray-800 rounded">-</button>
+                                <span class="font-mono">${i.qty}</span>
+                                <button onclick="updateQuantity(${idx}, 1)" class="px-2 bg-gray-800 rounded">+</button>
+                                <button onclick="removeFromCart(${idx})" class="text-red-400 ml-2">🗑</button>
                             </div>
                         </div>
                     `;
                 }).join('');
                 totalEl.innerText = `€${total.toFixed(2)}`;
             }
-            lucide.createIcons();
             document.getElementById('cart-modal').classList.remove('hidden');
         }
-
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
-        function openCheckout() { closeCartModal(); document.getElementById('checkout-modal').classList.remove('hidden'); }
-        function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
+        function goToCheckout() { window.location.href = 'checkout.html'; }
 
-        function processOrder(e) {
-            e.preventDefault();
-            lastInvoiceNum++;
-            localStorage.setItem('ls3d_invoice_num', lastInvoiceNum);
-
-            const shippingCost = parseFloat(document.getElementById('chk-shipping').value);
-            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-
-            currentOrder = {
-                id: `LS-${Math.floor(1000 + Math.random()*9000)}`,
-                number: `${lastInvoiceNum}/2026`,
-                name: document.getElementById('chk-name').value,
-                email: document.getElementById('chk-email').value,
-                phone: document.getElementById('chk-phone').value,
-                address: document.getElementById('chk-address').value,
-                shipping: shippingCost,
-                items: [...cart],
-                subtotal: subtotal,
-                total: subtotal + shippingCost,
-                status: "Pagato",
-                tracking: "In Attesa"
-            };
-
-            orders.unshift(currentOrder);
-            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
-            cart = [];
-            saveCart();
-            closeCheckoutModal();
-            handlePayPalCheckout(currentOrder);
-        }
-
-        function openInvoiceModal() {
-            if (!currentOrder) return;
-            document.getElementById('inv-number').innerText = `Fattura n. ${currentOrder.number}`;
-            document.getElementById('inv-client').innerText = currentOrder.name;
-            document.getElementById('inv-address').innerText = currentOrder.address;
-            document.getElementById('inv-sub').innerText = `€${currentOrder.subtotal.toFixed(2)}`;
-            document.getElementById('inv-ship').innerText = `€${currentOrder.shipping.toFixed(2)}`;
-            document.getElementById('inv-tot').innerText = `€${currentOrder.total.toFixed(2)}`;
-
-            let html = currentOrder.items.map(i => `
-                <tr class="border-b">
-                    <td class="py-1">${i.title}</td>
-                    <td class="py-1 text-center">${i.qty}</td>
-                    <td class="py-1 text-right">€${i.price.toFixed(2)}</td>
-                    <td class="py-1 text-right">€${(i.price * i.qty).toFixed(2)}</td>
-                </tr>
-            `).join('');
-            if(currentOrder.shipping > 0) {
-                html += `<tr class="border-b text-gray-500"><td class="py-1">Spedizione</td><td class="py-1 text-center">1</td><td class="py-1 text-right">€${currentOrder.shipping.toFixed(2)}</td><td class="py-1 text-right">€${currentOrder.shipping.toFixed(2)}</td></tr>`;
-            }
-            document.getElementById('inv-items').innerHTML = html;
-            document.getElementById('invoice-modal').classList.remove('hidden');
-        }
-        function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
-
-        function viewOrderInvoice(orderId) {
-            currentOrder = orders.find(o => o.id === orderId);
-            if(currentOrder) openInvoiceModal();
-        }
-
-        function trackOrder() {
-            const code = document.getElementById('track-input').value.trim().toUpperCase();
-            const resDiv = document.getElementById('track-result');
-            resDiv.classList.remove('hidden');
-
-            const found = orders.find(o => o.id.toUpperCase() === code);
-            if (!found) {
-                resDiv.innerHTML = `<p class="text-red-400">Nessun ordine trovato con il codice inserito.</p>`;
-                return;
-            }
-
-            resDiv.innerHTML = `
-                <p class="text-white font-bold">Ordine: <span class="text-brand-400">${found.id}</span></p>
-                <p class="text-gray-300">Cliente: ${found.name}</p>
-                <p class="text-gray-300">Stato Lavorazione: <span class="text-brand-400 font-bold">${found.status}</span></p>
-                <p class="text-gray-300">Tracking Spedizione: <span class="text-accent-400">${found.tracking}</span></p>
-            `;
-        }
-
-        function handleInfoRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('info-name').value;
-            const email = document.getElementById('info-email').value;
-            const type = document.getElementById('info-type').value;
-            const msg = document.getElementById('info-msg').value;
-
-            const mailtoLink = `mailto:luigi.schiavello@gmail.com?subject=${encodeURIComponent(`Richiesta Info: ${type} da ${name}`)}&body=${encodeURIComponent(`Nome: ${name}\nEmail: ${email}\nTipo: ${type}\n\nMessaggio:\n${msg}`)}`;
-            window.location.href = mailtoLink;
-        }
-
-        function showPage(pageId) {
-            document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
-            document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
-        }
-
-        renderCategories();
-        renderProducts();
-        saveCart();
+        renderCategories(); renderProducts(); saveCart();
     </script>
 </body>
 </html>
