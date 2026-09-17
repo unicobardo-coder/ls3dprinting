@@ -31,6 +31,8 @@
             }
         }
     </script>
+    <!-- Libreria per generare il PDF al volo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between">
 
@@ -231,60 +233,63 @@
             window.open('https://www.paypal.com/signin', '_blank');
         }
 
-        function confirmPaymentAndSendEmail() {
-            if (!currentOrderData) return;
+   function confirmPaymentAndSendEmail() {
+    if (!currentOrderData) return;
 
-            currentOrderData.status = "Pagato";
-            orders.unshift(currentOrderData);
-            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
-            localStorage.removeItem('ls3d_cart');
+    currentOrderData.status = "Pagato";
+    orders.unshift(currentOrderData);
+    localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+    localStorage.removeItem('ls3d_cart');
 
-            // Invio email tramite EmailJS con tracciamento di debug
-            const itemsDescription = currentOrderData.items.map(i => `${i.qty}x ${i.title} (€${(i.price * i.qty).toFixed(2)})`).join(', ');
-            
-            console.log("Tentativo invio email con EmailJS...");
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                customer_name: currentOrderData.name,
-                customer_email: currentOrderData.email,
-                customer_phone: currentOrderData.phone,
-                customer_address: currentOrderData.address,
-                message_details: itemsDescription + ` (Spedizione: €${currentOrderData.shipping.toFixed(2)})`,
-                order_total: `€${currentOrderData.total.toFixed(2)}`
-            }).then(
-                function(response) {
-                    console.log("SUCCESS! Email inviata con successo:", response.status, response.text);
-                },
-                function(error) {
-                    console.error("ERRORE EmailJS Fallito:", error);
-                    alert("Attenzione: l'ordine è stato registrato ma c'è stato un problema nell'invio della mail automatica. Controlla la console (F12).");
-                }
-            );
+    // 1. Popola la fattura a schermo (necessario per farla leggere alla libreria PDF)
+    document.getElementById('inv-number').innerText = `Fattura n. ${currentOrderData.number}`;
+    document.getElementById('inv-client').innerText = currentOrderData.name;
+    document.getElementById('inv-address').innerText = currentOrderData.address;
+    document.getElementById('inv-sub').innerText = `€${currentOrderData.subtotal.toFixed(2)}`;
+    document.getElementById('inv-ship').innerText = `€${currentOrderData.shipping.toFixed(2)}`;
+    document.getElementById('inv-tot').innerText = `€${currentOrderData.total.toFixed(2)}`;
 
-            // Popola la fattura
-            document.getElementById('inv-number').innerText = `Fattura n. ${currentOrderData.number}`;
-            document.getElementById('inv-client').innerText = currentOrderData.name;
-            document.getElementById('inv-address').innerText = currentOrderData.address;
-            document.getElementById('inv-sub').innerText = `€${currentOrderData.subtotal.toFixed(2)}`;
-            document.getElementById('inv-ship').innerText = `€${currentOrderData.shipping.toFixed(2)}`;
-            document.getElementById('inv-tot').innerText = `€${currentOrderData.total.toFixed(2)}`;
+    let html = currentOrderData.items.map(i => `
+        <tr class="border-b">
+            <td class="py-1">${i.title}</td>
+            <td class="py-1 text-center">${i.qty}</td>
+            <td class="py-1 text-right">€${i.price.toFixed(2)}</td>
+            <td class="py-1 text-right">€${(i.price * i.qty).toFixed(2)}</td>
+        </tr>
+    `).join('');
+    if(currentOrderData.shipping > 0) {
+        html += `<tr class="border-b text-gray-500"><td class="py-1">Spedizione</td><td class="py-1 text-center">1</td><td class="py-1 text-right">€${currentOrderData.shipping.toFixed(2)}</td><td class="py-1 text-right">€${currentOrderData.shipping.toFixed(2)}</td></tr>`;
+    }
+    document.getElementById('inv-items').innerHTML = html;
 
-            let html = currentOrderData.items.map(i => `
-                <tr class="border-b">
-                    <td class="py-1">${i.title}</td>
-                    <td class="py-1 text-center">${i.qty}</td>
-                    <td class="py-1 text-right">€${i.price.toFixed(2)}</td>
-                    <td class="py-1 text-right">€${(i.price * i.qty).toFixed(2)}</td>
-                </tr>
-            `).join('');
-            if(currentOrderData.shipping > 0) {
-                html += `<tr class="border-b text-gray-500"><td class="py-1">Spedizione</td><td class="py-1 text-center">1</td><td class="py-1 text-right">€${currentOrderData.shipping.toFixed(2)}</td><td class="py-1 text-right">€${currentOrderData.shipping.toFixed(2)}</td></tr>`;
-            }
-            document.getElementById('inv-items').innerHTML = html;
+    // 2. Genera il PDF in automatico e invialo con EmailJS
+    const element = document.getElementById('invoice-paper');
+    const opt = {
+        margin:       10,
+        filename:     `Fattura_${currentOrderData.number.replace('/', '-')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-            document.getElementById('pending-payment-section').classList.add('hidden');
-            document.getElementById('invoice-preview-section').classList.remove('hidden');
-        }
+    html2pdf().from(element).outputPdf('datauristring').then(function(pdfBase64) {
+        const itemsDescription = currentOrderData.items.map(i => `${i.qty}x ${i.title} (€${(i.price * i.qty).toFixed(2)})`).join(', ');
 
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            customer_name: currentOrderData.name,
+            customer_email: currentOrderData.email,
+            customer_phone: currentOrderData.phone,
+            customer_address: currentOrderData.address,
+            message_details: itemsDescription + ` (Spedizione: €${currentOrderData.shipping.toFixed(2)})`,
+            order_total: `€${currentOrderData.total.toFixed(2)}`,
+            content_pdf: pdfBase64 // <-- Variabile da aggiungere nel template EmailJS come allegato
+        }).then(() => console.log("Email con fattura in allegato inviata!"));
+    });
+
+    // Mostra l'anteprima a schermo
+    document.getElementById('pending-payment-section').classList.add('hidden');
+    document.getElementById('invoice-preview-section').classList.remove('hidden');
+}
         renderCheckoutSummary();
     </script>
 </body>
