@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | LS3Dmaker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){ emailjs.init("TUA_PUBLIC_KEY"); })();
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { brand: { 500: '#10b981', 400: '#34d399' }, dark: { bg: '#090d16', card: '#111827' } }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen p-4 sm:p-8">
+    <div class="max-w-2xl mx-auto space-y-6">
+        <a href="index.html" class="text-xs font-mono text-brand-400 hover:underline">← Torna al Catalogo</a>
+        
+        <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+            <h2 class="text-2xl font-bold mb-6">Procedi con il Checkout</h2>
+            
+            <div id="checkout-cart-summary" class="mb-6 p-4 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono space-y-2"></div>
+
+            <form onsubmit="processOrder(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Nome e Cognome *</label>
+                    <input type="text" id="chk-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Email (per ricezione ordine e fattura) *</label>
+                    <input type="email" id="chk-email" required placeholder="mario@example.com" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Telefono *</label>
+                    <input type="tel" id="chk-phone" required placeholder="3331234567" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Indirizzo di Spedizione *</label>
+                    <textarea id="chk-address" required rows="2" placeholder="Via Roma 1, 40121 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white"></textarea>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Metodo di Spedizione:</label>
+                    <select id="chk-shipping" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white font-mono">
+                        <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
+                        <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
+                        <option value="0.00">Ritiro a Mano (Gratuito)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-brand-500 text-black font-bold rounded-xl text-sm mt-4">Conferma Ordine e Paga con PayPal</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const PAYPAL_EMAIL = "unicobardo@gmail.com";
+        const EMAILJS_SERVICE_ID = "TUO_SERVICE_ID";
+        const EMAILJS_TEMPLATE_ID = "TUO_TEMPLATE_ID";
+
+        let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
+        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
+        let lastInvoiceNum = parseInt(localStorage.getItem('ls3d_invoice_num')) || 0;
+
+        function renderCheckoutSummary() {
+            const container = document.getElementById('checkout-cart-summary');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-red-400">Il carrello è vuoto. Torna al catalogo.</p>`;
+                return;
+            }
+            let subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            container.innerHTML = `
+                <p class="text-white font-bold mb-2">Riepilogo Carrello:</p>
+                ${cart.map(i => `<div class="flex justify-between text-gray-300"><span>${i.qty}x ${i.title}</span><span>€${(i.price * i.qty).toFixed(2)}</span></div>`).join('')}
+                <div class="border-t border-gray-800 pt-2 mt-2 flex justify-between font-bold text-brand-400 text-sm">
+                    <span>Totale Prodotti:</span><span>€${subtotal.toFixed(2)}</span>
+                </div>
+            `;
+        }
+
+        function processOrder(e) {
+            e.preventDefault();
+            if (cart.length === 0) { alert("Il carrello è vuoto!"); return; }
+
+            lastInvoiceNum++;
+            localStorage.setItem('ls3d_invoice_num', lastInvoiceNum);
+
+            const shippingCost = parseFloat(document.getElementById('chk-shipping').value);
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+
+            const orderData = {
+                id: `LS-${Math.floor(1000 + Math.random()*9000)}`,
+                number: `${lastInvoiceNum}/2026`,
+                name: document.getElementById('chk-name').value,
+                email: document.getElementById('chk-email'].value, // <-- Email obbligatoria richiesta qui
+                phone: document.getElementById('chk-phone').value,
+                address: document.getElementById('chk-address').value,
+                shipping: shippingCost,
+                items: [...cart],
+                subtotal: subtotal,
+                total: subtotal + shippingCost,
+                status: "Pagato",
+                tracking: "In Attesa"
+            };
+
+            orders.unshift(orderData);
+            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+            
+            // Svuota carrello
+            localStorage.removeItem('ls3d_cart');
+
+            // Invio Email con EmailJS (il cliente riceve l'ordine, tu in BCC)
+            const itemsDescription = orderData.items.map(i => `${i.qty}x ${i.title} (€${(i.price * i.qty).toFixed(2)})`).join(', ');
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                customer_name: orderData.name,
+                customer_email: orderData.email,
+                customer_phone: orderData.phone,
+                customer_address: orderData.address,
+                message_details: itemsDescription + ` (Spedizione: €${orderData.shipping.toFixed(2)})`,
+                order_total: `€${orderData.total.toFixed(2)}`
+            }).then(() => console.log("Email inviata!"));
+
+            // Apre PayPal e mostra avviso
+            window.open('https://www.paypal.com/signin', '_blank');
+            alert(`Ordine registrato! Invia €${orderData.total.toFixed(2)} a ${PAYPAL_EMAIL}`);
+            window.location.href = 'index.html';
+        }
+
+        renderCheckoutSummary();
+    </script>
+</body>
+</html>
