@@ -64,7 +64,6 @@
                     <i data-lucide="shopping-cart" class="w-4 h-4"></i> <span data-i18n="btn-cart">Carrello</span>
                     <span id="cart-badge" class="px-1.5 py-0.5 rounded-full bg-brand-500 text-black text-[10px] font-bold">0</span>
                 </button>
-                <!-- Pulsante Admin che reindirizza alla nuova pagina dedicata -->
                 <a href="admin.html" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700 hover:border-brand-500 transition-colors flex items-center gap-1.5">
                     <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-400 inline"></i> Admin
                 </a>
@@ -409,15 +408,24 @@
                 if (t[key]) el.innerText = t[key];
             });
             renderCategories();
+            renderProducts();
         }
 
-        let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Componenti", "Decorazioni", "Prototipi", "Gadget"];
+        let categories = ["Componenti", "Decorazioni", "Prototipi", "Gadget"];
         let selectedCategory = "Tutti";
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
 
-        let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Realizzato con polimeri ad altissima risoluzione.", categories: ["Decorazioni"], images: [defaultImg], colors: ["Nero", "Argento"], hidden: false }
+        // PRODOTTI DEFINITI DIRETTAMENTE NEL CODICE SORGENTE (Sincronizzati ovunque)
+        let defaultProducts = [
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Realizzato con polimeri ad altissima risoluzione.", categories: ["Decorazioni"], images: [defaultImg], hidden: false }
         ];
+
+        let products = JSON.parse(localStorage.getItem('ls3d_products'));
+        if (!products) {
+            products = defaultProducts;
+            localStorage.setItem('ls3d_products', JSON.stringify(products));
+        }
+
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
         let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
         let currentOrder = null;
