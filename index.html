@@ -37,6 +37,27 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
+    <!-- IUBENDA COOKIE SOLUTION & PRIVACY POLICY (Sostituire 12345678 con il proprio ID Iubenda) -->
+    <script type="text/javascript">
+    var _iub = _iub || [];
+    _iub.csConfiguration = {
+        "askConsentIfUnknown": true,
+        "enableFaint": true,
+        "enableCcca": true,
+        "lang": "it",
+        "siteId": 12345678,
+        "cookiePolicyId": 87654321,
+        "banner": {
+            "acceptButtonDisplay": true,
+            "customizeButtonDisplay": true,
+            "position": "bottom",
+            "textColor": "#ffffff",
+            "backgroundColor": "#111827"
+        }
+    };
+    </script>
+    <script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -104,7 +125,6 @@
             </nav>
 
             <div class="flex items-center gap-3">
-                <!-- Selettore Lingua -->
                 <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded-xl px-2 py-1.5 font-mono focus:outline-none focus:border-brand-500 cursor-pointer">
                     <option value="it">🇮🇹 IT</option>
                     <option value="en">🇬🇧 EN</option>
@@ -113,7 +133,6 @@
                     <option value="de">🇩🇪 DE</option>
                 </select>
 
-                <!-- Tasto Carrello -->
                 <button onclick="openCartModal()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-mono border border-brand-500/30 transition-all">
                     <i data-lucide="shopping-cart" class="w-4 h-4"></i>
                     <span class="hidden sm:inline font-bold" id="btn-cart-text">Carrello</span>
@@ -273,6 +292,20 @@
 
     </main>
 
+    <!-- FOOTER CON LINK IUBENDA PRIVACY & COOKIE POLICY -->
+    <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-bold text-white">LS3Dmaker © 2026</p>
+                <p>Tutti i diritti riservati. P.IVA / C.F. IT12345678901</p>
+            </div>
+            <div class="flex gap-4 font-mono">
+                <a href="https://www.iubenda.com/privacy-policy/87654321" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe hover:underline" title="Privacy Policy">Privacy Policy</a>
+                <a href="https://www.iubenda.com/privacy-policy/87654321/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe hover:underline" title="Cookie Policy">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
     <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative">
@@ -308,7 +341,7 @@
         </div>
     </div>
 
-    <!-- MODALE CHECKOUT & SELEZIONE SPEDIZIONI -->
+    <!-- MODALE CHECKOUT -->
     <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
@@ -343,7 +376,6 @@
                     <textarea id="checkout-address" rows="2" required placeholder="Via Roma 10, 40100 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- SELEZIONE SPEDIZIONE -->
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-2">Metodo di Spedizione:</label>
                     <select id="checkout-shipping-method" onchange="updateCheckoutTotal()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none font-mono">
@@ -353,7 +385,6 @@
                     </select>
                 </div>
 
-                <!-- SELEZIONE METODO PAGAMENTO -->
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-2" id="lbl-pay-method">Seleziona Metodo di Pagamento:</label>
                     <div class="grid grid-cols-3 gap-2">
@@ -398,7 +429,7 @@
         </div>
     </div>
 
-    <!-- MODALE ANTEPRIMA PRODOTTO E VISUALIZZATORE 3D STL -->
+    <!-- MODALE ANTEPRIMA PRODOTTO -->
     <div id="preview-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closePreviewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white z-10">
@@ -408,17 +439,14 @@
         </div>
     </div>
 
-    <!-- MODALE FATTURA (LAYOUT ESATTO STILE INV24) -->
+    <!-- MODALE FATTURA -->
     <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white print:hidden">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
 
-            <!-- CONTENITORE FATTURA STAMPABILE CON LAYOUT STILE INV24 -->
             <div id="invoice-paper" class="bg-white text-gray-900 p-10 rounded-xl font-sans text-sm border border-gray-300">
-                
-                <!-- Logo Top Left -->
                 <div class="flex justify-between items-start mb-6">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-emerald-500 text-white font-mono font-bold text-xl flex items-center justify-center rounded-lg">LS</div>
@@ -431,7 +459,6 @@
 
                 <hr class="border-gray-200 mb-8">
 
-                <!-- Header: Cliente vs Date -->
                 <div class="flex justify-between items-start mb-10 text-xs">
                     <div>
                         <p class="text-gray-500 mb-1">Fattura a:</p>
@@ -445,12 +472,10 @@
                     </div>
                 </div>
 
-                <!-- Titolo Centrale -->
                 <div class="text-center my-8">
                     <h2 class="text-2xl font-bold text-gray-900" id="paper-number">Fattura n. 560</h2>
                 </div>
 
-                <!-- Tabella Prodotti -->
                 <table class="w-full mb-8 text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-300 text-xs font-bold text-gray-900">
@@ -465,7 +490,6 @@
 
                 <hr class="border-gray-300 mb-6">
 
-                <!-- Totali a Destra -->
                 <div class="flex justify-end mb-12">
                     <div class="w-60 text-right space-y-1 text-xs">
                         <p><span class="text-gray-600">Subtotale Articoli:</span> <span id="paper-subtotal" class="font-medium">0,00 €</span></p>
@@ -477,7 +501,6 @@
 
                 <hr class="border-gray-200 mb-6">
 
-                <!-- Footer a 3 Colonne -->
                 <div class="grid grid-cols-3 gap-4 text-[11px] text-gray-600">
                     <div>
                         <p class="font-bold text-gray-900">LS3Dmaker</p>
@@ -494,7 +517,6 @@
                 </div>
             </div>
 
-            <!-- Pulsanti Azione -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 print:hidden">
                 <button onclick="window.print()" class="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-mono text-xs font-bold transition-all">Stampa / Salva PDF Fattura</button>
                 <button onclick="sendOrderAndInvoiceEmail()" class="py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-mono text-xs font-bold transition-all shadow-lg shadow-brand-500/20">Invia Ordine & Fattura via Email</button>
@@ -502,38 +524,54 @@
         </div>
     </div>
 
-    <!-- MODALE ADMIN COMPLETA CON GESTIONE PRODOTTI, STL, CATEGORIE E SPEDIZIONI -->
+    <!-- MODALE ADMIN COMPLETA CON TASTO "TORNA AL SITO", GESTIONE PRODOTTI, FOTO, STL, JSON & SPEDIZIONI -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+            
+            <!-- Tasto Chiudi X in alto -->
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors" title="Torna al sito">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
 
             <!-- Login View -->
             <div id="admin-login-view">
-                <h3 class="text-2xl font-bold text-white text-center mb-6">Accesso Riservato Admin</h3>
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-white">Accesso Riservato Admin</h3>
+                    <p class="text-xs text-gray-400 mt-1">Pannello di controllo LS3Dmaker</p>
+                </div>
                 <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-sm mx-auto">
                     <input type="text" id="admin-username" required placeholder="admin" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
                     <input type="password" id="admin-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
                     <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Accedi al Pannello</button>
+                    
+                    <!-- PULSANTE TORNA AL SITO NEL LOGIN -->
+                    <button type="button" onclick="closeAdminModal()" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-mono transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna alla Pagina Principale
+                    </button>
                 </form>
             </div>
 
             <!-- Panel View -->
             <div id="admin-panel-view" class="hidden space-y-6">
-                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h3 class="text-xl font-bold text-white">Dashboard Admin LS3Dmaker</h3>
+                <div class="flex flex-wrap justify-between items-center border-b border-gray-800 pb-4 gap-2">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-xl font-bold text-white">Dashboard Admin</h3>
+                        <!-- PULSANTE TORNA AL SITO NELLA DASHBOARD -->
+                        <button onclick="closeAdminModal()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 text-xs font-mono font-bold flex items-center gap-1.5 transition-all">
+                            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Torna al Sito
+                        </button>
+                    </div>
                     <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline font-mono">Logout</button>
                 </div>
 
                 <!-- Admin Tabs Navigation -->
                 <div class="flex gap-2 border-b border-gray-800 pb-2">
                     <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti & STL</button>
-                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Categorie</button>
+                    <button onclick="switchAdminTab('json')" id="tab-btn-json" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Import / Export JSON</button>
                     <button onclick="switchAdminTab('shipping')" id="tab-btn-shipping" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Ordini & Spedizioni</button>
                 </div>
 
-                <!-- TAB 1: GESTIONE PRODOTTI & STL -->
+                <!-- TAB 1: GESTIONE PRODOTTI, FOTO & STL -->
                 <div id="admin-tab-products" class="space-y-4">
                     <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
                         <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Nuovo / Modifica Prodotto</h4>
@@ -545,25 +583,46 @@
                             <select id="new-prod-category" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono"></select>
                         </div>
 
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-mono text-gray-400 mb-1">Carica Foto Prodotto (PNG/JPG)</label>
+                                <input type="file" id="img-file-input" accept="image/*" onchange="handleImageSelect(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono text-gray-400 mb-1">Oppure Inserisci URL Immagine</label>
+                                <input type="url" id="new-prod-imgurl" placeholder="https://..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                        </div>
+
                         <div>
-                            <label class="block text-[11px] font-mono text-gray-400 mb-1">Carica File Modello 3D STL (Opzionale)</label>
+                            <label class="block text-[11px] font-mono text-gray-400 mb-1">Carica Modello 3D STL (Opzionale)</label>
                             <input type="file" id="stl-file-input" accept=".stl" onchange="handleSTLSelect(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                         </div>
 
-                        <textarea id="new-prod-desc" rows="2" required placeholder="Descrizione Prodotto" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                        <textarea id="new-prod-desc" rows="2" required placeholder="Descrizione Dettagliata Prodotto" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
                         <button type="submit" class="w-full py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
                     </form>
 
                     <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
 
-                <!-- TAB 2: GESTIONE CATEGORIE -->
-                <div id="admin-tab-categories" class="hidden space-y-4">
-                    <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 flex gap-2">
-                        <input type="text" id="new-cat-name" placeholder="Nuova Categoria (es. Droni, Giochi)" class="flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                        <button onclick="handleAddCategory()" class="px-4 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Aggiungi</button>
+                <!-- TAB 2: IMPORT / EXPORT JSON CON IMMAGINI -->
+                <div id="admin-tab-json" class="hidden space-y-4">
+                    <div class="bg-gray-900/60 p-5 rounded-xl border border-gray-800 space-y-4">
+                        <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Gestione Backup Database (JSON)</h4>
+                        <p class="text-xs text-gray-300">Puoi scaricare l'intero catalogo dei prodotti (inclusi prezzi, foto in Base64 e modelli 3D) in formato `.json` oppure caricarne uno salvato in precedenza.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <button onclick="exportProductsJSON()" class="py-3 px-4 bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 rounded-xl font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                                <i data-lucide="download" class="w-4 h-4"></i> Scarica JSON Prodotti
+                            </button>
+
+                            <label class="py-3 px-4 bg-brand-500 hover:bg-brand-400 text-black rounded-xl font-mono text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all">
+                                <i data-lucide="upload" class="w-4 h-4"></i> Carica JSON Prodotti
+                                <input type="file" id="import-json-input" accept=".json" onchange="importProductsJSON(event)" class="hidden">
+                            </label>
+                        </div>
                     </div>
-                    <div id="admin-categories-list" class="space-y-2"></div>
                 </div>
 
                 <!-- TAB 3: GESTIONE ORDINI & SPEDIZIONI -->
@@ -575,24 +634,106 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT SISTEMA TRADUZIONE & LOGICA INTEGRATA -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         const myEmail = "unicobardo@gmail.com"; 
 
         let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Tutti", "Componenti", "Decorazioni", "Prototipi", "Gadget"];
         let selectedCategory = "Tutti";
 
+        const defaultPlaceholderImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
+
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, desc: "Design geometrico futurista.", category: "Decorazioni", stlUrl: null }
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, desc: "Design geometrico futurista.", category: "Decorazioni", imgUrl: defaultPlaceholderImg, stlUrl: null }
         ];
 
         let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
         let currentOrder = null;
         let selectedPayMethod = 'whatsapp';
+        let uploadedImageData = null;
         let uploadedSTLData = null;
 
-        // RENDER FILTRI CATEGORIE
+        const translations = {
+            it: {
+                subtitle: "CREATIVITÀ & PROTOTIPAZIONE",
+                navProducts: "Prodotti", navInfo: "Richiedi Info", navTrack: "Traccia Spedizione", navAbout: "Chi siamo?", cart: "Carrello",
+                heroBadge: "Stampa 3D & Spedizioni Tracciabili",
+                heroTitle: "Dai forma alle Tue Idee con <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
+                heroDesc: "Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.",
+                catalogTitle: "Catalogo Creazioni 3D", catalogSubtitle: "Sfoglia le nostre creazioni, ispeziona i modelli STL in 3D e aggiungi al carrello.",
+                infoTitle: "Richiedi Informazioni o Preventivo", infoSubtitle: "Compila il modulo per un preventivo personalizzato",
+                lblName: "Nome e Cognome", lblContact: "Email / Telefono", lblService: "Tipo di Servizio", lblMessage: "Messaggio / Dettagli Progetto", btnSendWA: "Invia Richiesta via WhatsApp",
+                trackTitle: "Traccia il tuo Ordine", trackSubtitle: "Inserisci il codice ordine per verificare lo stato", btnSearch: "Cerca",
+                aboutTitle: "Chi Siamo — ", aboutDesc: "Passione per la tecnologia e soluzioni su misura.",
+                aboutMissionTitle: "La Nostra Missione", aboutMissionP1: "LS3Dmaker trasforma idee in oggetti reali.", aboutMissionP2: "Ogni pezzo viene verificato singolarmente.",
+                btnBackCatalog: "Torna al Catalogo Prodotti", cartTitle: "Il Tuo Carrello", cartSubtitle: "Gestisci gli articoli prima di completare l'ordine", cartTotalLabel: "Totale Stimato:",
+                btnSaveEmail: "Salva / Invia via Email", btnProceedOrder: "Procedi al Pagamento", checkoutTitle: "Completa l'Ordine & Pagamento",
+                lblPayName: "Nome e Cognome / Ragione Sociale", lblPayEmail: "Email Cliente", lblPayPhone: "Telefono (WhatsApp)", lblPayAddress: "Indirizzo Completo di Spedizione", lblPayMethod: "Seleziona Metodo di Pagamento:",
+                btnAddToCart: "Aggiungi", emptyCart: "Il carrello è vuoto."
+            },
+            en: {
+                subtitle: "CREATIVITY & PROTOTYPING",
+                navProducts: "Products", navInfo: "Request Info", navTrack: "Track Order", navAbout: "About Us", cart: "Cart",
+                heroBadge: "3D Printing & Tracked Shipping",
+                heroTitle: "Shape your ideas with <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
+                heroDesc: "Rapid prototyping, functional components, and custom 3D creations.",
+                catalogTitle: "3D Creations Catalog", catalogSubtitle: "Browse our creations, inspect 3D STL models and add to cart.",
+                infoTitle: "Request Info or Quote", infoSubtitle: "Fill in the form for a custom quote",
+                lblName: "Full Name", lblContact: "Email / Phone", lblService: "Service Type", lblMessage: "Message / Project Details", btnSendWA: "Send Request via WhatsApp",
+                trackTitle: "Track your Order", trackSubtitle: "Enter order code to verify status", btnSearch: "Search",
+                aboutTitle: "About Us — ", aboutDesc: "Passion for technology and tailored additive manufacturing.",
+                aboutMissionTitle: "Our Mission", aboutMissionP1: "LS3Dmaker transforms complex concepts into physical objects.", aboutMissionP2: "Every part is inspected before shipping.",
+                btnBackCatalog: "Back to Product Catalog", cartTitle: "Your Cart", cartSubtitle: "Manage items before placing order", cartTotalLabel: "Estimated Total:",
+                btnSaveEmail: "Save / Send via Email", btnProceedOrder: "Proceed to Payment", checkoutTitle: "Complete Order & Payment",
+                lblPayName: "Full Name / Company", lblPayEmail: "Customer Email", lblPayPhone: "Phone (WhatsApp)", lblPayAddress: "Complete Shipping Address", lblPayMethod: "Select Payment Method:",
+                btnAddToCart: "Add to Cart", emptyCart: "Your cart is empty."
+            }
+        };
+
+        let currentLang = 'it';
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang] || translations.it;
+
+            document.getElementById('txt-nav-subtitle').innerText = t.subtitle;
+            document.getElementById('nav-products').innerText = t.navProducts;
+            document.getElementById('nav-info').innerText = t.navInfo;
+            document.getElementById('nav-track').innerText = t.navTrack;
+            document.getElementById('nav-about').innerText = t.navAbout;
+            document.getElementById('btn-cart-text').innerText = t.cart;
+
+            document.getElementById('hero-badge').innerHTML = `<i data-lucide="truck" class="w-3.5 h-3.5"></i> ${t.heroBadge}`;
+            document.getElementById('hero-title').innerHTML = t.heroTitle;
+            document.getElementById('hero-desc').innerText = t.heroDesc;
+
+            document.getElementById('catalog-title').innerText = t.catalogTitle;
+            document.getElementById('catalog-subtitle').innerText = t.catalogSubtitle;
+
+            document.getElementById('info-form-title').innerText = t.infoTitle;
+            document.getElementById('info-form-subtitle').innerText = t.infoSubtitle;
+            document.getElementById('lbl-name').innerText = t.lblName;
+            document.getElementById('lbl-contact').innerText = t.lblContact;
+            document.getElementById('lbl-service').innerText = t.lblService;
+            document.getElementById('lbl-message').innerText = t.lblMessage;
+            document.getElementById('btn-send-wa').innerText = t.btnSendWA;
+
+            document.getElementById('track-title').innerText = t.trackTitle;
+            document.getElementById('track-subtitle').innerText = t.trackSubtitle;
+            document.getElementById('btn-search').innerText = t.btnSearch;
+
+            document.getElementById('about-title').innerText = t.aboutTitle;
+            document.getElementById('about-desc').innerText = t.aboutDesc;
+            document.getElementById('about-mission-title').innerText = t.aboutMissionTitle;
+            document.getElementById('about-mission-p1').innerText = t.aboutMissionP1;
+            document.getElementById('about-mission-p2').innerText = t.aboutMissionP2;
+            document.getElementById('btn-back-catalog').innerHTML = `<i data-lucide="arrow-left" class="w-4 h-4"></i> ${t.btnBackCatalog}`;
+
+            renderProducts();
+            lucide.createIcons();
+        }
+
         function renderCategories() {
             const container = document.getElementById('category-filters');
             container.innerHTML = categories.map(cat => `
@@ -601,7 +742,6 @@
                 </button>
             `).join('');
 
-            // Popola anche il menu a tendina nell'admin
             const selectAdmin = document.getElementById('new-prod-category');
             if (selectAdmin) {
                 selectAdmin.innerHTML = categories.filter(c => c !== "Tutti").map(c => `<option value="${c}">${c}</option>`).join('');
@@ -621,7 +761,7 @@
             const filtered = selectedCategory === "Tutti" ? products : products.filter(p => p.category === selectedCategory);
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400 font-mono text-xs">Nessun prodotto trovato per questa categoria.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400 font-mono text-xs">Nessun prodotto trovato.</div>`;
                 return;
             }
 
@@ -631,7 +771,7 @@
                         <div class="relative h-48 bg-gray-900 flex items-center justify-center cursor-pointer" onclick="openPreviewModal(${p.id})">
                             ${p.stlUrl ? 
                                 `<div id="stl-container-${p.id}" class="w-full h-full stl-canvas-container"></div>` : 
-                                `<img src="${defaultPlaceholderImg}" class="w-full h-full object-cover">`
+                                `<img src="${p.imgUrl || defaultPlaceholderImg}" class="w-full h-full object-cover">`
                             }
                             <span class="absolute top-2 left-2 bg-gray-900/80 text-gray-300 text-[10px] font-mono px-2 py-0.5 rounded-md border border-gray-700">${p.category || 'Generale'}</span>
                             ${p.stlUrl ? `<span class="absolute top-2 right-2 bg-brand-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">3D STL</span>` : ''}
@@ -657,7 +797,6 @@
             });
         }
 
-        // VISUALIZZATORE THREE.JS
         function initSTLViewer(containerId, stlData) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -769,27 +908,16 @@
             const phone = document.getElementById('checkout-phone').value;
             const address = document.getElementById('checkout-address').value;
             const shippingCost = parseFloat(document.getElementById('checkout-shipping-method').value) || 0;
-
             const itemsSubtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
 
-            const orderId = `LS-${Math.floor(1000 + Math.random() * 9000)}`;
-
             currentOrder = {
-                id: orderId,
+                id: `LS-${Math.floor(1000 + Math.random() * 9000)}`,
                 number: Math.floor(100 + Math.random() * 900),
-                clientName: name,
-                clientEmail: email,
-                clientPhone: phone,
-                clientAddress: address,
-                shippingCost: shippingCost,
-                items: [...cart],
-                subtotal: itemsSubtotal,
-                tax: itemsSubtotal * 0.22,
-                total: itemsSubtotal + shippingCost,
-                status: 'In Elaborazione',
-                trackingCode: 'In Generazione',
-                date: new Date().toLocaleDateString('it-IT'),
-                dueDate: new Date(Date.now() + 14*24*60*60*1000).toLocaleDateString('it-IT')
+                clientName: name, clientEmail: email, clientPhone: phone, clientAddress: address,
+                shippingCost: shippingCost, items: [...cart], subtotal: itemsSubtotal,
+                tax: itemsSubtotal * 0.22, total: itemsSubtotal + shippingCost,
+                status: 'In Elaborazione', trackingCode: 'In Generazione',
+                date: new Date().toLocaleDateString('it-IT'), dueDate: new Date(Date.now() + 14*24*60*60*1000).toLocaleDateString('it-IT')
             };
 
             orders.unshift(currentOrder);
@@ -800,16 +928,6 @@
 
             closeCheckoutModal();
             openInvoiceModal();
-        }
-
-        function payWithPayPalDirect() {
-            if (cart.length === 0) return alert("Carrello vuoto!");
-            const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-            window.open(`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(myEmail)}&amount=${total.toFixed(2)}&currency_code=EUR&item_name=Ordine%20LS3Dmaker`, '_blank');
-        }
-
-        function processSatispayOrder() {
-            window.open(`https://tag.satispay.com/ls3dmaker`, '_blank');
         }
 
         function openInvoiceModal() {
@@ -860,11 +978,10 @@
             window.location.href = `mailto:${myEmail}?cc=${encodeURIComponent(currentOrder.clientEmail)}&subject=${subject}&body=${body}`;
         }
 
-        // TRACCIAMENTO SPEDIZIONE PER L'UTENTE
         function trackOrder() {
             const input = document.getElementById('track-input').value.trim().toUpperCase();
             const result = document.getElementById('track-result');
-            if(!input) return alert("Inserisci un codice ordine valid (es. LS-8921).");
+            if(!input) return alert("Inserisci un codice ordine.");
 
             const found = orders.find(o => o.id.toUpperCase() === input);
 
@@ -880,79 +997,18 @@
                     </div>
                 `;
             } else {
-                result.innerHTML = `
-                    <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono text-amber-400">
-                        Nessun ordine trovato con il codice ${input}. Verifica il codice inserito.
-                    </div>
-                `;
+                result.innerHTML = `<div class="p-4 bg-gray-900 rounded-xl text-xs font-mono text-amber-400">Nessun ordine trovato con il codice ${input}.</div>`;
             }
             result.classList.remove('hidden');
         }
 
-        function handleContactSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('info-name').value;
-            const contact = document.getElementById('info-contact').value;
-            const msg = document.getElementById('info-message').value;
-            window.open(`https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(`Richiesta Info da ${name} (${contact}): ${msg}`)}`, '_blank');
-        }
-
-        function openPreviewModal(id) {
-            const p = products.find(prod => prod.id === id);
-            if(!p) return;
-            const content = document.getElementById('preview-content');
-            content.innerHTML = `
-                <div class="space-y-4">
-                    <h3 class="text-2xl font-bold text-white">${p.title}</h3>
-                    <div id="modal-stl-view" class="h-64 bg-gray-900 rounded-xl stl-canvas-container"></div>
-                    <p class="text-gray-300 text-sm">${p.desc}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xl font-bold text-brand-400">€${p.price.toFixed(2)}</span>
-                        <button onclick="addToCart(${p.id}); closePreviewModal();" class="px-4 py-2 bg-brand-500 text-black font-bold rounded-xl text-xs">Aggiungi al Carrello</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('preview-modal').classList.remove('hidden');
-            if(p.stlUrl) initSTLViewer('modal-stl-view', p.stlUrl);
-        }
-
-        function closePreviewModal() { document.getElementById('preview-modal').classList.add('hidden'); }
-
-        function showPage(pageId) {
-            document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
-            document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
-        }
-
-        // ADMIN PANEL MANAGEMENT
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            if(document.getElementById('admin-username').value === 'admin' && document.getElementById('admin-password').value === 'ls3d2026') {
-                document.getElementById('admin-login-view').classList.add('hidden');
-                document.getElementById('admin-panel-view').classList.remove('hidden');
-                renderAdminProductsList();
-                renderAdminCategoriesList();
-                renderAdminOrdersList();
-            } else {
-                alert('Credenziali errate!');
-            }
-        }
-
-        function adminLogout() {
-            document.getElementById('admin-panel-view').classList.add('hidden');
-            document.getElementById('admin-login-view').classList.remove('hidden');
-        }
-
-        function switchAdminTab(tab) {
-            document.getElementById('admin-tab-products').classList.toggle('hidden', tab !== 'products');
-            document.getElementById('admin-tab-categories').classList.toggle('hidden', tab !== 'categories');
-            document.getElementById('admin-tab-shipping').classList.toggle('hidden', tab !== 'shipping');
-
-            document.getElementById('tab-btn-products').className = tab === 'products' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
-            document.getElementById('tab-btn-categories').className = tab === 'categories' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
-            document.getElementById('tab-btn-shipping').className = tab === 'shipping' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+        // CARICAMENTO IMMAGINI E GESTIONE ADMIN
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) { uploadedImageData = evt.target.result; };
+            reader.readAsDataURL(file);
         }
 
         function handleSTLSelect(e) {
@@ -969,23 +1025,26 @@
             const title = document.getElementById('new-prod-title').value;
             const price = parseFloat(document.getElementById('new-prod-price').value);
             const category = document.getElementById('new-prod-category').value;
+            const imgUrl = document.getElementById('new-prod-imgurl').value;
             const desc = document.getElementById('new-prod-desc').value;
+
+            const finalImg = uploadedImageData || imgUrl || defaultPlaceholderImg;
 
             if (id) {
                 const p = products.find(prod => prod.id == id);
                 if (p) {
-                    p.title = title; p.price = price; p.category = category; p.desc = desc;
+                    p.title = title; p.price = price; p.category = category; p.desc = desc; p.imgUrl = finalImg;
                     if (uploadedSTLData) p.stlUrl = uploadedSTLData;
                 }
             } else {
                 products.unshift({
-                    id: Date.now(),
-                    title, price, category, desc,
-                    stlUrl: uploadedSTLData
+                    id: Date.now(), title, price, category, desc,
+                    imgUrl: finalImg, stlUrl: uploadedSTLData
                 });
             }
 
             localStorage.setItem('ls3d_products', JSON.stringify(products));
+            uploadedImageData = null;
             uploadedSTLData = null;
             document.getElementById('edit-prod-id').value = '';
             renderProducts();
@@ -993,13 +1052,76 @@
             alert('Prodotto salvato con successo!');
         }
 
+        // EXPORT & IMPORT JSON
+        function exportProductsJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `prodotti_ls3d_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importProductsJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (Array.isArray(imported)) {
+                        products = imported;
+                        localStorage.setItem('ls3d_products', JSON.stringify(products));
+                        renderProducts();
+                        renderAdminProductsList();
+                        alert('Database prodotti importato con successo!');
+                    } else alert('Formato file JSON non valido!');
+                } catch(err) {
+                    alert('Errore durante la lettura del file JSON!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            if(document.getElementById('admin-username').value === 'admin' && document.getElementById('admin-password').value === 'ls3d2026') {
+                document.getElementById('admin-login-view').classList.add('hidden');
+                document.getElementById('admin-panel-view').classList.remove('hidden');
+                renderAdminProductsList();
+                renderAdminOrdersList();
+            } else alert('Credenziali errate!');
+        }
+
+        function adminLogout() {
+            document.getElementById('admin-panel-view').classList.add('hidden');
+            document.getElementById('admin-login-view').classList.remove('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('admin-tab-products').classList.toggle('hidden', tab !== 'products');
+            document.getElementById('admin-tab-json').classList.toggle('hidden', tab !== 'json');
+            document.getElementById('admin-tab-shipping').classList.toggle('hidden', tab !== 'shipping');
+
+            document.getElementById('tab-btn-products').className = tab === 'products' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-json').className = tab === 'json' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-shipping').className = tab === 'shipping' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+        }
+
         function renderAdminProductsList() {
             const container = document.getElementById('admin-products-list');
             container.innerHTML = products.map(p => `
                 <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
-                    <div>
-                        <p class="font-bold text-white">${p.title} <span class="text-gray-400">(${p.category})</span></p>
-                        <p class="text-brand-400 font-mono">€${p.price.toFixed(2)}</p>
+                    <div class="flex items-center gap-3">
+                        <img src="${p.imgUrl || defaultPlaceholderImg}" class="w-10 h-10 object-cover rounded-lg">
+                        <div>
+                            <p class="font-bold text-white">${p.title} <span class="text-gray-400">(${p.category})</span></p>
+                            <p class="text-brand-400 font-mono">€${p.price.toFixed(2)}</p>
+                        </div>
                     </div>
                     <button onclick="deleteProduct(${p.id})" class="px-2 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded text-[10px]">Elimina</button>
                 </div>
@@ -1012,33 +1134,6 @@
             localStorage.setItem('ls3d_products', JSON.stringify(products));
             renderProducts();
             renderAdminProductsList();
-        }
-
-        function handleAddCategory() {
-            const val = document.getElementById('new-cat-name').value.trim();
-            if (!val || categories.includes(val)) return;
-            categories.push(val);
-            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-            document.getElementById('new-cat-name').value = '';
-            renderCategories();
-            renderAdminCategoriesList();
-        }
-
-        function renderAdminCategoriesList() {
-            const container = document.getElementById('admin-categories-list');
-            container.innerHTML = categories.filter(c => c !== "Tutti").map(c => `
-                <div class="flex justify-between items-center p-2.5 bg-gray-900 rounded-xl border border-gray-800 text-xs">
-                    <span class="text-white font-mono">${c}</span>
-                    <button onclick="deleteCategory('${c}')" class="text-red-400 text-[10px] hover:underline">Rimuovi</button>
-                </div>
-            `).join('');
-        }
-
-        function deleteCategory(cat) {
-            categories = categories.filter(c => c !== cat);
-            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-            renderCategories();
-            renderAdminCategoriesList();
         }
 
         function renderAdminOrdersList() {
@@ -1087,6 +1182,34 @@
                 o.trackingCode = code;
                 localStorage.setItem('ls3d_orders', JSON.stringify(orders));
             }
+        }
+
+        function openPreviewModal(id) {
+            const p = products.find(prod => prod.id === id);
+            if(!p) return;
+            const content = document.getElementById('preview-content');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-white">${p.title}</h3>
+                    <div id="modal-stl-view" class="h-64 bg-gray-900 rounded-xl overflow-hidden flex items-center justify-center">
+                        ${p.stlUrl ? '<div class="w-full h-full stl-canvas-container"></div>' : `<img src="${p.imgUrl || defaultPlaceholderImg}" class="w-full h-full object-cover rounded-xl">`}
+                    </div>
+                    <p class="text-gray-300 text-sm">${p.desc}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold text-brand-400">€${p.price.toFixed(2)}</span>
+                        <button onclick="addToCart(${p.id}); closePreviewModal();" class="px-4 py-2 bg-brand-500 text-black font-bold rounded-xl text-xs">Aggiungi al Carrello</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('preview-modal').classList.remove('hidden');
+            if(p.stlUrl) initSTLViewer('modal-stl-view', p.stlUrl);
+        }
+
+        function closePreviewModal() { document.getElementById('preview-modal').classList.add('hidden'); }
+
+        function showPage(pageId) {
+            document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
+            document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
         }
 
         // INITIALIZATION
