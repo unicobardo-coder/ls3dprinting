@@ -1,46 +1,18 @@
-// payment.js - Gestione Reindirizzamento PayPal sicuro e EmailJS (Predisposto)
+// payment.js - Gestione Reindirizzamento PayPal sicuro
 
-const PAYPAL_USER = "unicobardo"; // Inserisci il tuo nome utente esatto di PayPal.Me
+const PAYPAL_USER = "unicobardo";
 const ADMIN_EMAIL = "luigi.schiavello@gmail.com";
-let selectedGateway = 'paypal';
-
-function selectPaymentType(type) {
-    selectedGateway = type;
-    const isPayPal = type === 'paypal';
-    
-    document.getElementById('box-opt-paypal').className = isPayPal 
-        ? "p-3 bg-blue-950/30 border-2 border-blue-500 rounded-xl cursor-pointer flex items-center justify-between"
-        : "p-3 bg-gray-900 border border-gray-700 rounded-xl cursor-pointer flex items-center justify-between opacity-70";
-        
-    document.getElementById('box-opt-card').className = !isPayPal 
-        ? "p-3 bg-blue-950/30 border-2 border-blue-500 rounded-xl cursor-pointer flex items-center justify-between"
-        : "p-3 bg-gray-900 border border-gray-700 rounded-xl cursor-pointer flex items-center justify-between opacity-70";
-
-    document.getElementById('card-inputs-container').classList.toggle('hidden', isPayPal);
-}
 
 function handlePayPalCheckout(orderData) {
     const totalAmount = orderData.total.toFixed(2);
     
     sessionStorage.setItem('pending_order', JSON.stringify(orderData));
-    
-    // Apriamo la pagina PayPal.Me pulita (senza forzare l'importo nell'URL che genera l'errore del merchant)
     window.open(`https://www.paypal.com/paypalme/${PAYPAL_USER}`, '_blank');
     
     showDownloadSection(orderData);
 }
 
-function handleCardCheckout(orderData) {
-    alert("Il pagamento con carta di credito sarà presto attivo. Procedi momentaneamente con PayPal.");
-}
-
 function showDownloadSection(orderData) {
-    document.getElementById('checkout-modal').classList.add('hidden');
-    
-    if (orderData.status === "Pagato") {
-        sendAutomaticEmailBackground(orderData);
-    }
-
     const successDiv = document.createElement('div');
     successDiv.id = 'success-download-modal';
     successDiv.className = 'fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4';
@@ -55,20 +27,4 @@ function showDownloadSection(orderData) {
         </div>
     `;
     document.body.appendChild(successDiv);
-}
-
-function sendAutomaticEmailBackground(orderData) {
-    /*
-    emailjs.send("TUO_SERVICE_ID", "TUO_TEMPLATE_ID", {
-        to_email: orderData.email,
-        customer_name: orderData.name,
-        order_id: orderData.id,
-        order_total: orderData.total.toFixed(2),
-        admin_bcc: ADMIN_EMAIL
-    }).then(function(response) {
-        console.log("Email inviata con successo!", response.status, response.text);
-    }, function(error) {
-        console.log("Errore invio email:", error);
-    });
-    */
 }
