@@ -62,8 +62,6 @@
 
     <!-- Main Content -->
     <main id="main-content">
-
-        <!-- VISTA HOME / CATALOGO ORIGINALE -->
         <div id="home-view">
             <section class="py-16 text-center">
                 <div class="max-w-7xl mx-auto px-4">
@@ -79,7 +77,6 @@
                 </div>
             </section>
 
-            <!-- Sezione Catalogo & Filtri Categorie -->
             <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
                 <div class="max-w-7xl mx-auto px-4">
                     <div class="mb-6">
@@ -90,40 +87,8 @@
                     <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
                 </div>
             </section>
-
-            <!-- Sezione Richiesta Info -->
-            <section id="info" class="py-16 bg-dark-bg">
-                <div class="max-w-3xl mx-auto px-4">
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-                        <h2 class="text-xl font-bold text-white mb-2">Richiedi Informazioni o Preventivo</h2>
-                        <p class="text-xs text-gray-400 mb-6">Compila il modulo per un preventivo personalizzato</p>
-                        <form onsubmit="handleContactSubmit(event)" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input type="text" id="info-name" required placeholder="Nome e Cognome" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm">
-                                <input type="text" id="info-contact" required placeholder="Email o Telefono" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm">
-                            </div>
-                            <textarea id="info-message" rows="4" required placeholder="Descrivi la tua richiesta..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm"></textarea>
-                            <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm">Invia Richiesta via WhatsApp</button>
-                        </form>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sezione Traccia Ordine -->
-            <section id="traccia" class="py-16 bg-dark-surface/20 border-t border-gray-800/80">
-                <div class="max-w-3xl mx-auto px-4 text-center">
-                    <h2 class="text-xl font-bold text-white mb-2">Traccia il tuo Ordine</h2>
-                    <p class="text-xs text-gray-400 mb-4">Inserisci il codice ordine per verificare lo stato</p>
-                    <div class="flex gap-2 max-w-md mx-auto">
-                        <input type="text" id="track-input" placeholder="Es. LS-8921" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white font-mono text-sm uppercase">
-                        <button onclick="trackOrder()" class="px-5 py-2.5 bg-brand-500 text-black font-bold text-sm rounded-xl">Cerca</button>
-                    </div>
-                    <div id="track-result" class="hidden mt-6 text-left max-w-md mx-auto"></div>
-                </div>
-            </section>
         </div>
 
-        <!-- VISTA CHI SIAMO ORIGINALE -->
         <div id="chi-siamo-view" class="hidden py-16">
             <div class="max-w-4xl mx-auto px-4 text-center">
                 <h1 class="text-4xl font-extrabold text-white mb-6">Chi Siamo — LS3Dmaker</h1>
@@ -133,13 +98,12 @@
                 <button onclick="showPage('home')" class="px-6 py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Torna al Catalogo</button>
             </div>
         </div>
-
     </main>
 
     <!-- FOOTER -->
     <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p class="font-bold text-white">LS3Dmaker © 2026 - Tutti i diritti riservati</p>
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <p class="font-bold text-white">LS3Dmaker © 2026</p>
             <div class="flex gap-4 font-mono">
                 <a href="#" class="hover:underline">Privacy Policy</a>
                 <a href="#" class="hover:underline">Cookie Policy</a>
@@ -161,45 +125,65 @@
         </div>
     </div>
 
-    <!-- MODALE ADMIN -->
+    <!-- MODALE ADMIN CON LOGIN PROTETTO -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h3 class="text-xl font-bold mb-4" id="admin-form-title">Nuovo Prodotto (Admin)</h3>
 
-            <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
-                <input type="hidden" id="edit-prod-id">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                    <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+            <!-- SCHERMATA LOGIN ADMIN -->
+            <div id="admin-login-view">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-white">Accesso Riservato Admin</h3>
+                    <p class="text-xs text-gray-400 mt-1">Inserisci le credenziali di gestione</p>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Descrizione Breve (Home):</label>
-                    <input type="text" id="new-prod-shortdesc" required placeholder="Es. Design geometrico ad alta resistenza" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-sm mx-auto">
+                    <input type="text" id="admin-username" required placeholder="admin" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm">
+                    <input type="password" id="admin-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm">
+                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Accedi al Pannello</button>
+                </form>
+            </div>
+
+            <!-- PANNELLO DI CONTROLLO (Nascosto finché non si effettua il login) -->
+            <div id="admin-panel-view" class="hidden space-y-6">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <h3 class="text-xl font-bold text-white" id="admin-form-title">Nuovo Prodotto (Admin)</h3>
+                    <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline font-mono">Logout</button>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Categorie Multiple:</label>
-                    <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Colori Disponibili:</label>
-                    <div id="admin-color-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Foto del Prodotto (Multiple):</label>
-                    <input type="file" id="img-files-input" accept="image/*" multiple onchange="handleMultipleImages(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                </div>
-                <textarea id="new-prod-desc" placeholder="Descrizione Dettagliata" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
-                    <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo</label>
-                </div>
-                <div class="flex gap-2">
-                    <button type="submit" id="btn-save-prod" class="flex-1 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
-                    <button type="button" onclick="resetAdminForm()" class="px-4 py-2 bg-gray-800 text-gray-300 text-xs rounded-lg border border-gray-700">Annulla</button>
-                </div>
-            </form>
-            <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+
+                <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900 p-4 rounded-xl border border-gray-800">
+                    <input type="hidden" id="edit-prod-id">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" id="new-prod-title" required placeholder="Titolo Prodotto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                        <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Descrizione Breve (Home):</label>
+                        <input type="text" id="new-prod-shortdesc" required placeholder="Es. Design geometrico ad alta resistenza" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Categorie Multiple:</label>
+                        <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Colori Disponibili:</label>
+                        <div id="admin-color-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Foto del Prodotto (Multiple):</label>
+                        <input type="file" id="img-files-input" accept="image/*" multiple onchange="handleMultipleImages(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                    <textarea id="new-prod-desc" placeholder="Descrizione Dettagliata" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
+                        <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo</label>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" id="btn-save-prod" class="flex-1 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
+                        <button type="button" onclick="resetAdminForm()" class="px-4 py-2 bg-gray-800 text-gray-300 text-xs rounded-lg border border-gray-700">Annulla</button>
+                    </div>
+                </form>
+                <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
         </div>
     </div>
 
@@ -374,6 +358,27 @@
 
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('admin-username').value;
+            const p = document.getElementById('admin-password').value;
+            if (u === 'admin' && p === 'ls3d2026') {
+                document.getElementById('admin-login-view').classList.add('hidden');
+                document.getElementById('admin-panel-view').classList.remove('hidden');
+                renderCategories();
+                renderAdminProductsList();
+            } else {
+                alert('Credenziali errate! (Usa admin / ls3d2026)');
+            }
+        }
+
+        function adminLogout() {
+            document.getElementById('admin-panel-view').classList.add('hidden');
+            document.getElementById('admin-login-view').classList.remove('hidden');
+            document.getElementById('admin-username').value = '';
+            document.getElementById('admin-password').value = '';
+        }
+
         function handleMultipleImages(e) {
             uploadedImagesList = [];
             Array.from(e.target.files).forEach(file => {
@@ -479,12 +484,18 @@
             document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
         }
 
-        function openAdminModal() { renderCategories(); renderAdminProductsList(); document.getElementById('admin-modal').classList.remove('hidden'); }
+        function openAdminModal() { 
+            document.getElementById('admin-login-view').classList.remove('hidden');
+            document.getElementById('admin-panel-view').classList.add('hidden');
+            document.getElementById('admin-modal').classList.remove('hidden'); 
+        }
         function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
         renderCategories();
         renderProducts();
         saveCart();
     </script>
+</body>
+</html>
 </body>
 </html>
