@@ -29,28 +29,13 @@
     <!-- Header Navigation -->
     <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-            <a href="#" onclick="showPage('home')" class="flex items-center gap-3">
+            <a href="#" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-14 object-contain">
             </a>
 
-            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
-                <a href="#prodotti" onclick="showPage('home')" class="hover:text-brand-400 transition-colors" data-i18n="nav-products">Prodotti</a>
-                <a href="#info-section" onclick="showPage('home')" class="hover:text-brand-400 transition-colors" data-i18n="nav-info">Richiedi Info</a>
-                <a href="#traccia-section" onclick="showPage('home')" class="hover:text-brand-400 transition-colors" data-i18n="nav-track">Traccia Spedizione</a>
-                <a href="#" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors" data-i18n="nav-about">Chi siamo?</a>
-            </nav>
-
             <div class="flex items-center gap-3">
-                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded-xl px-2 py-1.5 font-mono focus:outline-none focus:border-brand-500 cursor-pointer">
-                    <option value="it">🇮🇹 IT</option>
-                    <option value="en">🇬🇧 EN</option>
-                    <option value="fr">🇫🇷 FR</option>
-                    <option value="es">🇪🇸 ES</option>
-                    <option value="de">🇩🇪 DE</option>
-                </select>
-
                 <button onclick="openCartModal()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-mono border border-brand-500/30">
-                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> <span data-i18n="btn-cart">Carrello</span>
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> <span>Carrello</span>
                     <span id="cart-badge" class="px-1.5 py-0.5 rounded-full bg-brand-500 text-black text-[10px] font-bold">0</span>
                 </button>
                 <a href="admin.html" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700 hover:border-brand-500 transition-colors flex items-center gap-1.5">
@@ -61,71 +46,48 @@
     </header>
 
     <!-- Main Content -->
-    <main id="main-content">
-        <div id="home-view">
-            <section class="py-8 text-center">
-                <div class="max-w-7xl mx-auto px-4">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4">
-                        <i data-lucide="truck" class="w-3.5 h-3.5"></i> <span data-i18n="hero-tag">Stampa 3D & Spedizioni Tracciabili</span>
-                    </span>
-                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-white leading-tight">
-                        <span data-i18n="hero-title-1">Dai forma alle Tue Idee con</span> <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
-                    </h1>
+    <main class="py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-1">Catalogo Creazioni 3D</h2>
+                    <p class="text-gray-400 text-sm">Sfoglia le nostre creazioni, scegli i prodotti e aggiungili al carrello.</p>
                 </div>
-            </section>
-
-            <!-- Sezione Catalogo -->
-            <section id="prodotti" class="py-8 bg-dark-surface/30 border-y border-gray-800/80">
-                <div class="max-w-7xl mx-auto px-4">
-                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h2 class="text-2xl font-bold text-white mb-1" data-i18n="catalog-title">Catalogo Creazioni 3D</h2>
-                            <p class="text-gray-400 text-sm" data-i18n="catalog-subtitle">Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello.</p>
-                        </div>
-                        <div class="w-full sm:w-64">
-                            <select id="category-select" onchange="filterCategory(this.value)" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-brand-500 cursor-pointer">
-                                <option value="Tutti">Tutti i prodotti</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-                </div>
-            </section>
+            </div>
+            <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
         </div>
     </main>
 
-    <!-- MODALE CARRELLO -->
+    <!-- MODALE CARRELLO (Da qui si gestiscono gli articoli prima di pagare) -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-xl w-full p-6 relative">
             <button onclick="closeCartModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h3 class="text-xl font-bold mb-4" data-i18n="cart-title">Il Tuo Carrello</h3>
+            <h3 class="text-xl font-bold mb-4">Il Tuo Carrello</h3>
+            
+            <!-- Lista articoli nel carrello con tasti + / - -->
             <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 mb-6 border-y border-gray-800 py-4"></div>
+            
             <div class="flex justify-between items-center mb-6 font-mono p-4 bg-gray-900 rounded-xl">
-                <span class="text-xs text-gray-400 uppercase">Totale:</span>
+                <span class="text-xs text-gray-400 uppercase">Totale Carrello:</span>
                 <span id="cart-total" class="text-2xl font-bold text-brand-400">€0.00</span>
             </div>
-            <!-- Pulsante che porta alla pagina checkout.html -->
-            <button onclick="goToCheckout()" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm" data-i18n="cart-checkout-btn">Procedi al Checkout</button>
+            
+            <!-- Pulsante per andare alla pagina di inserimento dati e pagamento -->
+            <button onclick="goToCheckout()" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Procedi al Checkout</button>
         </div>
     </div>
 
     <script>
-        let categories = ["Componenti", "Decorazioni", "Prototipi", "Gadget"];
-        let selectedCategory = "Tutti";
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Realizzato con polimeri ad altissima risoluzione.", categories: ["Decorazioni"], images: [defaultImg], hidden: false }
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", categories: ["Decorazioni"], images: [defaultImg], hidden: false }
         ];
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
 
-        function renderCategories() {
-            document.getElementById('category-select').innerHTML = `<option value="Tutti">Tutti i prodotti</option>` + categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-        }
-        function filterCategory(cat) { selectedCategory = cat; renderProducts(); }
         function renderProducts() {
             const grid = document.getElementById('products-grid');
-            const filtered = selectedCategory === "Tutti" ? products.filter(p => !p.hidden) : products.filter(p => !p.hidden && p.categories?.includes(selectedCategory));
-            grid.innerHTML = filtered.map(p => `
+            const visible = products.filter(p => !p.hidden);
+            grid.innerHTML = visible.map(p => `
                 <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
                         <div class="h-48 bg-gray-900 rounded-xl overflow-hidden mb-4">
@@ -142,28 +104,40 @@
             `).join('');
             lucide.createIcons();
         }
+
         function addToCart(prodId) {
-            const p = products.find(x => x.id === prodId);
-            if (!p) return;
-            const ex = cart.find(x => x.id === prodId);
-            if (ex) ex.qty++; else cart.push({ id: p.id, title: p.title, price: p.price, qty: 1 });
-            saveCart(); openCartModal();
+            const product = products.find(p => p.id === prodId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === prodId);
+            if (existing) existing.qty += 1;
+            else cart.push({ id: product.id, title: product.title, price: product.price, qty: 1 });
+            saveCart();
+            openCartModal();
         }
-        function updateQuantity(idx, delta) {
-            cart[idx].qty += delta;
-            if (cart[idx].qty <= 0) cart.splice(idx, 1);
-            saveCart(); openCartModal();
+
+        function updateQuantity(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            saveCart();
+            openCartModal();
         }
-        function removeFromCart(idx) { cart.splice(idx, 1); saveCart(); openCartModal(); }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            saveCart();
+            openCartModal();
+        }
+
         function saveCart() {
             localStorage.setItem('ls3d_cart', JSON.stringify(cart));
-            document.getElementById('cart-badge').innerText = cart.reduce((a, b) => a + b.qty, 0);
+            document.getElementById('cart-badge').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
         }
+
         function openCartModal() {
             const container = document.getElementById('cart-items-list');
             const totalEl = document.getElementById('cart-total');
             if (cart.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-400 text-xs py-4 font-mono">Il carrello è vuoto.</p>`;
+                container.innerHTML = `<div class="text-center text-gray-400 text-xs py-4 font-mono">Il carrello è vuoto.</div>`;
                 totalEl.innerText = "€0.00";
             } else {
                 let total = 0;
@@ -171,24 +145,27 @@
                     total += i.price * i.qty;
                     return `
                         <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
-                            <div><p class="font-bold text-white">${i.title}</p><p class="text-brand-400 font-mono">€${i.price.toFixed(2)} x ${i.qty}</p></div>
+                            <div><p class="font-bold text-white">${i.title}</p><p class="text-brand-400 font-mono">€${i.price.toFixed(2)} cad.</p></div>
                             <div class="flex items-center gap-2">
-                                <button onclick="updateQuantity(${idx}, -1)" class="px-2 bg-gray-800 rounded">-</button>
-                                <span class="font-mono">${i.qty}</span>
-                                <button onclick="updateQuantity(${idx}, 1)" class="px-2 bg-gray-800 rounded">+</button>
-                                <button onclick="removeFromCart(${idx})" class="text-red-400 ml-2">🗑</button>
+                                <button onclick="updateQuantity(${idx}, -1)" class="px-2 py-1 bg-gray-800 rounded text-white font-bold">-</button>
+                                <span class="px-2 font-mono text-white font-bold">${i.qty}</span>
+                                <button onclick="updateQuantity(${idx}, 1)" class="px-2 py-1 bg-gray-800 rounded text-white font-bold">+</button>
+                                <button onclick="removeFromCart(${idx})" class="p-1 text-red-400 ml-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
                     `;
                 }).join('');
                 totalEl.innerText = `€${total.toFixed(2)}`;
             }
+            lucide.createIcons();
             document.getElementById('cart-modal').classList.remove('hidden');
         }
+
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function goToCheckout() { window.location.href = 'checkout.html'; }
 
-        renderCategories(); renderProducts(); saveCart();
+        renderProducts();
+        saveCart();
     </script>
 </body>
 </html>
