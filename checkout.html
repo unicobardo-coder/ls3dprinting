@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | LS3Dmaker</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -19,56 +20,95 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    colors: { brand: { 500: '#10b981', 400: '#34d399' }, dark: { bg: '#090d16', card: '#111827' } }
+                    colors: {
+                        brand: { 500: '#10b981', 600: '#059669', 400: '#34d399', 900: '#064e3b' },
+                        accent: { 500: '#06b6d4', 400: '#22d3ee' },
+                        dark: { bg: '#090d16', card: '#111827', surface: '#151e32' }
+                    }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-dark-bg text-gray-100 font-sans min-h-screen p-4 sm:p-8">
-    <div class="max-w-2xl mx-auto space-y-6">
-        <a href="index.html" class="text-xs font-mono text-brand-400 hover:underline">← Torna al Catalogo</a>
-        
-        <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-            <h2 class="text-2xl font-bold mb-6">Procedi con il Checkout</h2>
-            
-            <div id="checkout-cart-summary" class="mb-6 p-4 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono space-y-2"></div>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between">
 
-            <form onsubmit="processOrder(event)" class="space-y-4 text-xs">
-                <div>
-                    <label class="block text-gray-400 mb-1">Nome e Cognome *</label>
-                    <input type="text" id="chk-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white">
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1">Email (per ricezione ordine e fattura) *</label>
-                    <input type="email" id="chk-email" required placeholder="mario@example.com" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white">
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1">Telefono *</label>
-                    <input type="tel" id="chk-phone" required placeholder="3331234567" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white">
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1">Indirizzo di Spedizione *</label>
-                    <textarea id="chk-address" required rows="2" placeholder="Via Roma 1, 40121 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white"></textarea>
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1">Metodo di Spedizione:</label>
-                    <select id="chk-shipping" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white font-mono">
-                        <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
-                        <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
-                        <option value="0.00">Ritiro a Mano (Gratuito)</option>
-                    </select>
-                </div>
+    <!-- Header Navigation Completa -->
+    <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-14 object-contain">
+            </a>
 
-                <button type="submit" class="w-full py-4 bg-brand-500 text-black font-bold rounded-xl text-sm mt-4">Conferma Ordine e Paga con PayPal</button>
-            </form>
+            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
+                <a href="index.html#prodotti" class="hover:text-brand-400 transition-colors">Prodotti</a>
+                <a href="index.html#info-section" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
+                <a href="index.html#traccia-section" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700 hover:border-brand-500 transition-colors flex items-center gap-1.5">
+                    ← Torna al Catalogo
+                </a>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Content Checkout -->
+    <main class="py-12 px-4 flex-grow">
+        <div class="max-w-2xl mx-auto space-y-6">
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <h2 class="text-2xl font-bold mb-6 text-white">Conferma Dati & Pagamento</h2>
+                
+                <!-- Box Riepilogo Articoli scelti -->
+                <div id="checkout-cart-summary" class="mb-6 p-4 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono space-y-2"></div>
+
+                <form onsubmit="processOrder(event)" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block text-gray-400 mb-1 font-mono">Nome e Cognome *</label>
+                        <input type="text" id="chk-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1 font-mono">Email (per ricezione ordine e fattura) *</label>
+                        <input type="email" id="chk-email" required placeholder="mario@example.com" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1 font-mono">Telefono *</label>
+                        <input type="tel" id="chk-phone" required placeholder="3331234567" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1 font-mono">Indirizzo di Spedizione *</label>
+                        <textarea id="chk-address" required rows="2" placeholder="Via Roma 1, 40121 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1 font-mono">Metodo di Spedizione:</label>
+                        <select id="chk-shipping" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white font-mono focus:border-brand-500 focus:outline-none">
+                            <option value="5.90">Spedizione Standard Tracciabile (€5.90)</option>
+                            <option value="9.90">Spedizione Espressa 24/48h (€9.90)</option>
+                            <option value="0.00">Ritiro a Mano (Gratuito)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-brand-500 text-black font-bold rounded-xl text-sm mt-4 transition-transform hover:scale-[1.01]">Conferma Ordine e Paga con PayPal</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <p class="font-bold text-white">LS3Dmaker © 2026</p>
+            <div class="flex gap-4 font-mono">
+                <a href="#" class="hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:underline">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
         const PAYPAL_EMAIL = "unicobardo@gmail.com";
-        const EMAILJS_SERVICE_ID = "TUO_SERVICE_ID";
-        const EMAILJS_TEMPLATE_ID = "TUO_TEMPLATE_ID";
+        const EMAILJS_SERVICE_ID = "service_1nyj1gz";
+        const EMAILJS_TEMPLATE_ID = "template_437dnsk";
 
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
         let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
@@ -77,17 +117,18 @@
         function renderCheckoutSummary() {
             const container = document.getElementById('checkout-cart-summary');
             if (cart.length === 0) {
-                container.innerHTML = `<p class="text-red-400">Il carrello è vuoto. Torna al catalogo.</p>`;
+                container.innerHTML = `<p class="text-red-400">Il carrello è vuoto. <a href="index.html" class="underline">Torna al catalogo</a>.</p>`;
                 return;
             }
             let subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
             container.innerHTML = `
-                <p class="text-white font-bold mb-2">Riepilogo Carrello:</p>
+                <p class="text-white font-bold mb-2">Articoli nel carrello:</p>
                 ${cart.map(i => `<div class="flex justify-between text-gray-300"><span>${i.qty}x ${i.title}</span><span>€${(i.price * i.qty).toFixed(2)}</span></div>`).join('')}
                 <div class="border-t border-gray-800 pt-2 mt-2 flex justify-between font-bold text-brand-400 text-sm">
                     <span>Totale Prodotti:</span><span>€${subtotal.toFixed(2)}</span>
                 </div>
             `;
+            lucide.createIcons();
         }
 
         function processOrder(e) {
@@ -104,7 +145,7 @@
                 id: `LS-${Math.floor(1000 + Math.random()*9000)}`,
                 number: `${lastInvoiceNum}/2026`,
                 name: document.getElementById('chk-name').value,
-                email: document.getElementById('chk-email'].value, // <-- Email obbligatoria richiesta qui
+                email: document.getElementById('chk-email').value,
                 phone: document.getElementById('chk-phone').value,
                 address: document.getElementById('chk-address').value,
                 shipping: shippingCost,
@@ -117,11 +158,9 @@
 
             orders.unshift(orderData);
             localStorage.setItem('ls3d_orders', JSON.stringify(orders));
-            
-            // Svuota carrello
             localStorage.removeItem('ls3d_cart');
 
-            // Invio Email con EmailJS (il cliente riceve l'ordine, tu in BCC)
+            // Invio email automatica (al cliente e in BCC a te)
             const itemsDescription = orderData.items.map(i => `${i.qty}x ${i.title} (€${(i.price * i.qty).toFixed(2)})`).join(', ');
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
                 customer_name: orderData.name,
@@ -130,11 +169,10 @@
                 customer_address: orderData.address,
                 message_details: itemsDescription + ` (Spedizione: €${orderData.shipping.toFixed(2)})`,
                 order_total: `€${orderData.total.toFixed(2)}`
-            }).then(() => console.log("Email inviata!"));
+            }).then(() => console.log("Email inviata con successo!"));
 
-            // Apre PayPal e mostra avviso
             window.open('https://www.paypal.com/signin', '_blank');
-            alert(`Ordine registrato! Invia €${orderData.total.toFixed(2)} a ${PAYPAL_EMAIL}`);
+            alert(`Ordine registrato con successo! Invia €${orderData.total.toFixed(2)} a ${PAYPAL_EMAIL}`);
             window.location.href = 'index.html';
         }
 
