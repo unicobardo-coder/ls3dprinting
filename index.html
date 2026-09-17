@@ -11,17 +11,6 @@
     <meta name="author" content="LS3Dmaker">
     <meta name="robots" content="index, follow">
 
-    <!-- Schema.org JSON-LD -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "OnlineStore",
-      "name": "LS3Dmaker",
-      "description": "Servizio di stampa 3D su misura e prototipazione.",
-      "url": "https://ls3dmaker.com/"
-    }
-    </script>
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -209,10 +198,10 @@
                             <div>
                                 <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-service">Tipo di Servizio</label>
                                 <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none font-mono">
-                                    <option value="Preventivo Personalizzato" id="opt-service-1">Preventivo Stampa 3D Personalizzata</option>
-                                    <option value="Informazioni Prodotto" id="opt-service-2">Informazioni su Prodotto in Catalogo</option>
-                                    <option value="Prototipazione" id="opt-service-3">Prototipazione Tecnica</option>
-                                    <option value="Altro" id="opt-service-4">Altro</option>
+                                    <option value="Preventivo Personalizzato">Preventivo Stampa 3D Personalizzata</option>
+                                    <option value="Informazioni Prodotto">Informazioni su Prodotto in Catalogo</option>
+                                    <option value="Prototipazione">Prototipazione Tecnica</option>
+                                    <option value="Altro">Altro</option>
                                 </select>
                             </div>
                             <div>
@@ -254,35 +243,82 @@
             </section>
         </div>
 
-        <!-- VISTA DEDICATA: CHI SIAMO -->
+        <!-- VISTA DEDICATA: CHI SIAMO (RIDISEGNATA & RIORGANIZZATA) -->
         <div id="chi-siamo-view" class="hidden py-16">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Header Chi Siamo -->
                 <div class="text-center mb-12">
                     <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4">
-                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Ingegneria & Prototipazione
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Ingegneria, Qualità & Prototipazione
                     </span>
                     <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
                         <span id="about-title">Chi Siamo — </span><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
                     </h1>
-                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto" id="about-desc">
-                        Passione per la tecnologia, cura del dettaglio geometrico e soluzioni di produzione additiva su misura.
+                    <p class="text-gray-400 text-base sm:text-lg max-w-3xl mx-auto leading-relaxed" id="about-desc">
+                        LS3Dmaker è un laboratorio di fabbricazione digitale che unisce rigore ingegneristico, conoscenza dei materiali e passione per la modellazione geometrica 3D.
                     </p>
                 </div>
 
-                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-10 shadow-2xl mb-12">
-                    <h2 class="text-2xl font-bold text-white mb-4" id="about-mission-title">La Nostra Missione</h2>
-                    <p class="text-gray-300 leading-relaxed mb-6" id="about-mission-p1">
-                        LS3Dmaker nasce con l'obiettivo di trasformare concetti complessi, idee grafiche e modelli CAD in oggetti reali ad alta precisione.
-                    </p>
-                    <p class="text-gray-300 leading-relaxed" id="about-mission-p2">
-                        Ogni pezzo viene stampato, rifinito e verificato singolarmente prima della spedizione.
-                    </p>
+                <!-- Griglia dei 3 Pilastri Operativi -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                        <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400 w-fit mb-4">
+                            <i data-lucide="cpu" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2" id="about-card-1-title">Ingegneria & Modellazione CAD</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed" id="about-card-1-desc">
+                            Sviluppo di modelli parametrici e codici OpenSCAD/CAD su misura. Ottimizzazione delle geometrie e rispetto delle tolleranze meccaniche.
+                        </p>
+                    </div>
+
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                        <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400 w-fit mb-4">
+                            <i data-lucide="printer" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2" id="about-card-2-title">Stampa 3D di Precisione</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed" id="about-card-2-desc">
+                            Produzione additiva ad alta risoluzione con calibrazione accurata dei parametri di slicing e selezione dei polimeri idonei.
+                        </p>
+                    </div>
+
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                        <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400 w-fit mb-4">
+                            <i data-lucide="check-circle" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2" id="about-card-3-title">Qualità & Controllo Unico</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed" id="about-card-3-desc">
+                            Ogni componente viene ispezionato, rifinito e testato singolarmente garantendo elevati standard di finitura prima dell'imballaggio.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="text-center">
-                    <button onclick="showPage('prodotti')" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-500/20" id="btn-back-catalog">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna al Catalogo Prodotti
+                <!-- Box Profilo & Approccio Multidisciplinare -->
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-8 shadow-2xl mb-12">
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-mono font-black text-black text-3xl shrink-0 shadow-lg shadow-brand-500/20">
+                            LS
+                        </div>
+                        <div class="space-y-3">
+                            <h2 class="text-2xl font-bold text-white" id="about-profile-title">Approccio Metodologico & Competenze</h2>
+                            <p class="text-sm text-gray-300 leading-relaxed" id="about-profile-p1">
+                                La combinazione di una solidissima formazione in ingegneria Biomedica e di anni di esperienza nel settore del controllo qualità e delle regolamentazioni industriali permette a <strong>LS3Dmaker</strong> di affrontare ogni progetto con massima cura tecnica.
+                            </p>
+                            <p class="text-sm text-gray-300 leading-relaxed" id="about-profile-p2">
+                                Che si tratti di un prototipo tecnico, di componentistica sostitutiva o di un oggetto di design personalizzato, ogni realizzazione beneficia di una gestione metodica e precisa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pulsanti Azione -->
+                <div class="text-center flex flex-wrap justify-center gap-4">
+                    <button onclick="showPage('prodotti')" class="px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-sm transition-all inline-flex items-center gap-2" id="btn-back-catalog">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna al Catalogo
                     </button>
+                    <a href="#info" onclick="showPage('home')" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-500/20" id="btn-about-contact">
+                        <i data-lucide="mail" class="w-4 h-4"></i> Richiedi un Preventivo Su Misura
+                    </a>
                 </div>
             </div>
         </div>
@@ -373,7 +409,6 @@
                     <textarea id="checkout-address" rows="2" required placeholder="Via Roma 10, 40100 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- SELEZIONE SPEDIZIONE -->
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-2" id="lbl-shipping-select">Metodo di Spedizione:</label>
                     <select id="checkout-shipping-method" onchange="updateCheckoutTotal()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none font-mono">
@@ -383,7 +418,6 @@
                     </select>
                 </div>
 
-                <!-- SELEZIONE PAGAMENTO -->
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-2" id="lbl-pay-method">Seleziona Metodo di Pagamento:</label>
                     <div class="grid grid-cols-3 gap-2">
@@ -402,7 +436,6 @@
                     </div>
                 </div>
 
-                <!-- CONSENSO GDPR OBBLIGATORIO -->
                 <div class="flex items-start gap-2 pt-2">
                     <input type="checkbox" id="checkout-gdpr" required class="mt-1 rounded bg-gray-900 border-gray-700 text-brand-500 focus:ring-0">
                     <label for="checkout-gdpr" class="text-[11px] text-gray-400 leading-tight" id="lbl-gdpr-text">
@@ -531,7 +564,7 @@
         </div>
     </div>
 
-    <!-- MODALE ADMIN COMPLETA CON TASTO "TORNA AL SITO" -->
+    <!-- MODALE ADMIN COMPLETA CON GESTIONE CATEGORIE -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             
@@ -571,6 +604,7 @@
                 <!-- Admin Tabs -->
                 <div class="flex gap-2 border-b border-gray-800 pb-2">
                     <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti & STL</button>
+                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Categorie</button>
                     <button onclick="switchAdminTab('json')" id="tab-btn-json" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Import / Export JSON</button>
                     <button onclick="switchAdminTab('shipping')" id="tab-btn-shipping" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Ordini & Spedizioni</button>
                 </div>
@@ -610,7 +644,19 @@
                     <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
 
-                <!-- TAB 2: IMPORT / EXPORT JSON -->
+                <!-- TAB 2: GESTIONE CATEGORIE -->
+                <div id="admin-tab-categories" class="hidden space-y-4">
+                    <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 space-y-3">
+                        <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Aggiungi Nuova Categoria</h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="new-cat-name" placeholder="Es. Prototipi, Giochi, Droni..." class="flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            <button onclick="handleAddCategory()" class="px-4 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Aggiungi</button>
+                        </div>
+                    </div>
+                    <div id="admin-categories-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                </div>
+
+                <!-- TAB 3: IMPORT / EXPORT JSON -->
                 <div id="admin-tab-json" class="hidden space-y-4">
                     <div class="bg-gray-900/60 p-5 rounded-xl border border-gray-800 space-y-4">
                         <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Gestione Backup Database (JSON)</h4>
@@ -629,7 +675,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: GESTIONE SPEDIZIONI -->
+                <!-- TAB 4: GESTIONE SPEDIZIONI -->
                 <div id="admin-tab-shipping" class="hidden space-y-4">
                     <h4 class="text-sm font-bold text-brand-400 uppercase font-mono">Registro Ordini & Stato Spedizioni</h4>
                     <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
@@ -638,7 +684,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC & TRANSLATIONS -->
+    <!-- JAVASCRIPT LOGIC & DYNAMIC TRANSLATION ENGINE -->
     <script>
         const myEmail = "unicobardo@gmail.com"; 
 
@@ -659,6 +705,7 @@
         let uploadedSTLData = null;
 
         let lastInvoiceNumber = parseInt(localStorage.getItem('ls3d_last_invoice_num')) || 0;
+        let translatedProductsCache = {};
 
         const translations = {
             it: {
@@ -671,9 +718,8 @@
                 infoTitle: "Richiedi Informazioni o Preventivo", infoSubtitle: "Compila il modulo per un preventivo personalizzato",
                 lblName: "Nome e Cognome", lblContact: "Email / Telefono", lblService: "Tipo di Servizio", lblMessage: "Messaggio / Dettagli Progetto", btnSendWA: "Invia Richiesta via WhatsApp",
                 trackTitle: "Traccia il tuo Ordine", trackSubtitle: "Inserisci il codice ordine per verificare lo stato", btnSearch: "Cerca",
-                aboutTitle: "Chi Siamo — ", aboutDesc: "Passione per la tecnologia e soluzioni su misura.",
-                aboutMissionTitle: "La Nostra Missione", aboutMissionP1: "LS3Dmaker trasforma idee in oggetti reali.", aboutMissionP2: "Ogni pezzo viene verificato singolarmente.",
-                btnBackCatalog: "Torna al Catalogo Prodotti", cartTitle: "Il Tuo Carrello", cartSubtitle: "Gestisci gli articoli prima di completare l'ordine", cartTotalLabel: "Totale Stimato:",
+                aboutTitle: "Chi Siamo — ", aboutDesc: "LS3Dmaker è un laboratorio di fabbricazione digitale che unisce rigore ingegneristico, conoscenza dei materiali e passione per la modellazione geometrica 3D.",
+                btnBackCatalog: "Torna al Catalogo", cartTitle: "Il Tuo Carrello", cartSubtitle: "Gestisci gli articoli prima di completare l'ordine", cartTotalLabel: "Totale Stimato:",
                 btnSaveEmail: "Salva / Invia via Email", btnProceedOrder: "Procedi al Pagamento", checkoutTitle: "Completa l'Ordine & Pagamento",
                 checkoutSubtitle: "Inserisci i dati per la consegna e la fatturazione",
                 lblPayName: "Nome e Cognome / Ragione Sociale", lblPayEmail: "Email Cliente", lblPayPhone: "Telefono (WhatsApp)", lblPayAddress: "Indirizzo Completo di Spedizione", 
@@ -694,9 +740,8 @@
                 infoTitle: "Request Info or Quote", infoSubtitle: "Fill in the form for a custom quote",
                 lblName: "Full Name", lblContact: "Email / Phone", lblService: "Service Type", lblMessage: "Message / Project Details", btnSendWA: "Send Request via WhatsApp",
                 trackTitle: "Track your Order", trackSubtitle: "Enter order code to verify status", btnSearch: "Search",
-                aboutTitle: "About Us — ", aboutDesc: "Passion for technology and tailored additive manufacturing.",
-                aboutMissionTitle: "Our Mission", aboutMissionP1: "LS3Dmaker transforms complex concepts into physical objects.", aboutMissionP2: "Every part is inspected before shipping.",
-                btnBackCatalog: "Back to Product Catalog", cartTitle: "Your Cart", cartSubtitle: "Manage items before placing order", cartTotalLabel: "Estimated Total:",
+                aboutTitle: "About Us — ", aboutDesc: "LS3Dmaker is a digital fabrication lab combining engineering rigor, material knowledge, and passion for 3D modeling.",
+                btnBackCatalog: "Back to Catalog", cartTitle: "Your Cart", cartSubtitle: "Manage items before placing order", cartTotalLabel: "Estimated Total:",
                 btnSaveEmail: "Save / Send via Email", btnProceedOrder: "Proceed to Payment", checkoutTitle: "Complete Order & Payment",
                 checkoutSubtitle: "Enter delivery and invoicing details",
                 lblPayName: "Full Name / Company", lblPayEmail: "Customer Email", lblPayPhone: "Phone (WhatsApp)", lblPayAddress: "Complete Shipping Address",
@@ -706,81 +751,30 @@
                 lblInvTo: "Invoice to:", lblInvDate: "Invoice date:", lblInvDue: "Due date:", lblThDesc: "Description", lblThQty: "Quantity", lblThPrice: "Price", lblThSub: "Subtotal",
                 lblInvSub: "Items Subtotal:", lblInvShip: "Shipping:", lblInvTot: "Total:", btnPrintInv: "Print / Save PDF Invoice", btnEmailInv: "Send Order & Invoice via Email",
                 btnAddToCart: "Add to Cart", emptyCart: "Your cart is empty."
-            },
-            fr: {
-                subtitle: "CRÉATIVITÉ & PROTOTYPAGE",
-                navProducts: "Produits", navInfo: "Demander Info", navTrack: "Suivre Commande", navAbout: "À Propos", cart: "Panier",
-                heroBadge: "Impression 3D & Livraison Suivie",
-                heroTitle: "Donnez forme à vos idées avec <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Prototypage rapide, pièces fonctionnelles et créations 3D sur mesure.",
-                catalogTitle: "Catalogue de Créations 3D", catalogSubtitle: "Inspectez nos modèles 3D STL et ajoutez-les au panier.",
-                infoTitle: "Demande d'informations", infoSubtitle: "Remplissez le formulaire pour un devis",
-                lblName: "Nom et Prénom", lblContact: "E-mail / Téléphone", lblService: "Type de Service", lblMessage: "Message", btnSendWA: "Envoyer via WhatsApp",
-                trackTitle: "Suivre votre Commande", trackSubtitle: "Entrez le code de commande", btnSearch: "Chercher",
-                aboutTitle: "À Propos — ", aboutDesc: "Passion pour la technologie sur mesure.",
-                aboutMissionTitle: "Notre Mission", aboutMissionP1: "LS3Dmaker transforme des concepts en objets réels.", aboutMissionP2: "Chaque pièce est contrôlée avant expédition.",
-                btnBackCatalog: "Retour au Catalogue", cartTitle: "Votre Panier", cartSubtitle: "Gérez vos articles", cartTotalLabel: "Total Estimé:",
-                btnSaveEmail: "Par E-mail", btnProceedOrder: "Procéder au Paiement", checkoutTitle: "Commande & Paiement",
-                checkoutSubtitle: "Entrez les détails de livraison et facturation",
-                lblPayName: "Nom / Société", lblPayEmail: "Email Client", lblPayPhone: "Téléphone", lblPayAddress: "Adresse de Livraison",
-                lblShippingSelect: "Mode de Livraison:", optShipStd: "Livraison Standard (€5.90)", optShipExp: "Livraison Express (€9.90)", optShipPickup: "Retrait sur place (Gratuit)",
-                lblPayMethod: "Mode de Paiement:", lblGdprText: "J'accepte la politique de confidentialité pour le traitement de ma commande.",
-                lblGrandTotal: "Total Général:", btnConfirmInvoice: "Confirmer et Générer la Facture",
-                lblInvTo: "Facturé à:", lblInvDate: "Date facture:", lblInvDue: "Date d'échéance:", lblThDesc: "Description", lblThQty: "Quantité", lblThPrice: "Prix", lblThSub: "Sous-total",
-                lblInvSub: "Sous-total Articles:", lblInvShip: "Livraison:", lblInvTot: "Total:", btnPrintInv: "Imprimer / Enregistrer PDF", btnEmailInv: "Envoyer par E-mail",
-                btnAddToCart: "Ajouter", emptyCart: "Le panier est vide."
-            },
-            es: {
-                subtitle: "CREATIVIDAD Y PROTOTIPADO",
-                navProducts: "Productos", navInfo: "Pedir Info", navTrack: "Rastrear Envío", navAbout: "Nosotros", cart: "Carrito",
-                heroBadge: "Impresión 3D y Envíos Rastreables",
-                heroTitle: "Da forma a tus ideas con <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Prototipado rápido y creaciones 3D a medida.",
-                catalogTitle: "Catálogo 3D", catalogSubtitle: "Inspecciona modelos 3D STL y añade al carrito.",
-                infoTitle: "Solicitar Información", infoSubtitle: "Presupuesto personalizado",
-                lblName: "Nombre y Apellidos", lblContact: "Email / Teléfono", lblService: "Servicio", lblMessage: "Mensaje", btnSendWA: "Enviar por WhatsApp",
-                trackTitle: "Rastrear Pedido", trackSubtitle: "Introduce el código de pedido", btnSearch: "Buscar",
-                aboutTitle: "Sobre Nosotros — ", aboutDesc: "Fabricación aditiva personalizada.",
-                aboutMissionTitle: "Nuestra Misión", aboutMissionP1: "LS3Dmaker transforma conceptos en objetos reales.", aboutMissionP2: "Cada pieza se verifica antes del envío.",
-                btnBackCatalog: "Volver al Catálogo", cartTitle: "Tu Carrito", cartSubtitle: "Gestiona tus artículos", cartTotalLabel: "Total Estimado:",
-                btnSaveEmail: "Enviar por Email", btnProceedOrder: "Proceder al Pago", checkoutTitle: "Pedido y Pago",
-                checkoutSubtitle: "Introduce datos de envío y facturación",
-                lblPayName: "Nombre / Empresa", lblPayEmail: "Email Cliente", lblPayPhone: "Teléfono", lblPayAddress: "Dirección de Envío",
-                lblShippingSelect: "Método de Envío:", optShipStd: "Envío Estándar (€5.90)", optShipExp: "Envío Urgente 24/48h (€9.90)", optShipPickup: "Recogida Local (Gratis)",
-                lblPayMethod: "Método de Pago:", lblGdprText: "Acepto la Política de Privacidad para la gestión del pedido.",
-                lblGrandTotal: "Total General:", btnConfirmInvoice: "Confirmar Pedido y Factura",
-                lblInvTo: "Factura a:", lblInvDate: "Fecha factura:", lblInvDue: "Vencimiento:", lblThDesc: "Descripción", lblThQty: "Cantidad", lblThPrice: "Precio", lblThSub: "Subtotal",
-                lblInvSub: "Subtotal Artículos:", lblInvShip: "Envío:", lblInvTot: "Total:", btnPrintInv: "Imprimir / Guardar PDF", btnEmailInv: "Enviar Factura por Email",
-                btnAddToCart: "Añadir", emptyCart: "El carrito está vacío."
-            },
-            de: {
-                subtitle: "KREATIVITÄT & PROTOTYPING",
-                navProducts: "Produkte", navInfo: "Info Anfragen", navTrack: "Sendung Verfolgen", navAbout: "Über uns", cart: "Warenkorb",
-                heroBadge: "3D-Druck & Versand",
-                heroTitle: "Gestalten Sie Ihre Ideen mit <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400'>LS3Dmaker</span>",
-                heroDesc: "Schnelles Prototyping und maßgeschneiderte 3D-Kreationen.",
-                catalogTitle: "3D-Katalog", catalogSubtitle: "3D-STL-Modelle prüfen und bestellen.",
-                infoTitle: "Informationen anfordern", infoSubtitle: "Individuelles Angebot",
-                lblName: "Vor- und Nachname", lblContact: "E-Mail / Telefon", lblService: "Dienstleistung", lblMessage: "Nachricht", btnSendWA: "Über WhatsApp senden",
-                trackTitle: "Bestellung Verfolgen", trackSubtitle: "Bestellcode eingeben", btnSearch: "Suchen",
-                aboutTitle: "Über Uns — ", aboutDesc: "Leidenschaft für additive Fertigung.",
-                aboutMissionTitle: "Unsere Mission", aboutMissionP1: "LS3Dmaker verwandelt Konzepte in reale Objekte.", aboutMissionP2: "Jedes Teil wird vor dem Versand geprüft.",
-                btnBackCatalog: "Zurück zum Katalog", cartTitle: "Ihr Warenkorb", cartSubtitle: "Artikel verwalten", cartTotalLabel: "Gesamtsumme:",
-                btnSaveEmail: "Per E-Mail Speichern", btnProceedOrder: "Zur Kasse Gehen", checkoutTitle: "Bestellung & Zahlung",
-                checkoutSubtitle: "Liefer- und Rechnungsdaten eingeben",
-                lblPayName: "Name / Firma", lblPayEmail: "Kunden-E-Mail", lblPayPhone: "Telefon", lblPayAddress: "Lieferadresse",
-                lblShippingSelect: "Versandart:", optShipStd: "Standardversand (€5.90)", optShipExp: "Expressversand (€9.90)", optShipPickup: "Selbstabholung (Kostenlos)",
-                lblPayMethod: "Zahlungsmethode:", lblGdprText: "Ich akzeptiere die Datenschutzbestimmungen zur Auftragsabwicklung.",
-                lblGrandTotal: "Gesamtsumme:", btnConfirmInvoice: "Bestellung Bestätigen & Rechnung",
-                lblInvTo: "Rechnung an:", lblInvDate: "Rechnungsdatum:", lblInvDue: "Fälligkeit:", lblThDesc: "Beschreibung", lblThQty: "Menge", lblThPrice: "Preis", lblThSub: "Zwischensumme",
-                lblInvSub: "Zwischensumme Artikel:", lblInvShip: "Versand:", lblInvTot: "Gesamtsumme:", btnPrintInv: "Drucken / PDF Speichern", btnEmailInv: "Rechnung Per E-Mail Senden",
-                btnAddToCart: "Hinzufügen", emptyCart: "Der Warenkorb ist leer."
             }
         };
 
         let currentLang = 'it';
 
-        function changeLanguage(lang) {
+        async function translateText(text, targetLang) {
+            if (!text || targetLang === 'it') return text;
+            const cacheKey = `${text}_${targetLang}`;
+            if (translatedProductsCache[cacheKey]) return translatedProductsCache[cacheKey];
+
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=it|${targetLang}`);
+                const data = await res.json();
+                if (data && data.responseData && data.responseData.translatedText) {
+                    translatedProductsCache[cacheKey] = data.responseData.translatedText;
+                    return data.responseData.translatedText;
+                }
+            } catch (err) {
+                console.error("Errore traduzione:", err);
+            }
+            return text;
+        }
+
+        async function changeLanguage(lang) {
             currentLang = lang;
             const t = translations[lang] || translations.it;
 
@@ -812,10 +806,6 @@
 
             document.getElementById('about-title').innerText = t.aboutTitle;
             document.getElementById('about-desc').innerText = t.aboutDesc;
-            document.getElementById('about-mission-title').innerText = t.aboutMissionTitle;
-            document.getElementById('about-mission-p1').innerText = t.aboutMissionP1;
-            document.getElementById('about-mission-p2').innerText = t.aboutMissionP2;
-            document.getElementById('btn-back-catalog').innerHTML = `<i data-lucide="arrow-left" class="w-4 h-4"></i> ${t.btnBackCatalog}`;
 
             document.getElementById('cart-modal-title').innerText = t.cartTitle;
             document.getElementById('cart-modal-subtitle').innerText = t.cartSubtitle;
@@ -838,20 +828,8 @@
             document.getElementById('lbl-grand-total').innerText = t.lblGrandTotal;
             document.getElementById('btn-confirm-invoice').innerText = t.btnConfirmInvoice;
 
-            document.getElementById('lbl-inv-to').innerText = t.lblInvTo;
-            document.getElementById('lbl-inv-date').innerText = t.lblInvDate;
-            document.getElementById('lbl-inv-due').innerText = t.lblInvDue;
-            document.getElementById('lbl-th-desc').innerText = t.lblThDesc;
-            document.getElementById('lbl-th-qty').innerText = t.lblThQty;
-            document.getElementById('lbl-th-price').innerText = t.lblThPrice;
-            document.getElementById('lbl-th-sub').innerText = t.lblThSub;
-            document.getElementById('lbl-inv-sub').innerText = t.lblInvSub;
-            document.getElementById('lbl-inv-ship').innerText = t.lblInvShip;
-            document.getElementById('lbl-inv-tot').innerText = t.lblInvTot;
-            document.getElementById('btn-print-inv').innerText = t.btnPrintInv;
-            document.getElementById('btn-email-inv').innerText = t.btnEmailInv;
-
-            renderProducts();
+            renderCategories();
+            await renderProducts();
             lucide.createIcons();
         }
 
@@ -875,7 +853,7 @@
             renderProducts();
         }
 
-        function renderProducts() {
+        async function renderProducts() {
             const grid = document.getElementById('products-grid');
             const t = translations[currentLang] || translations.it;
 
@@ -886,31 +864,38 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(p => `
-                <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="relative h-48 bg-gray-900 flex items-center justify-center cursor-pointer" onclick="openPreviewModal(${p.id})">
-                            ${p.stlUrl ? 
-                                `<div id="stl-container-${p.id}" class="w-full h-full stl-canvas-container"></div>` : 
-                                `<img src="${p.imgUrl || defaultPlaceholderImg}" class="w-full h-full object-cover">`
-                            }
-                            <span class="absolute top-2 left-2 bg-gray-900/80 text-gray-300 text-[10px] font-mono px-2 py-0.5 rounded-md border border-gray-700">${p.category || 'Generale'}</span>
-                            ${p.stlUrl ? `<span class="absolute top-2 right-2 bg-brand-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">3D STL</span>` : ''}
-                        </div>
-                        <div class="p-5">
-                            <h3 onclick="openPreviewModal(${p.id})" class="text-lg font-bold text-white mb-2 hover:text-brand-400 cursor-pointer">${p.title}</h3>
-                            <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.desc}</p>
-                        </div>
-                    </div>
-                    <div class="p-5 pt-0 border-t border-gray-800/50 flex items-center justify-between">
-                        <span class="text-xl font-mono font-bold text-white">€${p.price.toFixed(2)}</span>
-                        <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500 text-black font-bold text-xs flex items-center gap-1.5 transition-all">
-                            <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> ${t.btnAddToCart}
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+            let html = '';
+            for (let p of filtered) {
+                const translatedTitle = await translateText(p.title, currentLang);
+                const translatedDesc = await translateText(p.desc, currentLang);
 
+                html += `
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 bg-gray-900 flex items-center justify-center cursor-pointer" onclick="openPreviewModal(${p.id})">
+                                ${p.stlUrl ? 
+                                    `<div id="stl-container-${p.id}" class="w-full h-full stl-canvas-container"></div>` : 
+                                    `<img src="${p.imgUrl || defaultPlaceholderImg}" class="w-full h-full object-cover">`
+                                }
+                                <span class="absolute top-2 left-2 bg-gray-900/80 text-gray-300 text-[10px] font-mono px-2 py-0.5 rounded-md border border-gray-700">${p.category || 'Generale'}</span>
+                                ${p.stlUrl ? `<span class="absolute top-2 right-2 bg-brand-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">3D STL</span>` : ''}
+                            </div>
+                            <div class="p-5">
+                                <h3 onclick="openPreviewModal(${p.id})" class="text-lg font-bold text-white mb-2 hover:text-brand-400 cursor-pointer">${translatedTitle}</h3>
+                                <p class="text-gray-400 text-xs mb-4 line-clamp-2">${translatedDesc}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 border-t border-gray-800/50 flex items-center justify-between">
+                            <span class="text-xl font-mono font-bold text-white">€${p.price.toFixed(2)}</span>
+                            <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500 text-black font-bold text-xs flex items-center gap-1.5 transition-all">
+                                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> ${t.btnAddToCart}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = html;
             lucide.createIcons();
 
             filtered.forEach(p => {
@@ -1205,6 +1190,35 @@
             alert('Prodotto salvato con successo!');
         }
 
+        function handleAddCategory() {
+            const val = document.getElementById('new-cat-name').value.trim();
+            if (!val) return;
+            if (categories.includes(val)) return alert('Categoria già esistente!');
+            categories.push(val);
+            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
+            document.getElementById('new-cat-name').value = '';
+            renderCategories();
+            renderAdminCategoriesList();
+        }
+
+        function renderAdminCategoriesList() {
+            const container = document.getElementById('admin-categories-list');
+            container.innerHTML = categories.filter(c => c !== "Tutti").map(c => `
+                <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs">
+                    <span class="font-bold text-white font-mono">${c}</span>
+                    <button onclick="deleteCategory('${c}')" class="px-2 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded text-[10px]">Elimina</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteCategory(cat) {
+            if(!confirm(`Vuoi eliminare la categoria "${cat}"?`)) return;
+            categories = categories.filter(c => c !== cat);
+            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
+            renderCategories();
+            renderAdminCategoriesList();
+        }
+
         function exportProductsJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -1245,6 +1259,7 @@
                 document.getElementById('admin-login-view').classList.add('hidden');
                 document.getElementById('admin-panel-view').classList.remove('hidden');
                 renderAdminProductsList();
+                renderAdminCategoriesList();
                 renderAdminOrdersList();
             } else alert('Credenziali errate!');
         }
@@ -1256,10 +1271,12 @@
 
         function switchAdminTab(tab) {
             document.getElementById('admin-tab-products').classList.toggle('hidden', tab !== 'products');
+            document.getElementById('admin-tab-categories').classList.toggle('hidden', tab !== 'categories');
             document.getElementById('admin-tab-json').classList.toggle('hidden', tab !== 'json');
             document.getElementById('admin-tab-shipping').classList.toggle('hidden', tab !== 'shipping');
 
             document.getElementById('tab-btn-products').className = tab === 'products' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            document.getElementById('tab-btn-categories').className = tab === 'categories' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
             document.getElementById('tab-btn-json').className = tab === 'json' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
             document.getElementById('tab-btn-shipping').className = tab === 'shipping' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
         }
@@ -1336,17 +1353,20 @@
             }
         }
 
-        function openPreviewModal(id) {
+        async function openPreviewModal(id) {
             const p = products.find(prod => prod.id === id);
             if(!p) return;
+            const translatedTitle = await translateText(p.title, currentLang);
+            const translatedDesc = await translateText(p.desc, currentLang);
+
             const content = document.getElementById('preview-content');
             content.innerHTML = `
                 <div class="space-y-4">
-                    <h3 class="text-2xl font-bold text-white">${p.title}</h3>
+                    <h3 class="text-2xl font-bold text-white">${translatedTitle}</h3>
                     <div id="modal-stl-view" class="h-64 bg-gray-900 rounded-xl overflow-hidden flex items-center justify-center">
                         ${p.stlUrl ? '<div class="w-full h-full stl-canvas-container"></div>' : `<img src="${p.imgUrl || defaultPlaceholderImg}" class="w-full h-full object-cover rounded-xl">`}
                     </div>
-                    <p class="text-gray-300 text-sm">${p.desc}</p>
+                    <p class="text-gray-300 text-sm">${translatedDesc}</p>
                     <div class="flex justify-between items-center">
                         <span class="text-xl font-bold text-brand-400">€${p.price.toFixed(2)}</span>
                         <button onclick="addToCart(${p.id}); closePreviewModal();" class="px-4 py-2 bg-brand-500 text-black font-bold rounded-xl text-xs">Aggiungi al Carrello</button>
