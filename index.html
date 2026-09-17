@@ -56,11 +56,11 @@
             <div id="category-filters" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <!-- Griglia Prodotti -->
+        <!-- Griglia Prodotti Home -->
         <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- MODALE CARRELLO CON GESTIONE QUANTITA' ED ELIMINAZIONE -->
+    <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-xl w-full p-6 relative">
             <button onclick="closeCartModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -77,11 +77,11 @@
         </div>
     </div>
 
-    <!-- MODALE ADMIN: GESTIONE CATEGORIE MULTIPLE, SHORT DESC, FOTO E COLORI -->
+    <!-- MODALE ADMIN: INCLUSO TASTO MODIFICA, CATEGORIE, SHORT DESC, FOTO E COLORI -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h3 class="text-xl font-bold mb-4">Gestione Prodotti (Admin)</h3>
+            <h3 class="text-xl font-bold mb-4" id="admin-form-title">Nuovo Prodotto (Admin)</h3>
 
             <form onsubmit="handleSaveProduct(event)" class="space-y-4 bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
                 <input type="hidden" id="edit-prod-id">
@@ -93,7 +93,7 @@
 
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Descrizione Breve (Visualizzata in Home):</label>
-                    <input type="text" id="new-prod-shortdesc" required placeholder="Es. Supporto ergonomico stampato in PLA+" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    <input type="text" id="new-prod-shortdesc" required placeholder="Es. Supporto ergonomico in PLA+" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                 </div>
 
                 <div>
@@ -111,14 +111,17 @@
                     <input type="file" id="img-files-input" accept="image/*" multiple onchange="handleMultipleImages(event)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white">
                 </div>
 
-                <textarea id="new-prod-desc" placeholder="Descrizione Dettagliata (Completa)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                <textarea id="new-prod-desc" placeholder="Descrizione Dettagliata" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
 
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="new-prod-hidden" class="rounded bg-gray-800 border-gray-700 text-brand-500">
                     <label for="new-prod-hidden" class="text-xs text-gray-300">Nascondi prodotto nel catalogo pubblico</label>
                 </div>
 
-                <button type="submit" class="w-full py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
+                <div class="flex gap-2">
+                    <button type="submit" id="btn-save-prod" class="flex-1 py-2 bg-brand-500 text-black font-bold text-xs rounded-lg">+ Salva Prodotto</button>
+                    <button type="button" onclick="resetAdminForm()" class="px-4 py-2 bg-gray-800 text-gray-300 text-xs rounded-lg border border-gray-700">Annulla</button>
+                </div>
             </form>
 
             <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
@@ -147,7 +150,7 @@
                 title: "Fermalibri Cyber Geometry", 
                 price: 34.90, 
                 shortDesc: "Design geometrico ad alta resistenza per librerie e scrivanie.",
-                desc: "Realizzato con polimeri ad altissima risoluzione per garantire stabilità meccanica e una finitura estetica impeccabile.", 
+                desc: "Realizzato con polimeri ad altissima risoluzione.", 
                 categories: ["Decorazioni", "Componenti"], 
                 images: [defaultImg],
                 colors: ["Nero", "Verde Smeraldo", "Argento"],
@@ -207,7 +210,6 @@
                 return `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
-                            <!-- Galleria Foto con Carousel integrato -->
                             <div class="relative h-48 bg-gray-900 rounded-xl overflow-hidden mb-4 group">
                                 <img src="${imgs[activeIndex]}" class="w-full h-full object-cover">
                                 ${imgs.length > 1 ? `
@@ -217,15 +219,13 @@
                                 ` : ''}
                             </div>
 
-                            <!-- Categorie Multiple -->
                             <div class="flex flex-wrap gap-1 mb-2">
                                 ${(p.categories || []).map(c => `<span class="bg-gray-800 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-700">${c}</span>`).join('')}
                             </div>
 
                             <h3 class="text-lg font-bold text-white mb-1">${p.title}</h3>
-                            <p class="text-brand-400 text-xs font-semibold mb-2">${p.shortDesc || ''}</p>
+                            <p class="text-brand-400 text-xs font-semibold mb-4">${p.shortDesc || ''}</p>
 
-                            <!-- Selezione Colori Disponibili -->
                             ${colors.length > 0 ? `
                                 <div class="mb-4">
                                     <label class="block text-[10px] font-mono text-gray-400 mb-1">Seleziona Colore:</label>
@@ -282,11 +282,11 @@
             openCartModal();
         }
 
-        function updateQuantity(prodId, delta) {
-            const item = cart[prodId];
+        function updateQuantity(index, delta) {
+            const item = cart[index];
             if (!item) return;
             item.qty += delta;
-            if (item.qty <= 0) cart.splice(prodId, 1);
+            if (item.qty <= 0) cart.splice(index, 1);
             saveCart();
             openCartModal();
         }
@@ -366,8 +366,6 @@
             const selectedCats = Array.from(document.querySelectorAll('input[name="prod-categories"]:checked')).map(cb => cb.value);
             const selectedCols = Array.from(document.querySelectorAll('input[name="prod-colors"]:checked')).map(cb => cb.value);
 
-            const finalImgs = uploadedImagesList.length > 0 ? uploadedImagesList : [defaultImg];
-
             if (id) {
                 const p = products.find(prod => prod.id == id);
                 if (p) {
@@ -378,15 +376,59 @@
             } else {
                 products.unshift({
                     id: Date.now(), title, price, shortDesc, desc,
-                    categories: selectedCats, colors: selectedCols, images: finalImgs, hidden: isHidden
+                    categories: selectedCats, colors: selectedCols, 
+                    images: uploadedImagesList.length > 0 ? uploadedImagesList : [defaultImg], 
+                    hidden: isHidden
                 });
             }
 
             localStorage.setItem('ls3d_products', JSON.stringify(products));
-            uploadedImagesList = [];
+            resetAdminForm();
             renderProducts();
             renderAdminProductsList();
-            alert('Prodotto salvato!');
+            alert('Prodotto salvato con successo!');
+        }
+
+        // Funzione per caricare i dati nel form di modifica
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            document.getElementById('edit-prod-id').value = p.id;
+            document.getElementById('new-prod-title').value = p.title;
+            document.getElementById('new-prod-price').value = p.price;
+            document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
+            document.getElementById('new-prod-desc').value = p.desc || '';
+            document.getElementById('new-prod-hidden').checked = p.hidden || false;
+            document.getElementById('admin-form-title').innerText = "Modifica Prodotto (Admin)";
+            document.getElementById('btn-save-prod').innerText = "Aggiorna Prodotto";
+
+            // Spunta le categorie salvate
+            document.querySelectorAll('input[name="prod-categories"]').forEach(cb => {
+                cb.checked = p.categories && p.categories.includes(cb.value);
+            });
+
+            // Spunta i colori salvati
+            document.querySelectorAll('input[name="prod-colors"]').forEach(cb => {
+                cb.checked = p.colors && p.colors.includes(cb.value);
+            });
+
+            uploadedImagesList = p.images || [];
+        }
+
+        function resetAdminForm() {
+            document.getElementById('edit-prod-id').value = '';
+            document.getElementById('new-prod-title').value = '';
+            document.getElementById('new-prod-price').value = '';
+            document.getElementById('new-prod-shortdesc').value = '';
+            document.getElementById('new-prod-desc').value = '';
+            document.getElementById('new-prod-hidden').checked = false;
+            document.getElementById('img-files-input').value = '';
+            document.getElementById('admin-form-title').innerText = "Nuovo Prodotto (Admin)";
+            document.getElementById('btn-save-prod').innerText = "+ Salva Prodotto";
+            uploadedImagesList = [];
+            document.querySelectorAll('input[name="prod-categories"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('input[name="prod-colors"]').forEach(cb => cb.checked = false);
         }
 
         function renderAdminProductsList() {
@@ -398,9 +440,12 @@
                         ${p.hidden ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded">Nascosto</span>` : ''}
                         <p class="text-gray-400 text-[10px]">${(p.categories || []).join(', ')} | Colori: ${(p.colors || []).join(', ')}</p>
                     </div>
-                    <button onclick="toggleHideProduct(${p.id})" class="px-2 py-1 bg-gray-800 text-gray-300 rounded text-[10px] border border-gray-700">
-                        ${p.hidden ? 'Mostra' : 'Nascondi'}
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="editProduct(${p.id})" class="px-2.5 py-1 bg-brand-500/20 text-brand-400 rounded text-[10px] border border-brand-500/30 font-bold">Modifica</button>
+                        <button onclick="toggleHideProduct(${p.id})" class="px-2.5 py-1 bg-gray-800 text-gray-300 rounded text-[10px] border border-gray-700">
+                            ${p.hidden ? 'Mostra' : 'Nascondi'}
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -416,6 +461,7 @@
         }
 
         function openAdminModal() { 
+            renderCategories();
             renderAdminProductsList();
             document.getElementById('admin-modal').classList.remove('hidden'); 
         }
