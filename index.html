@@ -3,18 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS3Dmaker - Stampa 3D su Misura & Spedizioni</title>
-    <!-- Tailwind CSS CDN -->
+    
+    <!-- TAG SEO PER MOTORI DI RICERCA -->
+    <title>LS3Dmaker | Stampa 3D su Misura, Prototipazione & Modelli STL</title>
+    <meta name="description" content="LS3Dmaker è il tuo service di stampa 3D su misura, prototipazione rapida e modellazione CAD. Visualizza i modelli 3D STL e ordina online.">
+    <meta name="keywords" content="stampa 3d, prototipazione rapida, modelli stl, ls3dmaker, service stampa 3d, modellazione cad, stampa 3d bologna">
+    <meta name="author" content="LS3Dmaker">
+    <meta name="robots" content="index, follow">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "OnlineStore",
+      "name": "LS3Dmaker",
+      "description": "Servizio di stampa 3D su misura e prototipazione.",
+      "url": "https://ls3dmaker.com/"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Three.js & STLLoader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- PayPal SDK (Integrazione con il tuo account) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=EUR"></script>
 
     <script>
         tailwind.config = {
@@ -26,21 +42,13 @@
                     },
                     colors: {
                         brand: {
-                            50: '#ecfdf5',
                             500: '#10b981',
-                            600: '#059669',
                             400: '#34d399',
-                            900: '#064e3b',
-                        },
-                        accent: {
-                            500: '#06b6d4',
-                            400: '#22d3ee',
                         },
                         dark: {
                             bg: '#090d16',
                             card: '#111827',
-                            border: '#1f2937',
-                            surface: '#151e32'
+                            border: '#1f2937'
                         }
                     }
                 }
@@ -51,430 +59,339 @@
         .glass-panel {
             background: rgba(17, 24, 39, 0.85);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .stl-canvas-container canvas {
-            width: 100% !important;
-            height: 100% !important;
-            outline: none;
         }
     </style>
 </head>
-<body class="bg-dark-bg text-gray-100 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-black">
+<body class="bg-dark-bg text-gray-100 font-sans antialiased min-h-screen">
 
     <!-- Header Navigation -->
     <header class="sticky top-0 z-40 glass-panel">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" onclick="showPage('home')" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-mono font-black text-black text-xl shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-                    LS
-                </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <a href="#" onclick="showPage('home')" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-500 flex items-center justify-center font-mono font-black text-black text-xl">LS</div>
                 <div class="flex flex-col">
-                    <span class="font-bold text-lg tracking-tight group-hover:text-brand-400 transition-colors">LS3Dmaker</span>
+                    <span class="font-bold text-lg tracking-tight">LS3Dmaker</span>
                     <span class="text-[10px] text-gray-400 font-mono tracking-wider" id="txt-nav-subtitle">CREATIVITÀ & PROTOTIPAZIONE</span>
                 </div>
             </a>
 
-            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
-                <a href="#prodotti" onclick="showPage('prodotti')" class="hover:text-brand-400 transition-colors" id="nav-products">Prodotti</a>
-                <a href="#info" onclick="showPage('info')" class="hover:text-brand-400 transition-colors" id="nav-info">Richiedi Info</a>
-                <a href="#traccia" onclick="showPage('traccia')" class="hover:text-brand-400 transition-colors" id="nav-track">Traccia Spedizione</a>
-                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors" id="nav-about">Chi siamo?</a>
-            </nav>
-
             <div class="flex items-center gap-3">
-                <!-- Selector Lingua -->
-                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded-xl px-2 py-1.5 font-mono focus:outline-none focus:border-brand-500">
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded-xl px-2 py-1.5 font-mono">
                     <option value="it">🇮🇹 IT</option>
                     <option value="en">🇬🇧 EN</option>
-                    <option value="fr">🇫🇷 FR</option>
-                    <option value="es">🇪🇸 ES</option>
-                    <option value="de">🇩🇪 DE</option>
                 </select>
 
-                <!-- Tasto Carrello -->
-                <button onclick="openCartModal()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-mono border border-brand-500/30 transition-all">
+                <button onclick="openCartModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 text-brand-400 text-xs font-mono border border-brand-500/30">
                     <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline font-bold" id="btn-cart-text">Carrello</span>
+                    <span id="btn-cart-text">Carrello</span>
                     <span id="cart-badge" class="px-1.5 py-0.5 rounded-full bg-brand-500 text-black text-[10px] font-bold">0</span>
                 </button>
 
-                <button onclick="openAdminModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-mono border border-gray-700 transition-all">
+                <button onclick="openAdminModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700">
                     <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-400"></i> Admin
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Content Wrapper -->
-    <div id="main-content">
-
-        <!-- VISTA HOME / CATALOGO -->
-        <div id="home-view">
-            <!-- Hero Section -->
-            <section id="hero-section" class="relative py-16 overflow-hidden">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-6" id="hero-badge">
-                        <i data-lucide="truck" class="w-3.5 h-3.5"></i> Stampa 3D & Spedizioni Tracciabili
-                    </span>
-                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight" id="hero-title">
-                        Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
-                    </h1>
-                    <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8" id="hero-desc">
-                        Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
-                    </p>
-                </div>
-            </section>
-
-            <!-- Sezione Catalogo Prodotti -->
-            <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                        <div>
-                            <h2 class="text-2xl font-bold text-white mb-2" id="catalog-title">Catalogo Creazioni 3D</h2>
-                            <p class="text-gray-400 text-sm" id="catalog-subtitle">Sfoglia le nostre creazioni, ispeziona i modelli STL in 3D e aggiungi al carrello.</p>
-                        </div>
-                    </div>
-
-                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                </div>
-            </section>
-
-            <!-- Sezione Form Richiesta Info -->
-            <section id="info" class="py-16 bg-dark-bg">
-                <div class="max-w-3xl mx-auto px-4">
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
-                                <i data-lucide="mail" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-xl font-bold text-white" id="info-form-title">Richiedi Informazioni o Preventivo</h2>
-                                <p class="text-xs text-gray-400" id="info-form-subtitle">Compila il modulo per un preventivo personalizzato</p>
-                            </div>
-                        </div>
-
-                        <form onsubmit="handleContactSubmit(event)" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-name">Nome e Cognome</label>
-                                    <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-contact">Email / Telefono</label>
-                                    <input type="text" id="info-contact" required placeholder="mario@email.it o 333..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-service">Tipo di Servizio</label>
-                                <select id="info-service" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                                    <option value="Preventivo Personalizzato">Preventivo Stampa 3D Personalizzata</option>
-                                    <option value="Informazioni Prodotto">Informazioni su Prodotto in Catalogo</option>
-                                    <option value="Prototipazione">Prototipazione Tecnica</option>
-                                    <option value="Altro">Altro</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-mono text-gray-300 mb-1" id="lbl-message">Messaggio / Dettagli Progetto</label>
-                                <textarea id="info-message" rows="4" required placeholder="Descrivi la tua richiesta..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
-                            </div>
-                            <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="send" class="w-4 h-4"></i> <span id="btn-send-wa">Invia Richiesta via WhatsApp</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- VISTA DEDICATA: CHI SIAMO -->
-        <div id="chi-siamo-view" class="hidden py-16">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono font-semibold uppercase tracking-wider mb-4" id="about-badge">
-                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Ingegneria & Prototipazione
-                    </span>
-                    <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-                        <span>Chi Siamo — </span><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
-                    </h1>
-                </div>
-
-                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-10 shadow-2xl mb-12">
-                    <h2 class="text-2xl font-bold text-white mb-4">La Nostra Missione</h2>
-                    <p class="text-gray-300 leading-relaxed mb-6">
-                        LS3Dmaker nasce con l'obiettivo di trasformare concetti complessi, idee grafiche e modelli CAD in oggetti reali ad alta precisione.
-                    </p>
-                </div>
-
-                <div class="text-center">
-                    <button onclick="showPage('prodotti')" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-500/20">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna al Catalogo Prodotti
-                    </button>
-                </div>
+    <main id="main-content">
+        <!-- VISTA CATALOGO -->
+        <div id="home-view" class="py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <h1 class="text-4xl font-extrabold text-white mb-2" id="hero-title">Dai forma alle Tue Idee con <span class="text-brand-400">LS3Dmaker</span></h1>
+                <p class="text-gray-400 mb-8" id="hero-desc">Prototipazione rapida e creazioni 3D su misura.</p>
+                <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
             </div>
         </div>
-
-    </div>
+    </main>
 
     <!-- MODALE CARRELLO -->
-    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative">
-            <button onclick="closeCartModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-6">
-                <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
-                    <i data-lucide="shopping-cart" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-white">Il Tuo Carrello</h3>
-                    <p class="text-xs text-gray-400">Gestisci gli articoli prima di completare l'ordine</p>
-                </div>
-            </div>
-
-            <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 mb-6 border-y border-gray-800 py-4"></div>
-
-            <div class="flex justify-between items-center mb-6 font-mono p-4 bg-gray-900/60 rounded-xl border border-gray-800">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">Totale Stimato:</span>
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-xl w-full p-6 relative">
+            <button onclick="closeCartModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="text-xl font-bold text-white mb-4">Il Tuo Carrello</h3>
+            <div id="cart-items-list" class="space-y-3 max-h-60 overflow-y-auto mb-4"></div>
+            <div class="flex justify-between items-center p-4 bg-gray-900 rounded-xl mb-4 font-mono">
+                <span>Totale:</span>
                 <span id="cart-total" class="text-2xl font-bold text-brand-400">€0.00</span>
             </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button onclick="sendCartViaEmail()" class="w-full py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-brand-400 border border-brand-500/30 text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all">
-                    <i data-lucide="mail" class="w-4 h-4"></i> Salva / Invia via Email
-                </button>
-                <button onclick="openCheckoutFromCart()" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> Procedi al Pagamento
-                </button>
-            </div>
+            <button onclick="openCheckoutFromCart()" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Procedi al Pagamento</button>
         </div>
     </div>
 
-    <!-- MODALE ANTEPRIMA PRODOTTO -->
-    <div id="preview-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closePreviewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white z-10">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <div id="preview-content"></div>
-        </div>
-    </div>
+    <!-- MODALE CHECKOUT -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="text-xl font-bold text-white mb-4">Dati Spedizione & Pagamento</h3>
+            <form onsubmit="processOrder(event)" class="space-y-4">
+                <input type="text" id="checkout-name" required placeholder="Nome e Cognome / Ragione Sociale" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                <input type="email" id="checkout-email" required placeholder="Email Cliente" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                <input type="tel" id="checkout-phone" required placeholder="Telefono / WhatsApp" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                <textarea id="checkout-address" rows="2" required placeholder="Indirizzo Completo di Spedizione" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
 
-    <!-- MODALE CHECKOUT CORRETTA E FUNZIONANTE -->
-    <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-6">
-                <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-400">
-                    <i data-lucide="credit-card" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-white">Completa l'Ordine & Pagamento</h3>
-                    <p class="text-xs text-gray-400" id="checkout-summary-title">Inserisci i tuoi dati</p>
-                </div>
-            </div>
-
-            <form id="checkout-form" onsubmit="processOrder(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-1">Nome e Cognome</label>
-                    <input type="text" id="checkout-name" required placeholder="Mario Rossi" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-1">Telefono (WhatsApp)</label>
-                    <input type="tel" id="checkout-phone" required placeholder="+39 333 1234567" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-1">Indirizzo Completo di Spedizione</label>
-                    <textarea id="checkout-address" rows="2" required placeholder="Via Roma 10, 40100 Bologna (BO)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-brand-500 focus:outline-none"></textarea>
+                <div class="p-4 bg-gray-900 rounded-xl flex justify-between font-mono">
+                    <span>Totale Ordine:</span>
+                    <span id="checkout-total-price" class="text-xl font-bold text-brand-400">€0.00</span>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-mono text-gray-300 mb-2">Seleziona Metodo di Pagamento:</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button type="button" onclick="setPayMethod('whatsapp')" id="btn-pay-wa" class="border-2 border-brand-500 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
-                            <i data-lucide="message-circle" class="w-5 h-5 text-brand-400 mb-1"></i>
-                            <span class="text-[11px] font-bold text-white">WhatsApp</span>
-                        </button>
-                        <button type="button" onclick="setPayMethod('paypal')" id="btn-pay-paypal" class="border border-gray-700 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
-                            <i data-lucide="wallet" class="w-5 h-5 text-blue-400 mb-1"></i>
-                            <span class="text-[11px] font-bold text-white">PayPal</span>
-                        </button>
-                        <button type="button" onclick="setPayMethod('satispay')" id="btn-pay-satispay" class="border border-gray-700 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
-                            <i data-lucide="smartphone" class="w-5 h-5 text-red-400 mb-1"></i>
-                            <span class="text-[11px] font-bold text-white">Satispay</span>
-                        </button>
-                    </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-xs">Ordina via Mail / WhatsApp</button>
+                    <button type="button" onclick="payWithPayPalDirect()" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1">
+                        <i data-lucide="wallet" class="w-4 h-4"></i> Paga con PayPal
+                    </button>
                 </div>
-
-                <div class="p-4 bg-gray-900/60 border border-gray-800 rounded-xl flex justify-between items-center">
-                    <span class="text-xs font-mono text-gray-400">Totale Ordine:</span>
-                    <span id="checkout-total-price" class="text-xl font-mono font-bold text-brand-400">€0.00</span>
-                </div>
-
-                <button type="submit" id="btn-submit-checkout" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> Conferma & Completa Ordine
-                </button>
             </form>
         </div>
     </div>
 
-    <!-- MODALE ADMIN -->
-    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
+    <!-- MODALE FATTURA (LAYOUT INV24 ESATTO) -->
+    <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-3xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white print:hidden"><i data-lucide="x" class="w-6 h-6"></i></button>
 
-            <!-- Login View -->
-            <div id="admin-login-view">
-                <div class="text-center mb-6">
-                    <h3 class="text-2xl font-bold text-white">Accesso Riservato Admin</h3>
+            <!-- CONTENITORE FATTURA STAMPABILE CON LAYOUT STILE INV24 -->
+            <div id="invoice-paper" class="bg-white text-gray-900 p-10 rounded-xl font-sans text-sm border border-gray-300">
+                
+                <!-- Logo Top Left -->
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center gap-3">
+                        <!-- PUOI SOSTITUIRE QUESTO LOGO CON L'URL DELLA TUA IMMAGINE -->
+                        <div class="w-10 h-10 bg-emerald-500 text-white font-mono font-bold text-xl flex items-center justify-center rounded-lg">LS</div>
+                        <div>
+                            <span class="text-2xl font-bold tracking-tight text-emerald-600">LS3Dmaker</span>
+                            <p class="text-xs text-gray-500 font-mono">Stampa 3D & Prototipazione Rapida</p>
+                        </div>
+                    </div>
                 </div>
-                <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-sm mx-auto">
-                    <input type="text" id="admin-username" required placeholder="admin" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
-                    <input type="password" id="admin-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
-                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 text-black font-bold text-sm">Accedi</button>
-                </form>
+
+                <hr class="border-gray-200 mb-8">
+
+                <!-- Header: Cliente (Sinistra) vs Date (Destra) -->
+                <div class="flex justify-between items-start mb-10 text-xs">
+                    <div>
+                        <p class="text-gray-500 mb-1">Fattura a:</p>
+                        <p class="font-bold text-sm text-gray-900" id="paper-client-name">[Nome dell'azienda del cliente]</p>
+                        <p class="text-gray-600" id="paper-client-address">[Indirizzo dell'azienda del cliente]</p>
+                        <p class="text-gray-600">P.IVA/C.F.: <span id="paper-client-vat">[Numero P.IVA / Codice Fiscale]</span></p>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <p><span class="text-gray-500">Data fattura:</span> <span id="paper-date" class="font-medium">17/09/2026</span></p>
+                        <p><span class="text-gray-500">Data di scadenza:</span> <span id="paper-due-date" class="font-medium">01/10/2026</span></p>
+                    </div>
+                </div>
+
+                <!-- Titolo Centrale -->
+                <div class="text-center my-8">
+                    <h2 class="text-2xl font-bold text-gray-900" id="paper-number">Fattura n. 560</h2>
+                </div>
+
+                <!-- Tabella Prodotti -->
+                <table class="w-full mb-8 text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-300 text-xs font-bold text-gray-900">
+                            <th class="py-2">Descrizione</th>
+                            <th class="py-2 text-center">Quantità</th>
+                            <th class="py-2 text-right">Prezzo</th>
+                            <th class="py-2 text-right">Subtotale</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paper-items-body" class="divide-y divide-gray-100 text-xs">
+                        <tr>
+                            <td class="py-2">il mio prodotto</td>
+                            <td class="py-2 text-center">1</td>
+                            <td class="py-2 text-right">50,00 €</td>
+                            <td class="py-2 text-right">50,00 €</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr class="border-gray-300 mb-6">
+
+                <!-- Totali a Destra -->
+                <div class="flex justify-end mb-12">
+                    <div class="w-60 text-right space-y-1 text-xs">
+                        <p><span class="text-gray-600">Subtotale:</span> <span id="paper-subtotal" class="font-medium">150,00 €</span></p>
+                        <p><span class="text-gray-600" id="paper-tax-label">IVA (22%):</span> <span id="paper-tax-value" class="font-medium">33,00 €</span></p>
+                        <p class="text-sm font-bold text-gray-900 pt-1 border-t border-gray-200"><span class="text-gray-900">Totale:</span> <span id="paper-total">183,00 €</span></p>
+                    </div>
+                </div>
+
+                <hr class="border-gray-200 mb-6">
+
+                <!-- Footer a 3 Colonne -->
+                <div class="grid grid-cols-3 gap-4 text-[11px] text-gray-600">
+                    <div>
+                        <p class="font-bold text-gray-900">LS3Dmaker</p>
+                        <p>P.IVA/C.F.: IT12345678901</p>
+                    </div>
+                    <div>
+                        <p>Bologna (BO), Italia</p>
+                        <p>Email: unicobardo@gmail.com</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-gray-900">Banca Appoggio / Pagamenti</p>
+                        <p>PayPal: unicobardo@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pulsanti per Azione -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 print:hidden">
+                <button onclick="window.print()" class="py-3 rounded-xl bg-gray-800 text-white font-bold text-xs">Stampa / Salva PDF Fattura</button>
+                <button onclick="sendOrderAndInvoiceEmail()" class="py-3 rounded-xl bg-brand-500 text-black font-bold text-xs">Invia Ordine & Fattura via Email</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT CORRETTO -->
+    <!-- JAVASCRIPT LOGICA & CONFIGURAZIONE -->
     <script>
-        const defaultPlaceholderImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
+        // CONFIGURAZIONE EMAIL ED ESERCENTE
+        const myEmail = "unicobardo@gmail.com"; 
 
-        let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, desc: "Design geometrico futurista.", stlUrl: null }
+        let products = [
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, desc: "Design geometrico futurista per stampa 3D." }
         ];
-        let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
-        let selectedPayMethod = 'whatsapp';
+        let cart = [];
+        let currentOrder = null;
 
         function renderProducts() {
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = products.map(p => `
-                <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden hover:border-brand-500/50 transition-all flex flex-col justify-between">
-                    <div class="p-5">
-                        <img src="${defaultPlaceholderImg}" class="w-full h-40 object-cover rounded-xl mb-4">
+            document.getElementById('products-grid').innerHTML = products.map(p => `
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
                         <h3 class="text-lg font-bold text-white mb-2">${p.title}</h3>
-                        <p class="text-gray-400 text-xs mb-4 line-clamp-2">${p.desc}</p>
+                        <p class="text-gray-400 text-xs mb-4">${p.desc}</p>
                     </div>
-                    <div class="p-5 pt-0 border-t border-gray-800/50 flex items-center justify-between">
-                        <span class="text-xl font-mono font-bold text-white">€${p.price.toFixed(2)}</span>
-                        <button onclick="addToCart(${p.id})" class="px-3.5 py-2 rounded-xl bg-brand-500 text-black font-bold text-xs flex items-center gap-1.5 transition-all">
-                            <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> Aggiungi
-                        </button>
+                    <div class="flex justify-between items-center pt-3 border-t border-gray-800">
+                        <span class="text-xl font-bold text-white">€${p.price.toFixed(2)}</span>
+                        <button onclick="addToCart(${p.id})" class="px-3.5 py-2 bg-brand-500 text-black font-bold text-xs rounded-xl">Aggiungi</button>
                     </div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        function addToCart(prodId) {
-            const product = products.find(p => p.id === prodId);
-            if (!product) return;
-            const existing = cart.find(item => item.id === prodId);
-            if (existing) existing.qty += 1;
-            else cart.push({ id: product.id, title: product.title, price: product.price, qty: 1 });
+        function addToCart(id) {
+            const p = products.find(item => item.id === id);
+            cart.push({ ...p, qty: 1 });
             saveCart();
             openCartModal();
         }
 
         function saveCart() {
-            localStorage.setItem('ls3d_cart', JSON.stringify(cart));
-            document.getElementById('cart-badge').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+            document.getElementById('cart-badge').innerText = cart.length;
         }
 
         function openCartModal() {
             const container = document.getElementById('cart-items-list');
-            const totalEl = document.getElementById('cart-total');
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-400 text-xs py-8 font-mono">Carrello vuoto.</div>`;
-                totalEl.innerText = "€0.00";
-            } else {
-                let total = 0;
-                container.innerHTML = cart.map(i => {
-                    total += i.price * i.qty;
-                    return `<div class="flex justify-between p-3 bg-gray-900 rounded-xl border border-gray-800">
-                                <span class="text-sm font-bold text-white">${i.title} (x${i.qty})</span>
-                                <span class="text-sm font-mono font-bold text-brand-400">€${(i.price*i.qty).toFixed(2)}</span>
-                            </div>`;
-                }).join('');
-                totalEl.innerText = `€${total.toFixed(2)}`;
-            }
+            let total = 0;
+            container.innerHTML = cart.map(i => {
+                total += i.price;
+                return `<div class="flex justify-between p-2.5 bg-gray-900 rounded-xl text-xs"><span>${i.title}</span><span class="font-bold text-brand-400">€${i.price.toFixed(2)}</span></div>`;
+            }).join('');
+            document.getElementById('cart-total').innerText = `€${total.toFixed(2)}`;
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
-        // APERTURA CHECKOUT CORRETTA
         function openCheckoutFromCart() {
-            if (cart.length === 0) {
-                alert("Il carrello è vuoto! Aggiungi prima un prodotto.");
-                return;
-            }
+            if (cart.length === 0) return alert("Il carrello è vuoto!");
             closeCartModal();
-            const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const total = cart.reduce((acc, i) => acc + i.price, 0);
             document.getElementById('checkout-total-price').innerText = `€${total.toFixed(2)}`;
             document.getElementById('checkout-modal').classList.remove('hidden');
         }
 
         function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
 
-        function setPayMethod(method) {
-            selectedPayMethod = method;
-            document.getElementById('btn-pay-wa').className = method === 'whatsapp' ? 'border-2 border-brand-500 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center' : 'border border-gray-700 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center';
-            document.getElementById('btn-pay-paypal').className = method === 'paypal' ? 'border-2 border-blue-500 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center' : 'border border-gray-700 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center';
-            document.getElementById('btn-pay-satispay').className = method === 'satispay' ? 'border-2 border-red-500 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center' : 'border border-gray-700 bg-gray-900 rounded-xl p-3 flex flex-col items-center justify-center';
-        }
-
-        // INVIO DELL'ORDINE E PAGAMENTO
         function processOrder(e) {
             e.preventDefault();
             const name = document.getElementById('checkout-name').value;
+            const email = document.getElementById('checkout-email').value;
             const phone = document.getElementById('checkout-phone').value;
             const address = document.getElementById('checkout-address').value;
-            const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-            const summary = cart.map(i => `${i.title} (x${i.qty})`).join(', ');
+            const total = cart.reduce((acc, i) => acc + i.price, 0);
 
-            if (selectedPayMethod === 'whatsapp') {
-                const waText = `Ciao LS3Dmaker!\nNuovo Ordine:\n- Articoli: ${summary}\n- Totale: €${total.toFixed(2)}\n- Cliente: ${name}\n- Tel: ${phone}\n- Indirizzo: ${address}`;
-                window.open(`https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(waText)}`, '_blank');
-            } else if (selectedPayMethod === 'paypal') {
-                window.open(`https://www.paypal.me/`, '_blank');
-            } else if (selectedPayMethod === 'satispay') {
-                window.open(`https://tag.satispay.com/ls3dmaker`, '_blank');
-            }
+            currentOrder = {
+                number: Math.floor(100 + Math.random() * 900),
+                clientName: name,
+                clientEmail: email,
+                clientPhone: phone,
+                clientAddress: address,
+                items: [...cart],
+                subtotal: total,
+                tax: total * 0.22,
+                total: total * 1.22,
+                date: new Date().toLocaleDateString('it-IT'),
+                dueDate: new Date(Date.now() + 14*24*60*60*1000).toLocaleDateString('it-IT')
+            };
 
-            cart = [];
-            saveCart();
             closeCheckoutModal();
-            alert("Ordine completato con successo!");
+            openInvoiceModal();
         }
 
-        function sendCartViaEmail() {
+        function payWithPayPalDirect() {
             if (cart.length === 0) return alert("Carrello vuoto!");
-            const email = prompt("Inserisci la tua email:");
-            if(!email) return;
-            const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-            const items = cart.map(i => `- ${i.title} (x${i.qty}) - €${(i.price * i.qty).toFixed(2)}`).join('\n');
-            window.location.href = `mailto:${email}?subject=Carrello LS3Dmaker&body=${encodeURIComponent(items + '\n\nTotale: €' + total.toFixed(2))}`;
+            const total = cart.reduce((acc, i) => acc + i.price, 0);
+            window.open(`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(myEmail)}&amount=${total.toFixed(2)}&currency_code=EUR&item_name=Ordine%20LS3Dmaker`, '_blank');
         }
 
-        function showPage(pageId) {
-            document.getElementById('home-view').classList.toggle('hidden', pageId === 'chi-siamo');
-            document.getElementById('chi-siamo-view').classList.toggle('hidden', pageId !== 'chi-siamo');
+        function openInvoiceModal() {
+            if(!currentOrder) return;
+            document.getElementById('paper-number').innerText = `Fattura n. ${currentOrder.number}`;
+            document.getElementById('paper-client-name').innerText = currentOrder.clientName;
+            document.getElementById('paper-client-address').innerText = currentOrder.clientAddress;
+            document.getElementById('paper-date').innerText = currentOrder.date;
+            document.getElementById('paper-due-date').innerText = currentOrder.dueDate;
+
+            document.getElementById('paper-items-body').innerHTML = currentOrder.items.map(i => `
+                <tr>
+                    <td class="py-2 font-medium">${i.title}</td>
+                    <td class="py-2 text-center">1</td>
+                    <td class="py-2 text-right">${i.price.toFixed(2)} €</td>
+                    <td class="py-2 text-right">${i.price.toFixed(2)} €</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('paper-subtotal').innerText = `${currentOrder.subtotal.toFixed(2)} €`;
+            document.getElementById('paper-tax-value').innerText = `${currentOrder.tax.toFixed(2)} €`;
+            document.getElementById('paper-total').innerText = `${currentOrder.total.toFixed(2)} €`;
+
+            document.getElementById('invoice-modal').classList.remove('hidden');
         }
 
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+        function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
+
+        // INVIO MAIL A TE (UNICOBARDO@GMAIL.COM) E AL CLIENTE
+        function sendOrderAndInvoiceEmail() {
+            if(!currentOrder) return;
+
+            const itemsText = currentOrder.items.map(i => `- ${i.title}: €${i.price.toFixed(2)}`).join('\n');
+            const subject = encodeURIComponent(`NUOVO ORDINE + FATTURA N. ${currentOrder.number} - LS3Dmaker`);
+            const body = encodeURIComponent(
+                `NUOVO ORDINE E FATTURA GENERATA DA LS3Dmaker\n\n` +
+                `DATI CLIENTE:\n` +
+                `Nome/Azienda: ${currentOrder.clientName}\n` +
+                `Email Cliente: ${currentOrder.clientEmail}\n` +
+                `Telefono: ${currentOrder.clientPhone}\n` +
+                `Indirizzo Spedizione: ${currentOrder.clientAddress}\n\n` +
+                `DETTAGLIO ARTICOLI:\n${itemsText}\n\n` +
+                `RIEPILOGO FATTURA N. ${currentOrder.number}:\n` +
+                `Data: ${currentOrder.date}\n` +
+                `Subtotale: €${currentOrder.subtotal.toFixed(2)}\n` +
+                `IVA (22%): €${currentOrder.tax.toFixed(2)}\n` +
+                `TOTALE FATTURA: €${currentOrder.total.toFixed(2)}\n`
+            );
+
+            // Apre il mailto con destinatario principal unicobardo@gmail.com e in CC il cliente
+            window.location.href = `mailto:${myEmail}?cc=${encodeURIComponent(currentOrder.clientEmail)}&subject=${subject}&body=${body}`;
+        }
+
+        function openAdminModal() { openInvoiceModal(); }
 
         renderProducts();
-        saveCart();
     </script>
 </body>
 </html>
