@@ -71,9 +71,14 @@
                     <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight">
                         Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
                     </h1>
-                    <p class="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg mb-8">
-                        Prototipazione rapida, componentistica funzionale e creazioni 3D su misura.
-                    </p>
+                    
+                    <!-- Spazio allargato e frase descrizione veloce inserita -->
+                    <div class="max-w-3xl mx-auto bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl mb-12">
+                        <p class="text-brand-400 font-mono text-xs uppercase tracking-widest mb-2">Soluzioni Professionali di Stampa 3D</p>
+                        <p class="text-gray-200 text-lg sm:text-xl font-medium leading-relaxed">
+                            Trasformiamo progetti digitali in oggetti reali ad alta precisione con materiali tecnici avanzati, finiture curate nei minimi dettagli e spedizioni rapide in tutta Italia.
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -125,14 +130,14 @@
         </div>
     </div>
 
-    <!-- MODALE CHECKOUT & FATTURA -->
+    <!-- MODALE CHECKOUT & PAYPAL -->
     <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h3 class="text-xl font-bold mb-4">Completa l'Ordine e Fattura</h3>
+            <h3 class="text-xl font-bold mb-4">Checkout & Pagamento PayPal</h3>
             <form onsubmit="processOrder(event)" class="space-y-3 text-xs">
                 <input type="text" id="chk-name" required placeholder="Nome e Cognome / Azienda" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
-                <input type="email" id="chk-email" required placeholder="Email" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+                <input type="email" id="chk-email" required placeholder="Email (per ricezione fattura)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
                 <input type="tel" id="chk-phone" required placeholder="Telefono" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
                 <textarea id="chk-address" required rows="2" placeholder="Indirizzo completo di spedizione" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white"></textarea>
                 
@@ -145,9 +150,9 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2">
-                    <input type="checkbox" id="chk-gdpr" required class="rounded bg-gray-900 border-gray-700 text-brand-500">
-                    <label for="chk-gdpr" class="text-[11px] text-gray-400">Accetto la Privacy Policy e il trattamento dati.</label>
+                <div class="p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl">
+                    <p class="font-bold text-blue-400 mb-1">Pagamento Sicuro PayPal</p>
+                    <p class="text-[11px] text-gray-300">Invio fondi a: <strong class="font-mono text-white">unicobardo@gmail.com</strong></p>
                 </div>
 
                 <button type="submit" class="w-full py-3 bg-brand-500 text-black font-bold rounded-lg mt-2">Conferma Ordine & Genera Fattura</button>
@@ -174,6 +179,7 @@
                     <p class="text-gray-500">Intestato a:</p>
                     <p class="font-bold" id="inv-client">[Nome]</p>
                     <p class="text-gray-600" id="inv-address">[Indirizzo]</p>
+                    <p class="text-blue-600 font-mono text-[10px] mt-1">Metodo Pagamento: PayPal (unicobardo@gmail.com)</p>
                 </div>
                 <table class="w-full mb-6 text-left border-collapse">
                     <thead>
@@ -194,12 +200,12 @@
             </div>
             <div class="flex gap-2 mt-4">
                 <button onclick="window.print()" class="flex-1 py-2.5 bg-gray-800 text-white rounded-lg font-bold text-xs">Stampa / Salva PDF</button>
-                <button onclick="sendInvoiceEmail()" class="flex-1 py-2.5 bg-brand-500 text-black rounded-lg font-bold text-xs">Invia via Email</button>
+                <button onclick="sendInvoiceEmail()" class="flex-1 py-2.5 bg-brand-500 text-black rounded-lg font-bold text-xs">Invia Email all'Utente</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE ADMIN CON GESTIONE PRODOTTI, CATEGORIE E ORDINI -->
+    <!-- MODALE ADMIN -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -225,10 +231,11 @@
                 </div>
 
                 <!-- Tabs Navigazione Admin -->
-                <div class="flex gap-2 border-b border-gray-800 pb-2">
+                <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-2">
                     <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti</button>
-                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Gestione Categorie</button>
-                    <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Ordini & Spedizioni</button>
+                    <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Categorie</button>
+                    <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Spedizioni & Ordini</button>
+                    <button onclick="switchAdminTab('invoices')" id="tab-btn-invoices" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Gestione Fatture</button>
                 </div>
 
                 <!-- TAB 1: PRODOTTI -->
@@ -279,6 +286,11 @@
                 <!-- TAB 3: ORDINI & SPEDIZIONI -->
                 <div id="admin-tab-orders" class="hidden space-y-4">
                     <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
+                </div>
+
+                <!-- TAB 4: GESTIONE FATTURE -->
+                <div id="admin-tab-invoices" class="hidden space-y-4">
+                    <div id="admin-invoices-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
                 </div>
             </div>
         </div>
@@ -515,9 +527,17 @@
             document.getElementById('invoice-modal').classList.remove('hidden');
         }
         function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
+
         function sendInvoiceEmail() {
             if(!currentOrder) return;
-            window.location.href = `mailto:unicobardo@gmail.com?subject=Ordine ${currentOrder.id}&body=Invio ordine ${currentOrder.id} per ${currentOrder.name}`;
+            const subject = encodeURIComponent(`Fattura ${currentOrder.number} - LS3Dmaker`);
+            const body = encodeURIComponent(`Gentile ${currentOrder.name},\n\nIn allegato i dettagli dell'ordine ${currentOrder.id}.\nTotale complessivo: €${currentOrder.total.toFixed(2)}\nPagamento PayPal effettuato a: unicobardo@gmail.com\n\nGrazie per aver scelto LS3Dmaker!`);
+            window.location.href = `mailto:${currentOrder.email}?subject=${subject}&body=${body}`;
+        }
+
+        function viewOrderInvoice(orderId) {
+            currentOrder = orders.find(o => o.id === orderId);
+            if(currentOrder) openInvoiceModal();
         }
 
         function handleAdminLogin(e) {
@@ -529,6 +549,7 @@
                 renderAdminProductsList();
                 renderAdminCategoriesList();
                 renderAdminOrdersList();
+                renderAdminInvoicesList();
             } else {
                 alert('Credenziali errate!');
             }
@@ -540,13 +561,10 @@
         }
 
         function switchAdminTab(tab) {
-            document.getElementById('admin-tab-products').classList.toggle('hidden', tab !== 'products');
-            document.getElementById('admin-tab-categories').classList.toggle('hidden', tab !== 'categories');
-            document.getElementById('admin-tab-orders').classList.toggle('hidden', tab !== 'orders');
-
-            document.getElementById('tab-btn-products').className = tab === 'products' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
-            document.getElementById('tab-btn-categories').className = tab === 'categories' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
-            document.getElementById('tab-btn-orders').className = tab === 'orders' ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            ['products', 'categories', 'orders', 'invoices'].forEach(t => {
+                document.getElementById(`admin-tab-${t}`).classList.toggle('hidden', t !== tab);
+                document.getElementById(`tab-btn-${t}`).className = t === tab ? 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black' : 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300';
+            });
         }
 
         function handleMultipleImages(e) {
@@ -687,6 +705,23 @@
                         </select>
                         <input type="text" value="${o.tracking}" onchange="updateOrderTracking('${o.id}', this.value)" placeholder="Codice Tracking" class="bg-gray-800 text-white rounded p-1">
                     </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminInvoicesList() {
+            const container = document.getElementById('admin-invoices-list');
+            if(orders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 font-mono">Nessuna fattura emessa.</p>`;
+                return;
+            }
+            container.innerHTML = orders.map(o => `
+                <div class="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs font-mono">
+                    <div>
+                        <strong class="text-white">Fattura n. ${o.number}</strong> (${o.name})
+                        <p class="text-gray-400 text-[10px]">Totale: €${o.total.toFixed(2)} - Email: ${o.email}</p>
+                    </div>
+                    <button onclick="viewOrderInvoice('${o.id}')" class="px-3 py-1.5 bg-brand-500 text-black rounded font-bold">Visualizza / Stampa</button>
                 </div>
             `).join('');
         }
