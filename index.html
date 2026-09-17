@@ -37,20 +37,28 @@
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-mono font-black text-black text-xl">LS</div>
                 <div class="flex flex-col">
                     <span class="font-bold text-lg tracking-tight">LS3Dmaker</span>
-                    <span class="text-[10px] text-gray-400 font-mono tracking-wider">CREATIVITÀ & PROTOTIPAZIONE</span>
+                    <span class="text-[10px] text-gray-400 font-mono tracking-wider" id="txt-nav-subtitle">CREATIVITÀ & PROTOTIPAZIONE</span>
                 </div>
             </a>
 
             <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
-                <a href="#prodotti" onclick="showPage('home')" class="hover:text-brand-400 transition-colors">Prodotti</a>
-                <a href="#info" onclick="showPage('home')" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
-                <a href="#traccia" onclick="showPage('home')" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
-                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors">Chi siamo?</a>
+                <a href="#prodotti" onclick="showPage('home')" class="hover:text-brand-400 transition-colors" id="nav-products">Prodotti</a>
+                <a href="#info" onclick="showPage('home')" class="hover:text-brand-400 transition-colors" id="nav-info">Richiedi Info</a>
+                <a href="#traccia" onclick="showPage('home')" class="hover:text-brand-400 transition-colors" id="nav-track">Traccia Spedizione</a>
+                <a href="#chi-siamo" onclick="showPage('chi-siamo')" class="hover:text-brand-400 transition-colors" id="nav-about">Chi siamo?</a>
             </nav>
 
             <div class="flex items-center gap-3">
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded-xl px-2 py-1.5 font-mono focus:outline-none focus:border-brand-500 cursor-pointer">
+                    <option value="it">🇮🇹 IT</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="es">🇪🇸 ES</option>
+                    <option value="de">🇩🇪 DE</option>
+                </select>
+
                 <button onclick="openCartModal()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-mono border border-brand-500/30">
-                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> Carrello
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> <span id="btn-cart-text">Carrello</span>
                     <span id="cart-badge" class="px-1.5 py-0.5 rounded-full bg-brand-500 text-black text-[10px] font-bold">0</span>
                 </button>
                 <button onclick="openAdminModal()" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700">
@@ -72,7 +80,7 @@
                         Dai forma alle Tue Idee con <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">LS3Dmaker</span>
                     </h1>
                     
-                    <!-- Spazio allargato e frase descrizione veloce inserita -->
+                    <!-- Spazio allargato e frase descrizione veloce -->
                     <div class="max-w-3xl mx-auto bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl mb-12">
                         <p class="text-brand-400 font-mono text-xs uppercase tracking-widest mb-2">Soluzioni Professionali di Stampa 3D</p>
                         <p class="text-gray-200 text-lg sm:text-xl font-medium leading-relaxed">
@@ -85,8 +93,8 @@
             <section id="prodotti" class="py-12 bg-dark-surface/30 border-y border-gray-800/80">
                 <div class="max-w-7xl mx-auto px-4">
                     <div class="mb-6">
-                        <h2 class="text-2xl font-bold text-white mb-2">Catalogo Creazioni 3D</h2>
-                        <p class="text-gray-400 text-sm mb-4">Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello.</p>
+                        <h2 class="text-2xl font-bold text-white mb-2" id="catalog-title">Catalogo Creazioni 3D</h2>
+                        <p class="text-gray-400 text-sm mb-4" id="catalog-subtitle">Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello.</p>
                         <div id="category-filters" class="flex flex-wrap gap-2"></div>
                     </div>
                     <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
@@ -160,7 +168,7 @@
         </div>
     </div>
 
-    <!-- MODALE ANTEPRIMA FATTURA -->
+    <!-- MODALE FATTURA INV24 STYLE -->
     <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -210,7 +218,7 @@
         <div class="bg-dark-card border border-gray-800 rounded-2xl max-w-4xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
 
-            <!-- SCHERMATA LOGIN ADMIN -->
+            <!-- LOGIN -->
             <div id="admin-login-view">
                 <div class="text-center mb-6">
                     <h3 class="text-2xl font-bold text-white">Accesso Riservato Admin</h3>
@@ -223,14 +231,13 @@
                 </form>
             </div>
 
-            <!-- PANNELLO DI CONTROLLO -->
+            <!-- PANNELLO -->
             <div id="admin-panel-view" class="hidden space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                     <h3 class="text-xl font-bold text-white">Dashboard Amministrazione</h3>
                     <button onclick="adminLogout()" class="text-xs text-red-400 hover:underline font-mono">Logout</button>
                 </div>
 
-                <!-- Tabs Navigazione Admin -->
                 <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-2">
                     <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-brand-500 text-black">Prodotti</button>
                     <button onclick="switchAdminTab('categories')" id="tab-btn-categories" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gray-800 text-gray-300">Categorie</button>
@@ -247,7 +254,8 @@
                             <input type="number" step="0.01" id="new-prod-price" required placeholder="Prezzo (€)" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
                         </div>
                         <input type="text" id="new-prod-shortdesc" required placeholder="Descrizione Breve (Home)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white">
-                        <textarea id="new-prod-fulldesc" rows="3" placeholder="Descrizione Dettagliata (per i dettagli del prodotto)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white"></textarea>
+                        <textarea id="new-prod-fulldesc" rows="3" placeholder="Descrizione Dettagliata (Specifiche tecniche)" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white"></textarea>
+                        
                         <div>
                             <label class="block text-gray-400 mb-1">Categorie Multiple:</label>
                             <div id="admin-category-checkboxes" class="flex flex-wrap gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700"></div>
@@ -283,12 +291,12 @@
                     <div id="admin-categories-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
                 </div>
 
-                <!-- TAB 3: ORDINI & SPEDIZIONI -->
+                <!-- TAB 3: ORDINI -->
                 <div id="admin-tab-orders" class="hidden space-y-4">
                     <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
                 </div>
 
-                <!-- TAB 4: GESTIONE FATTURE -->
+                <!-- TAB 4: FATTURE -->
                 <div id="admin-tab-invoices" class="hidden space-y-4">
                     <div id="admin-invoices-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
                 </div>
@@ -308,7 +316,7 @@
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
 
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Dettagli tecnici avanzati.", categories: ["Decorazioni"], images: [defaultImg], colors: ["Nero", "Argento"], hidden: false }
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", desc: "Realizzato con polimeri ad altissima risoluzione per garantire stabilità meccanica.", categories: ["Decorazioni"], images: [defaultImg], colors: ["Nero", "Argento"], hidden: false }
         ];
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
         let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
@@ -317,6 +325,46 @@
         let uploadedImagesList = [];
         let activeImageIndices = {};
         let selectedProductColors = {};
+        let currentLang = 'it';
+        let translatedCache = {};
+
+        const translations = {
+            it: { subtitle: "CREATIVITÀ & PROTOTIPAZIONE", products: "Prodotti", info: "Richiedi Info", track: "Traccia Spedizione", about: "Chi siamo?", cart: "Carrello", catalogTitle: "Catalogo Creazioni 3D", catalogSubtitle: "Sfoglia le nostre creazioni, scegli i colori e aggiungi al carrello." },
+            en: { subtitle: "CREATIVITY & PROTOTYPING", products: "Products", info: "Request Info", track: "Track Order", about: "About Us", cart: "Cart", catalogTitle: "3D Creations Catalog", catalogSubtitle: "Browse our creations, choose colors and add to cart." },
+            fr: { subtitle: "CRÉATIVITÉ & PROTOTYPAGE", products: "Produits", info: "Infos", track: "Suivi Commande", about: "À propos", cart: "Panier", catalogTitle: "Catalogue 3D", catalogSubtitle: "Parcourez nos créations et ajoutez au panier." },
+            es: { subtitle: "CREATIVIDAD & PROTOTIPADO", products: "Productos", info: "Info", track: "Seguimiento", about: "Sobre nosotros", cart: "Carrito", catalogTitle: "Catálogo 3D", catalogSubtitle: "Explora nuestras creaciones y añade al carrito." },
+            de: { subtitle: "KREATIVITÄT & PROTOTYPING", products: "Produkte", info: "Info", track: "Sendungsverfolgung", about: "Über uns", cart: "Warenkorb", catalogTitle: "3D-Katalog", catalogSubtitle: "Durchstöbern Sie unsere Kreationen." }
+        };
+
+        async function translateText(text, targetLang) {
+            if (!text || targetLang === 'it') return text;
+            const key = `${text}_${targetLang}`;
+            if (translatedCache[key]) return translatedCache[key];
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=it|${targetLang}`);
+                const data = await res.json();
+                if (data?.responseData?.translatedText) {
+                    translatedCache[key] = data.responseData.translatedText;
+                    return data.responseData.translatedText;
+                }
+            } catch (e) { console.error(e); }
+            return text;
+        }
+
+        async function changeLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang] || translations.it;
+            document.getElementById('txt-nav-subtitle').innerText = t.subtitle;
+            document.getElementById('nav-products').innerText = t.products;
+            document.getElementById('nav-info').innerText = t.info;
+            document.getElementById('nav-track').innerText = t.track;
+            document.getElementById('nav-about').innerText = t.about;
+            document.getElementById('btn-cart-text').innerText = t.cart;
+            document.getElementById('catalog-title').innerText = t.catalogTitle;
+            document.getElementById('catalog-subtitle').innerText = t.catalogSubtitle;
+            renderCategories();
+            await renderProducts();
+        }
 
         function renderCategories() {
             const container = document.getElementById('category-filters');
@@ -346,18 +394,23 @@
             renderProducts();
         }
 
-        function renderProducts() {
+        async function renderProducts() {
             const grid = document.getElementById('products-grid');
             const visible = products.filter(p => !p.hidden);
             const filtered = selectedCategory === "Tutti" ? visible : visible.filter(p => p.categories && p.categories.includes(selectedCategory));
-        
-            grid.innerHTML = filtered.map(p => {
+
+            let html = '';
+            for (let p of filtered) {
+                const trTitle = await translateText(p.title, currentLang);
+                const trShort = await translateText(p.shortDesc, currentLang);
+                const trFull = await translateText(p.desc, currentLang);
+
                 const imgs = (p.images && p.images.length > 0) ? p.images : [defaultImg];
                 const activeIndex = activeImageIndices[p.id] || 0;
                 const colors = p.colors || [];
                 const currentColor = selectedProductColors[p.id] || colors[0] || 'Standard';
-        
-                return `
+
+                html += `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
                         <div>
                             <div class="relative h-48 bg-gray-900 rounded-xl overflow-hidden mb-4">
@@ -371,9 +424,9 @@
                             <div class="flex flex-wrap gap-1 mb-2">
                                 ${(p.categories || []).map(c => `<span class="bg-gray-800 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-700">${c}</span>`).join('')}
                             </div>
-                            <h3 class="text-lg font-bold text-white mb-1">${p.title}</h3>
-                            <p class="text-brand-400 text-xs font-semibold mb-2">${p.shortDesc || ''}</p>
-                            <p class="text-gray-400 text-xs mb-4">${p.desc || ''}</p>
+                            <h3 class="text-lg font-bold text-white mb-1">${trTitle}</h3>
+                            <p class="text-brand-400 text-xs font-semibold mb-2">${trShort || ''}</p>
+                            <p class="text-gray-400 text-xs mb-4">${trFull || ''}</p>
                             ${colors.length > 0 ? `
                                 <div class="mb-4">
                                     <label class="block text-[10px] font-mono text-gray-400 mb-1">Seleziona Colore:</label>
@@ -392,7 +445,8 @@
                         </div>
                     </div>
                 `;
-            }).join('');
+            }
+            grid.innerHTML = html;
             lucide.createIcons();
         }
 
@@ -583,6 +637,7 @@
             const title = document.getElementById('new-prod-title').value;
             const price = parseFloat(document.getElementById('new-prod-price').value);
             const shortDesc = document.getElementById('new-prod-shortdesc').value;
+            const desc = document.getElementById('new-prod-fulldesc').value;
             const isHidden = document.getElementById('new-prod-hidden').checked;
             const selectedCats = Array.from(document.querySelectorAll('input[name="prod-categories"]:checked')).map(cb => cb.value);
             const selectedCols = Array.from(document.querySelectorAll('input[name="prod-colors"]:checked')).map(cb => cb.value);
@@ -590,13 +645,13 @@
             if (id) {
                 const p = products.find(prod => prod.id == id);
                 if (p) {
-                    p.title = title; p.price = price; p.shortDesc = shortDesc;
+                    p.title = title; p.price = price; p.shortDesc = shortDesc; p.desc = desc;
                     p.categories = selectedCats; p.colors = selectedCols; p.hidden = isHidden;
                     if(uploadedImagesList.length > 0) p.images = uploadedImagesList;
                 }
             } else {
                 products.unshift({
-                    id: Date.now(), title, price, shortDesc,
+                    id: Date.now(), title, price, shortDesc, desc,
                     categories: selectedCats, colors: selectedCols, 
                     images: uploadedImagesList.length > 0 ? uploadedImagesList : [defaultImg], hidden: isHidden
                 });
@@ -616,9 +671,8 @@
             document.getElementById('new-prod-title').value = p.title;
             document.getElementById('new-prod-price').value = p.price;
             document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
+            document.getElementById('new-prod-fulldesc').value = p.desc || '';
             document.getElementById('new-prod-hidden').checked = p.hidden || false;
-            document.getElementById('new-prod-shortdesc').value = '';
-            document.getElementById('new-prod-fulldesc').value = ''; // Pulisce la descrizione dettagliata
             document.getElementById('btn-save-prod').innerText = "Aggiorna Prodotto";
 
             document.querySelectorAll('input[name="prod-categories"]').forEach(cb => cb.checked = p.categories && p.categories.includes(cb.value));
@@ -631,8 +685,7 @@
             document.getElementById('new-prod-title').value = '';
             document.getElementById('new-prod-price').value = '';
             document.getElementById('new-prod-shortdesc').value = '';
-            document.getElementById('new-prod-shortdesc').value = p.shortDesc || '';
-            document.getElementById('new-prod-fulldesc').value = p.desc || ''; // Riempie la descrizione dettagliata
+            document.getElementById('new-prod-fulldesc').value = '';
             document.getElementById('new-prod-hidden').checked = false;
             document.getElementById('img-files-input').value = '';
             document.getElementById('btn-save-prod').innerText = "+ Salva Prodotto";
