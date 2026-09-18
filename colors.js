@@ -1,4 +1,4 @@
-// Elenco dei colori con nome e codice per il pallino visivo
+// Elenco globale dei colori con nome e codice esadecimale per i pallini visivi
 let filamentColors = JSON.parse(localStorage.getItem('ls3d_filament_colors')) || [
     { name: "Nero Opaco", code: "#111827" },
     { name: "Bianco Perla", code: "#f3f4f6" },
