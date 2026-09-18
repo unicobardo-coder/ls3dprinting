@@ -23,7 +23,6 @@
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     colors: {
                         brand: { 500: '#10b981', 400: '#34d399', 600: '#059669' },
-                        accent: { 500: '#06b6d4', 400: '#22d3ee' },
                         dark: { bg: '#070b14', card: '#0d1322', surface: '#131c31' }
                     }
                 }
@@ -35,10 +34,10 @@
 
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
         <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-3 group">
-                <img src="logo.png" alt="LS3Dmaker Logo" class="h-12 sm:h-14 object-contain">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.svg" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain">
             </a>
-            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all" data-i18n="backToCatalog">
+            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all">
                 ← Torna al Catalogo
             </a>
         </div>
@@ -47,6 +46,7 @@
     <main class="py-16 px-4 flex-grow">
         <div class="max-w-2xl mx-auto space-y-6">
             
+            <!-- FORM CHECKOUT -->
             <div id="checkout-form-section" class="bg-dark-card border border-brand-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl">
                 <h2 class="text-2xl font-bold mb-6 text-white tracking-tight">Checkout & Spedizione</h2>
                 
@@ -58,7 +58,7 @@
                         <input type="text" id="chk-name" required placeholder="Mario Rossi" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Email (per riepilogo e PDF fattura) *</label>
+                        <label class="block text-gray-400 mb-1 font-mono">Email (per conferma ordine e fattura) *</label>
                         <input type="email" id="chk-email" required placeholder="mario@example.com" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                     <div>
@@ -78,77 +78,39 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-sm mt-4 transition-all shadow-lg shadow-brand-500/10">Procedi al Pagamento</button>
+                    <!-- ACCETTAZIONE GDPR / PRIVACY (Stile Iubenda) -->
+                    <div class="pt-2 border-t border-gray-800 space-y-2">
+                        <label class="flex items-start gap-3 cursor-pointer text-gray-300 select-none">
+                            <input type="checkbox" id="chk-gdpr" required class="mt-0.5 w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 focus:ring-offset-dark-bg cursor-pointer">
+                            <span class="text-[11px] leading-relaxed">
+                                Dichiaro di aver preso visione dell'<a href="#" target="_blank" class="text-brand-400 underline hover:text-brand-300">Informativa Privacy</a> e acconsento al trattamento dei miei dati personali ai sensi del Regolamento UE 2016/679 (GDPR) per l'evasione dell'ordine e la fatturazione. *
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-sm mt-4 transition-all shadow-lg shadow-brand-500/10 cursor-pointer">Procedi al Pagamento</button>
                 </form>
             </div>
 
+            <!-- SEZIONE IN ATTESA DI PAGAMENTO -->
             <div id="pending-payment-section" class="hidden bg-dark-card border border-brand-500/50 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-4 font-mono">
                 <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">⏳</div>
-                <h3 class="text-xl font-bold text-white font-sans">In attesa di verifica pagamento</h3>
+                <h3 class="text-xl font-bold text-white font-sans">Ordine Registrato - In Attesa di Pagamento</h3>
                 <p class="text-xs text-gray-300 leading-relaxed font-sans">
                     Totale da versare: <strong class="text-brand-400 text-sm font-mono" id="pending-total">€0.00</strong><br>
                     Effettua il pagamento tramite PayPal a:<br>
                     <span class="text-brand-400 font-bold select-all text-sm">unicobardo@gmail.com</span>
                 </p>
                 <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-[11px] text-left font-sans">
-                    ⚠️ <strong>Regola Fiscale:</strong> Fatture ed email di conferma vengono generate ed emesse <strong>solo dopo la verifica manuale del pagamento</strong>.
+                    ℹ️ L'ordine è stato registrato nel pannello amministrativo. Una volta verificato il pagamento, l'amministratore emetterà la fattura ufficiale e la invierà via email.
                 </div>
                 <div class="flex flex-col gap-3 pt-2">
                     <a href="https://www.paypal.com/signin" target="_blank" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs font-sans">
                         Apri PayPal per pagare
                     </a>
-                    <button onclick="verifyAndEmitInvoice()" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-sans">
-                        Ho pagato (Genera Fattura & Invia Email)
+                    <button onclick="finalizeOrder()" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-sans">
+                        Ho Effettuato il Pagamento (Torna alla Home)
                     </button>
-                </div>
-            </div>
-
-            <div id="invoice-preview-section" class="hidden bg-dark-card border border-brand-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-4">
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-brand-500/20 text-brand-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-2">✓</div>
-                    <h3 class="text-xl font-bold text-white">Pagamento Verificato & Fattura Emessa!</h3>
-                    <p class="text-xs text-gray-400">La fattura è stata emessa e inviata via email come allegato PDF.</p>
-                </div>
-
-                <div id="invoice-paper" class="bg-white text-gray-900 p-6 rounded-xl font-sans text-xs space-y-4">
-                    <div class="flex justify-between items-start border-b pb-4">
-                        <div>
-                            <img src="logo.svg" alt="Logo" class="h-12 object-contain mb-1">
-                            <p class="text-[10px] text-gray-500 font-mono">3D Printing & Prototyping</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-sm" id="inv-number">Fattura n. -</p>
-                            <p class="text-gray-500" id="inv-date">Data: Oggi</p>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-gray-500">Intestata a:</p>
-                        <p class="font-bold" id="inv-client">[Nome]</p>
-                        <p class="text-gray-600" id="inv-address">[Indirizzo]</p>
-                        <p class="text-green-600 font-mono text-[10px] mt-1">Metodo: PayPal - PAGATO</p>
-                    </div>
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b font-bold text-gray-700">
-                                <th class="py-1">Descrizione</th>
-                                <th class="py-1 text-center">Qtà</th>
-                                <th class="py-1 text-right">Prezzo</th>
-                                <th class="py-1 text-right">Totale</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inv-items"></tbody>
-                    </table>
-                    <div class="text-right space-y-1 border-t pt-4 font-mono">
-                        <p>Imponibile: <span id="inv-sub">€0.00</span></p>
-                        <p>Spedizione: <span id="inv-ship">€0.00</span></p>
-                        <p class="font-bold text-sm text-black">Totale Documento: <span id="inv-tot">€0.00</span></p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                    <button onclick="window.print()" class="py-3 bg-brand-500 text-black font-bold rounded-xl text-xs hover:bg-brand-400">🖨️ Stampa / Salva PDF</button>
-                    <button onclick="downloadFatturaXML()" class="py-3 bg-accent-500 hover:bg-accent-400 text-black font-bold rounded-xl text-xs font-mono">📥 Scarica XML (SdI)</button>
-                    <a href="index.html" class="py-3 bg-dark-bg text-gray-300 font-bold rounded-xl text-xs text-center flex items-center justify-center hover:bg-gray-800 border border-gray-700">🏠 Torna alla Home</a>
                 </div>
             </div>
 
@@ -159,12 +121,11 @@
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <p class="font-bold text-white">LS3DMAKER © 2026</p>
             <div class="flex gap-6 font-mono">
-                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Catalogo</a>
             </div>
         </div>
     </footer>
 
-    <script src="i18n.js"></script>
     <script>
         const EMAILJS_SERVICE_ID = "TUO_SERVICE_ID";
         const EMAILJS_TEMPLATE_ID = "TUO_TEMPLATE_ID";
@@ -194,6 +155,13 @@
             e.preventDefault();
             if (cart.length === 0) { alert("Il carrello è vuoto!"); return; }
 
+            // Verifica spunta GDPR
+            const gdprChecked = document.getElementById('chk-gdpr').checked;
+            if (!gdprChecked) {
+                alert("È necessario accettare l'informativa sulla privacy per procedere.");
+                return;
+            }
+
             lastInvoiceNum++;
             localStorage.setItem('ls3d_invoice_num', lastInvoiceNum);
 
@@ -211,108 +179,33 @@
                 items: [...cart],
                 subtotal: subtotal,
                 total: subtotal + shippingCost,
-                status: "Pagato",
-                tracking: "In lavorazione"
+                status: "In attesa pagamento",
+                tracking: "In lavorazione",
+                date: new Date().toISOString().split('T')[0]
             };
+
+            // Salva l'ordine nella dashboard admin
+            orders.unshift(currentOrderData);
+            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
+            localStorage.removeItem('ls3d_cart');
+
+            // Invia email di notifica ordine ricevuto
+            const itemsDescription = currentOrderData.items.map(i => `${i.qty}x ${i.title} [${i.color}] (€${(i.price * i.qty).toFixed(2)})`).join(', ');
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                customer_name: currentOrderData.name,
+                customer_email: currentOrderData.email,
+                message_details: `Nuovo ordine ricevuto. Articoli: ${itemsDescription}. Spedizione: €${currentOrderData.shipping.toFixed(2)}`,
+                order_total: `€${currentOrderData.total.toFixed(2)}`
+            }).catch(err => console.log("Email inviata o simulata", err));
 
             document.getElementById('checkout-form-section').classList.add('hidden');
             document.getElementById('pending-payment-section').classList.remove('hidden');
             document.getElementById('pending-total').innerText = `€${currentOrderData.total.toFixed(2)}`;
         }
 
-        function verifyAndEmitInvoice() {
-            if (!currentOrderData) return;
-
-            orders.unshift(currentOrderData);
-            localStorage.setItem('ls3d_orders', JSON.stringify(orders));
-            localStorage.removeItem('ls3d_cart');
-
-            document.getElementById('inv-number').innerText = `Fattura n. ${currentOrderData.number}`;
-            document.getElementById('inv-client').innerText = currentOrderData.name;
-            document.getElementById('inv-address').innerText = currentOrderData.address;
-            document.getElementById('inv-sub').innerText = `€${currentOrderData.subtotal.toFixed(2)}`;
-            document.getElementById('inv-ship').innerText = `€${currentOrderData.shipping.toFixed(2)}`;
-            document.getElementById('inv-tot').innerText = `€${currentOrderData.total.toFixed(2)}`;
-
-            let html = currentOrderData.items.map(i => `
-                <tr class="border-b">
-                    <td class="py-1">${i.title} (${i.color})</td>
-                    <td class="py-1 text-center">${i.qty}</td>
-                    <td class="py-1 text-right">€${i.price.toFixed(2)}</td>
-                    <td class="py-1 text-right">€${(i.price * i.qty).toFixed(2)}</td>
-                </tr>
-            `).join('');
-            if(currentOrderData.shipping > 0) {
-                html += `<tr class="border-b text-gray-500"><td class="py-1">Spedizione</td><td class="py-1 text-center">1</td><td class="py-1 text-right">€${currentOrderData.shipping.toFixed(2)}</td><td class="py-1 text-right">€${currentOrderData.shipping.toFixed(2)}</td></tr>`;
-            }
-            document.getElementById('inv-items').innerHTML = html;
-
-            const element = document.getElementById('invoice-paper');
-            const opt = {
-                margin: 10,
-                filename: `Fattura_${currentOrderData.number.replace('/', '-')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().from(element).outputPdf('datauristring').then(function(pdfBase64) {
-                const itemsDescription = currentOrderData.items.map(i => `${i.qty}x ${i.title} [${i.color}] (€${(i.price * i.qty).toFixed(2)})`).join(', ');
-
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    customer_name: currentOrderData.name,
-                    customer_email: currentOrderData.email,
-                    customer_phone: currentOrderData.phone,
-                    customer_address: currentOrderData.address,
-                    message_details: itemsDescription + ` (Spedizione: €${currentOrderData.shipping.toFixed(2)})`,
-                    order_total: `€${currentOrderData.total.toFixed(2)}`,
-                    content_pdf: pdfBase64
-                }).then(() => console.log("Fattura emessa e inviata via email correttamente!"));
-            });
-
-            document.getElementById('pending-payment-section').classList.add('hidden');
-            document.getElementById('invoice-preview-section').classList.remove('hidden');
-        }
-
-        function downloadFatturaXML() {
-            if (!currentOrderData) return;
-            const today = new Date().toISOString().split('T')[0];
-            const numeroFattura = currentOrderData.number.split('/')[0];
-            const imponibile = currentOrderData.subtotal.toFixed(2);
-            const aliquotaIVA = "22.00";
-            const ivamgr = (currentOrderData.subtotal * 0.22).toFixed(2);
-
-            let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-<p:FatturaElettronica versione="FPR12" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <FatturaElettronicaHeader>
-        <DatiTrasmissione>
-            <IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>TUA_PARTITA_IVA</IdCodice></IdTrasmittente>
-            <ProgressivoInvio>${currentOrderData.id}</ProgressivoInvio>
-            <FormatoTrasmissione>FPR12</FormatoTrasmissione>
-            <CodiceDestinatario>0000000</CodiceDestinatario>
-        </DatiTrasmissione>
-        <CedentePrestatore><DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>TUA_PARTITA_IVA</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3DMAKER</Denominazione></Anagrafica><RegimeFiscale>RF19</RegimeFiscale></DatiAnagrafici></CedentePrestatore>
-        <CessionarioCommittente><DatiAnagrafici><Anagrafica><Denominazione>${currentOrderData.name}</Denominazione></Anagrafica></DatiAnagrafici></CessionarioCommittente>
-    </FatturaElettronicaHeader>
-    <FatturaElettronicaBody>
-        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${today}</Data><Numero>${numeroFattura}</Numero><ImportoTotaleDocumento>${currentOrderData.total.toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
-        <DatiBeniServizi>`;
-
-            currentOrderData.items.forEach((item, index) => {
-                xmlContent += `<DettaglioLinee><NumeroLinea>${index+1}</NumeroLinea><Descrizione>${item.title} (${item.color})</Descrizione><Quantita>${item.qty}.00</Quantita><PrezzoUnitario>${item.price.toFixed(2)}</PrezzoUnitario><PrezzoTotale>${(item.price * item.qty).toFixed(2)}</PrezzoTotale><AliquotaIVA>${aliquotaIVA}</AliquotaIVA></DettaglioLinee>`;
-            });
-
-            xmlContent += `</DatiBeniServizi>
-    </FatturaElettronicaBody>
-</p:FatturaElettronica>`;
-
-            const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `IT_FATT_${currentOrderData.number.replace('/', '-')}.xml`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function finalizeOrder() {
+            alert("Ordine registrato con successo! Verrai reindirizzato al catalogo.");
+            window.location.href = "index.html";
         }
 
         renderCheckoutSummary();
