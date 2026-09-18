@@ -28,25 +28,17 @@
     <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
         <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-            <!-- Logo & Brand -->
-            <a href="index.html" class="flex items-center gap-3 group">
-                <img src="logo.png" alt="LS3Dmaker Logo" class="h-12 object-contain">
-                <div class="flex flex-col">
-                    <span class="font-extrabold tracking-wider text-white text-base">LS3DMAKER</span>
-                    <span class="text-[9px] font-mono tracking-widest text-brand-400 uppercase">3D Prints and Prototypes</span>
-                </div>
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.svg" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain">
             </a>
 
-            <!-- Nav Links -->
             <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
                 <a href="index.html" class="text-white hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
                 <a href="chisiamo.html" class="hover:text-brand-400 transition-colors" data-i18n="navAbout">Chi Siamo</a>
                 <a href="info.html" class="hover:text-brand-400 transition-colors" data-i18n="navQuote">Preventivi</a>
             </nav>
 
-            <!-- Right Actions (Language, Cart, Admin) -->
             <div class="flex items-center gap-3">
-                <!-- Selettore Lingua (Default: IT) -->
                 <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-dark-surface border border-gray-800 text-xs font-mono text-gray-300">
                     <select id="lang-select" onchange="setLanguage(this.value)" class="bg-transparent text-gray-300 focus:outline-none cursor-pointer">
                         <option value="it" class="bg-dark-bg text-white">🇮🇹 IT</option>
@@ -56,14 +48,12 @@
                     </select>
                 </div>
 
-                <!-- Carrello -->
                 <button onclick="openCartModal()" class="relative px-4 py-2 bg-dark-surface rounded-xl border border-gray-800 hover:border-brand-500/50 transition-all flex items-center gap-2 text-xs font-medium">
                     <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i>
                     <span data-i18n="cartTitle">Carrello</span>
                     <span id="cart-badge" class="bg-brand-500 text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center font-mono">0</span>
                 </button>
 
-                <!-- Admin Button -->
                 <a href="admin.html" class="px-3.5 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 transition-all flex items-center gap-2 text-xs font-medium text-gray-300">
                     <i data-lucide="user" class="w-4 h-4 text-gray-400"></i>
                     <span class="hidden sm:inline" data-i18n="navAdmin">Admin</span>
@@ -72,24 +62,25 @@
         </div>
     </header>
 
-    <!-- HERO SECTION -->
-    <section class="relative py-24 px-4 overflow-hidden bg-gradient-to-b from-dark-bg via-[#0b1220] to-dark-bg border-b border-gray-800/50">
+    <!-- HERO SECTION CON CUBI E LINEE GEOMETRICHE -->
+    <section class="relative py-28 px-4 overflow-hidden bg-gradient-to-b from-dark-bg via-[#07101e] to-dark-bg border-b border-gray-800/50">
+        <div class="absolute -left-20 top-1/2 -translate-y-1/2 w-72 h-72 border border-brand-500/20 rounded-3xl rotate-12 pointer-events-none hidden lg:block bg-gradient-to-br from-brand-500/5 to-transparent backdrop-blur-sm shadow-[0_0_50px_rgba(16,185,129,0.05)]"></div>
+        <div class="absolute -right-20 top-1/2 -translate-y-1/2 w-72 h-72 border border-brand-500/20 rounded-3xl -rotate-12 pointer-events-none hidden lg:block bg-gradient-to-bl from-brand-500/5 to-transparent backdrop-blur-sm shadow-[0_0_50px_rgba(16,185,129,0.05)]"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1f293d15_1px,transparent_1px),linear-gradient(to_bottom,#1f293d15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
+
         <div class="max-w-4xl mx-auto text-center space-y-8 relative z-10">
-            <!-- Badge superiore -->
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-dark-surface border border-brand-500/30 text-brand-400 text-xs font-mono tracking-wider uppercase shadow-lg shadow-brand-500/5">
                 <i data-lucide="box" class="w-3.5 h-3.5"></i>
                 <span data-i18n="heroBadge">Soluzioni di Stampa 3D & Prototipazione</span>
             </div>
 
-            <!-- Titolo principale -->
             <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight">
                 <span data-i18n="heroTitle1">Trasforma le tue idee in</span> <br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-200" data-i18n="heroTitle2">Stampe 3D</span>
             </h1>
 
-            <!-- Box di descrizione centrale con bordo sfumato -->
-            <div class="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-dark-card/60 backdrop-blur-md border border-brand-500/30 shadow-2xl space-y-3">
-                <p class="text-[11px] font-mono tracking-widest text-brand-400 uppercase" data-i18n="heroBadge">Servizio Professionale di Stampa 3D</p>
+            <div class="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-dark-card/80 backdrop-blur-md border border-brand-500/30 shadow-[0_0_30px_rgba(16,185,129,0.08)] space-y-3">
+                <p class="text-[11px] font-mono tracking-widest text-brand-400 uppercase">Professional 3D Printing Service</p>
                 <p class="text-xs sm:text-sm text-gray-300 leading-relaxed font-light" data-i18n="heroDesc">
                     Trasformiamo i tuoi progetti digitali in oggetti reali con materiali ad alta precisione e tecnologie avanzate, producendo stampe rapide e affidabili in ogni dettaglio.
                 </p>
@@ -140,13 +131,13 @@
         </div>
     </footer>
 
-    <!-- Inclusione dello script per la gestione multilingua (Default: italiano) -->
+    <script src="colors.js"></script>
     <script src="i18n.js"></script>
 
     <script>
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
         let products = JSON.parse(localStorage.getItem('ls3d_products')) || [
-            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, shortDesc: "Design geometrico futurista.", colors: ["Nero Opaco", "Bianco Perla", "Grigio Techno"], images: [defaultImg], hidden: false }
+            { id: 1, title: "Fermalibri Cyber Geometry", price: 34.90, category: "Design", shortDesc: "Design geometrico futurista.", images: [defaultImg], hidden: false }
         ];
         let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
 
@@ -159,9 +150,8 @@
                 return;
             }
 
-            // Traduzione dinamica del testo pulsante in base alla lingua attiva
-            const btnText = (typeof translations !== 'undefined' && translations[currentLang]?.addToCart) ? translations[currentLang].addToCart : "Aggiungi al Carrello";
-            const colorLabel = (typeof translations !== 'undefined' && translations[currentLang]?.filamentColor) ? translations[currentLang].filamentColor : "Colore Filamento:";
+            const btnText = translations[currentLang]?.addToCart || "Aggiungi al Carrello";
+            const colorLabel = translations[currentLang]?.filamentColor || "Colore Filamento:";
 
             grid.innerHTML = activeProducts.map(p => `
                 <div class="bg-dark-card border border-gray-800/80 hover:border-brand-500/40 transition-all rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group">
@@ -170,6 +160,9 @@
                             <img src="${p.images?.[0] || defaultImg}" alt="${p.title}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <div class="p-5 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-dark-bg text-brand-400 border border-gray-800">${p.category || 'Generale'}</span>
+                            </div>
                             <h3 class="font-bold text-white text-base">${p.title}</h3>
                             <p class="text-xs text-gray-400 leading-relaxed">${p.shortDesc || ''}</p>
                             <p class="font-mono font-bold text-brand-400 text-sm pt-1">€${p.price.toFixed(2)}</p>
@@ -179,7 +172,7 @@
                         <div>
                             <label class="block text-[10px] font-mono text-gray-400 mb-1">${colorLabel}</label>
                             <select id="color-select-${p.id}" class="w-full bg-dark-bg border border-gray-700/80 text-white rounded-xl px-3 py-2 text-xs font-mono focus:border-brand-500 focus:outline-none">
-                                ${(p.colors || ["Standard"]).map(c => `<option value="${c}">${c}</option>`).join('')}
+                                ${(typeof filamentColors !== 'undefined' ? filamentColors : ["Standard"]).map(c => `<option value="${c}">${c}</option>`).join('')}
                             </select>
                         </div>
                         <button onclick="addToCart(${p.id})" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg shadow-brand-500/10">${btnText}</button>
@@ -192,7 +185,6 @@
         function addToCart(prodId) {
             const product = products.find(p => p.id === prodId);
             if (!product) return;
-
             const colorSelect = document.getElementById(`color-select-${prodId}`);
             const selectedColor = colorSelect ? colorSelect.value : "Standard";
 
@@ -200,13 +192,7 @@
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({
-                    id: product.id,
-                    title: product.title,
-                    price: product.price,
-                    color: selectedColor,
-                    qty: 1
-                });
+                cart.push({ id: product.id, title: product.title, price: product.price, color: selectedColor, qty: 1 });
             }
             saveCart();
             openCartModal();
@@ -249,20 +235,8 @@
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
-        function closeCartModal() {
-            document.getElementById('cart-modal').classList.add('hidden');
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            saveCart();
-            openCartModal();
-        }
-
-        // Sovrascriviamo l'inizializzazione della lingua per avere l'italiano come default assoluto se non scelto
-        if (!localStorage.getItem('ls3d_lang')) {
-            localStorage.setItem('ls3d_lang', 'it');
-        }
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        function removeFromCart(index) { cart.splice(index, 1); saveCart(); openCartModal(); }
 
         renderProducts();
         updateCartBadge();
