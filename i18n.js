@@ -1,4 +1,3 @@
-// Dizionario multilingua per LS3Dmaker (Italiano, Inglese, Spagnolo, Francese)
 const translations = {
     it: {
         flag: "🇮🇹",
@@ -86,7 +85,6 @@ const translations = {
     }
 };
 
-// Gestione della lingua attiva (salvata in localStorage)
 let currentLang = localStorage.getItem('ls3d_lang') || 'it';
 
 function setLanguage(lang) {
@@ -94,30 +92,24 @@ function setLanguage(lang) {
         currentLang = lang;
         localStorage.setItem('ls3d_lang', lang);
         updatePageTexts();
+        if (typeof renderProducts === 'function') renderProducts();
     }
 }
 
-// Funzione che aggiorna i testi della pagina in base agli attributi data-i18n
 function updatePageTexts() {
     const t = translations[currentLang];
     if (!t) return;
-
-    // Aggiorna tutti gli elementi con attributo data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (t[key]) {
-            el.innerHTML = t[key];
-        }
+        if (t[key]) el.innerHTML = t[key];
     });
-
-    // Aggiorna il selettore della lingua se presente nella pagina
     const selectEl = document.getElementById('lang-select');
-    if (selectEl) {
-        selectEl.value = currentLang;
-    }
+    if (selectEl) selectEl.value = currentLang;
 }
 
-// Inizializzazione automatica al caricamento del DOM
 document.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem('ls3d_lang')) {
+        localStorage.setItem('ls3d_lang', 'it');
+    }
     updatePageTexts();
 });
