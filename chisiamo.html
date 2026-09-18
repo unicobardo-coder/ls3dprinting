@@ -25,30 +25,24 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
         <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
-                <img src="logo.png" alt="LS3Dmaker Logo" class="h-12 object-contain">
-                <div class="flex flex-col">
-                    <span class="font-extrabold tracking-wider text-white text-base">LS3DMAKER</span>
-                    <span class="text-[9px] font-mono tracking-widest text-brand-400 uppercase">3D Prints and Prototypes</span>
-                </div>
+                <img src="logo.svg" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain">
             </a>
 
             <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
-                <a href="index.html" class="hover:text-brand-400 transition-colors">Products</a>
-                <a href="chisiamo.html" class="text-white hover:text-brand-400 transition-colors">About</a>
-                <a href="info.html" class="hover:text-brand-400 transition-colors">Quote Request</a>
+                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
+                <a href="chisiamo.html" class="text-white hover:text-brand-400 transition-colors" data-i18n="navAbout">Chi Siamo</a>
+                <a href="info.html" class="hover:text-brand-400 transition-colors" data-i18n="navQuote">Preventivi</a>
             </nav>
 
-            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all">
-                ← Back to Catalog
+            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all" data-i18n="backToCatalog">
+                ← Torna al Catalogo
             </a>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="py-20 px-4 flex-grow max-w-4xl mx-auto space-y-12">
         <div class="text-center space-y-4">
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-dark-surface border border-brand-500/30 text-brand-400 text-xs font-mono uppercase tracking-wider">
@@ -76,28 +70,19 @@
                     <p class="text-gray-400">Fully structured invoices, PDF generation, and XML records fully aligned with compliance standards.</p>
                 </div>
             </div>
-            <p class="pt-2">
-                Whether you need a unique piece of home design or functional industrial prototypes, we are equipped to bring your blueprints to life. Get in touch for custom projects!
-            </p>
-        </div>
-
-        <div class="text-center">
-            <a href="info.html" class="inline-block px-8 py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg shadow-brand-500/10">
-                Contact Us for a Project
-            </a>
         </div>
     </main>
 
-    <!-- FOOTER -->
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <p class="font-bold text-white">LS3DMAKER © 2026</p>
             <div class="flex gap-6 font-mono">
-                <a href="index.html" class="hover:text-brand-400 transition-colors">Catalog</a>
-                <a href="info.html" class="hover:text-brand-400 transition-colors">Contact</a>
+                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
+                <a href="info.html" class="hover:text-brand-400 transition-colors" data-i18n="navQuote">Preventivi</a>
             </div>
         </div>
     </footer>
+    <script src="i18n.js"></script>
     <script>lucide.createIcons();</script>
 </body>
 </html>
