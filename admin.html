@@ -30,7 +30,7 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen p-4 sm:p-8 flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- SEZIONE LOGIN (VISIBILE DI DEFAULT, PASSWORD OBBLIGATORIA) -->
+    <!-- SEZIONE LOGIN (PASSWORD OBBLIGATORIA: ls3d2026) -->
     <div id="login-section" class="max-w-md mx-auto my-auto w-full bg-dark-card border border-brand-500/30 p-8 rounded-2xl space-y-6 shadow-2xl backdrop-blur-md">
         <div class="text-center space-y-2">
             <h1 class="text-2xl font-bold text-white tracking-tight">Area Riservata Admin</h1>
@@ -45,7 +45,7 @@
         </form>
     </div>
 
-    <!-- DASHBOARD (NASCOSTA FINCHÉ NON SI INSERISCE LA PASSWORD) -->
+    <!-- DASHBOARD ADMIN -->
     <div id="admin-dashboard" class="max-w-6xl mx-auto space-y-6 w-full hidden">
         
         <div class="flex flex-col sm:flex-row justify-between items-center bg-dark-card border border-brand-500/30 p-6 rounded-2xl shadow-2xl backdrop-blur-md gap-4">
@@ -67,7 +67,7 @@
             <button onclick="switchTab('invoices')" id="tab-btn-invoices" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">📄 Fatture & Email</button>
         </div>
 
-        <!-- SCHEDA 1: PRODOTTI -->
+        <!-- SCHEDA 1: PRODOTTI (Categorie Multiple, Colori, Foto PC) -->
         <div id="tab-content-products" class="admin-tab-content space-y-6">
             <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
                 <h2 id="form-title" class="text-lg font-bold text-white">Aggiungi / Modifica Prodotto</h2>
@@ -85,15 +85,21 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Categoria</label>
-                            <select id="prod-category" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Carica Immagini dal PC</label>
-                            <input type="file" id="prod-images-file" multiple accept="image/*" onchange="handleImageUpload(event)" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2 text-gray-300 text-xs cursor-pointer">
-                        </div>
+                    <!-- SELEZIONE CATEGORIE MULTIPLE -->
+                    <div>
+                        <label class="block text-gray-400 mb-2 font-mono">Categorie (Seleziona una o più categorie) *</label>
+                        <div id="categories-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-dark-bg p-3 rounded-xl border border-gray-700/80 max-h-36 overflow-y-auto"></div>
+                    </div>
+
+                    <!-- SELEZIONE COLORI DISPONIBILI PER IL PRODOTTO -->
+                    <div>
+                        <label class="block text-gray-400 mb-2 font-mono">Colori Filamento Disponibili per questo Prodotto</label>
+                        <div id="colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-dark-bg p-3 rounded-xl border border-gray-700/80 max-h-36 overflow-y-auto"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 mb-1 font-mono">Carica Immagini dal PC</label>
+                        <input type="file" id="prod-images-file" multiple accept="image/*" onchange="handleImageUpload(event)" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2 text-gray-300 text-xs cursor-pointer">
                     </div>
 
                     <div id="image-preview-container" class="hidden space-y-2 p-3 bg-dark-bg rounded-xl border border-gray-800">
@@ -112,7 +118,7 @@
                     </div>
 
                     <div class="flex gap-3 pt-2">
-                        <button type="submit" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg">Salva Prodotto</button>
+                        <button type="submit" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
                         <button type="button" onclick="resetForm()" class="px-4 py-3 bg-dark-surface text-gray-300 rounded-xl text-xs hover:bg-gray-800 transition-colors">Annulla</button>
                     </div>
                 </form>
@@ -124,13 +130,13 @@
             </div>
         </div>
 
-        <!-- SCHEDA 2: CATEGORIE -->
+        <!-- SCHEDA 2: GESTIONE CATEGORIE -->
         <div id="tab-content-categories" class="admin-tab-content space-y-6 hidden">
             <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
                 <h2 class="text-lg font-bold text-white">Gestione Categorie</h2>
                 <div class="flex gap-3">
-                    <input type="text" id="new-category-name" placeholder="Nome nuova categoria" class="flex-1 bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
-                    <button onclick="addNewCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs">Aggiungi</button>
+                    <input type="text" id="new-category-name" placeholder="Nome nuova categoria (es. Gadget Tech)" class="flex-1 bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
+                    <button onclick="addNewCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs">Crea Categoria</button>
                 </div>
                 <div id="categories-list-container" class="space-y-2 pt-2"></div>
             </div>
@@ -180,7 +186,6 @@
         let currentTempImages = [];
         let currentMainImageIndex = 0;
 
-        // CONTROLLO ACCESSO BLINDATO: Richiede SEMPRE la password all'apertura
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('login-section').classList.remove('hidden');
@@ -188,8 +193,7 @@
 
         function checkPassword(e) {
             e.preventDefault();
-            const passInput = document.getElementById('admin-pass').value;
-            if (passInput === ADMIN_PASSWORD) {
+            if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 showAdminDashboard();
@@ -206,7 +210,8 @@
         }
 
         function showAdminDashboard() {
-            renderCategoriesSelect();
+            renderCategoriesCheckboxes();
+            renderColorsCheckboxes();
             renderAdminProducts();
             renderAdminCategories();
             renderAdminColorsWithDots();
@@ -221,6 +226,29 @@
                 const btn = document.getElementById(`tab-btn-${t}`);
                 btn.className = t === tabName ? "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg" : "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800";
             });
+        }
+
+        // Render checkbox categorie multiple nel form prodotto
+        function renderCategoriesCheckboxes(selectedCategories = []) {
+            const container = document.getElementById('categories-checkboxes');
+            container.innerHTML = categories.map(cat => `
+                <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white">
+                    <input type="checkbox" name="product-categories" value="${cat}" ${selectedCategories.includes(cat) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500">
+                    <span>${cat}</span>
+                </label>
+            `).join('');
+        }
+
+        // Render checkbox colori nel form prodotto
+        function renderColorsCheckboxes(selectedColors = []) {
+            const container = document.getElementById('colors-checkboxes');
+            container.innerHTML = filamentColors.map(c => `
+                <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white">
+                    <input type="checkbox" name="product-colors" value="${c.name}" ${selectedColors.length === 0 || selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500">
+                    <span class="w-3 h-3 rounded-full inline-block border border-gray-600" style="background-color: ${c.code || '#10b981'}"></span>
+                    <span>${c.name}</span>
+                </label>
+            `).join('');
         }
 
         function handleImageUpload(e) {
@@ -264,10 +292,6 @@
             renderImagePreviews();
         }
 
-        function renderCategoriesSelect() {
-            document.getElementById('prod-category').innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-        }
-
         function renderAdminCategories() {
             document.getElementById('categories-list-container').innerHTML = categories.map(cat => `
                 <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
@@ -275,7 +299,7 @@
                     <button onclick="deleteCategory('${cat}')" class="text-red-400 hover:text-red-300">Elimina</button>
                 </div>
             `).join('');
-            renderCategoriesSelect();
+            renderCategoriesCheckboxes();
         }
 
         function addNewCategory() {
@@ -305,6 +329,7 @@
                     <button onclick="deleteColorItem('${c.name}')" class="text-red-400 hover:text-red-300">✕</button>
                 </div>
             `).join('');
+            renderColorsCheckboxes();
         }
 
         function addNewColorItem() {
@@ -330,13 +355,14 @@
             }
             container.innerHTML = products.map(p => {
                 const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
+                const cats = Array.isArray(p.categories) ? p.categories.join(', ') : (p.category || 'Generale');
                 return `
                     <div class="flex justify-between items-center p-4 bg-dark-bg rounded-xl border border-gray-800 text-xs">
                         <div class="flex items-center gap-3">
                             <img src="${mainImg}" class="w-12 h-12 object-cover rounded-lg border border-gray-700">
                             <div>
                                 <p class="font-bold text-white text-sm">${p.title}</p>
-                                <p class="text-brand-400 font-mono">€${p.price.toFixed(2)} | Categoria: ${p.category || 'Generale'}</p>
+                                <p class="text-brand-400 font-mono">€${p.price.toFixed(2)} | Categorie: ${cats}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -353,9 +379,18 @@
             const id = document.getElementById('prod-id').value;
             const title = document.getElementById('prod-title').value;
             const price = parseFloat(document.getElementById('prod-price').value);
-            const category = document.getElementById('prod-category').value;
             const shortDesc = document.getElementById('prod-shortdesc').value;
             const longDesc = document.getElementById('prod-longdesc').value;
+
+            // Raccogli categorie spuntate
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(cb => cb.value);
+            if (selectedCategories.length === 0) {
+                alert("Seleziona almeno una categoria per il prodotto.");
+                return;
+            }
+
+            // Raccogli colori spuntati
+            const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(cb => cb.value);
 
             let imagesToSave = currentTempImages;
             let mainIndexToSave = currentMainImageIndex;
@@ -365,7 +400,8 @@
                 if (p) {
                     p.title = title;
                     p.price = price;
-                    p.category = category;
+                    p.categories = selectedCategories;
+                    p.colors = selectedColors;
                     p.shortDesc = shortDesc;
                     p.longDesc = longDesc;
                     if (imagesToSave.length > 0) {
@@ -379,7 +415,8 @@
                     id: newId,
                     title,
                     price,
-                    category,
+                    categories: selectedCategories,
+                    colors: selectedColors,
                     shortDesc,
                     longDesc,
                     images: imagesToSave.length > 0 ? imagesToSave : [defaultImg],
@@ -399,10 +436,15 @@
             document.getElementById('prod-id').value = p.id;
             document.getElementById('prod-title').value = p.title;
             document.getElementById('prod-price').value = p.price;
-            document.getElementById('prod-category').value = p.category || categories[0];
             document.getElementById('prod-shortdesc').value = p.shortDesc || '';
             document.getElementById('prod-longdesc').value = p.longDesc || '';
             
+            const prodCats = p.categories || (p.category ? [p.category] : [categories[0]]);
+            renderCategoriesCheckboxes(prodCats);
+
+            const prodCols = p.colors || [];
+            renderColorsCheckboxes(prodCols);
+
             currentTempImages = p.images || [];
             currentMainImageIndex = p.mainImageIndex || 0;
             if (currentTempImages.length > 0) {
@@ -428,6 +470,8 @@
             document.getElementById('image-preview-container').classList.add('hidden');
             currentTempImages = [];
             currentMainImageIndex = 0;
+            renderCategoriesCheckboxes();
+            renderColorsCheckboxes();
             document.getElementById('form-title').innerText = "Aggiungi / Modifica Prodotto";
         }
 
