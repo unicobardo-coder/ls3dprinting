@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Siamo | LS3Dmaker</title>
+    <title>About | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -15,82 +15,89 @@
                 extend: {
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     colors: {
-                        brand: { 500: '#10b981', 600: '#059669', 400: '#34d399', 900: '#064e3b' },
-                        dark: { bg: '#090d16', card: '#111827', surface: '#151e32' }
+                        brand: { 500: '#10b981', 400: '#34d399', 600: '#059669' },
+                        dark: { bg: '#070b14', card: '#0d1322', surface: '#131c31' }
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
     <!-- HEADER -->
-    <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
+        <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
-                <img src="logo.png" alt="LS3Dmaker Logo" class="h-14 object-contain">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-12 object-contain">
+                <div class="flex flex-col">
+                    <span class="font-extrabold tracking-wider text-white text-base">LS3DMAKER</span>
+                    <span class="text-[9px] font-mono tracking-widest text-brand-400 uppercase">3D Prints and Prototypes</span>
+                </div>
             </a>
 
-            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
-                <a href="index.html" class="hover:text-brand-400 transition-colors">Catalogo</a>
-                <a href="chisiamo.html" class="text-brand-400 font-bold">Chi Siamo</a>
-                <a href="info.html" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
+            <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Products</a>
+                <a href="chisiamo.html" class="text-white hover:text-brand-400 transition-colors">About</a>
+                <a href="info.html" class="hover:text-brand-400 transition-colors">Quote Request</a>
             </nav>
 
-            <a href="index.html" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700 hover:border-brand-500 transition-colors">
-                ← Torna al Catalogo
+            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all">
+                ← Back to Catalog
             </a>
         </div>
     </header>
 
-    <!-- MAIN CONTENT - CHI SIAMO -->
-    <main class="py-16 px-4 flex-grow max-w-4xl mx-auto space-y-12">
+    <!-- MAIN CONTENT -->
+    <main class="py-20 px-4 flex-grow max-w-4xl mx-auto space-y-12">
         <div class="text-center space-y-4">
-            <h1 class="text-4xl font-extrabold text-white">Chi è LS3Dmaker</h1>
-            <p class="text-brand-400 font-mono text-sm">Precisione, passione e tecnologia nella stampa 3D</p>
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-dark-surface border border-brand-500/30 text-brand-400 text-xs font-mono uppercase tracking-wider">
+                <span>About Our Workshop</span>
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">Precision, Passion & Technology</h1>
         </div>
 
-        <div class="bg-dark-card border border-gray-800 p-8 rounded-2xl space-y-6 text-sm text-gray-300 leading-relaxed shadow-xl">
+        <div class="bg-dark-card border border-brand-500/30 p-8 sm:p-10 rounded-2xl space-y-6 text-sm text-gray-300 leading-relaxed shadow-2xl backdrop-blur-md">
             <p>
-                Benvenuti in <strong>LS3Dmaker</strong>, il punto di riferimento per la prototipazione rapida, gli oggetti di design e le soluzioni di stampa 3D personalizzate. 
-                Nato dalla passione per la manifattura digitale e l'ingegneria di precisione, il nostro laboratorio trasforma idee digitali in oggetti reali, funzionali e rifiniti nei minimi dettagli.
+                Welcome to <strong>LS3Dmaker</strong>, your premier destination for rapid prototyping, design objects, and customized 3D printing solutions. 
+                Rooted in a deep passion for digital manufacturing and precision engineering, our workshop bridges the gap between digital concepts and functional physical reality.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 font-mono text-xs">
-                <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 space-y-2">
-                    <h3 class="font-bold text-white text-sm">🖨️ Tecnologia Avanzata</h3>
-                    <p class="text-gray-400">Utilizziamo stampanti e filamenti di ultima generazione per garantire tolleranze millimetriche e finiture estetiche eccellenti.</p>
+                <div class="bg-dark-bg p-5 rounded-xl border border-gray-800/80 space-y-2">
+                    <h3 class="font-bold text-white text-sm flex items-center gap-2"><i data-lucide="cpu" class="w-4 h-4 text-brand-400"></i> Advanced Tech</h3>
+                    <p class="text-gray-400">High-performance printers and top-tier filaments for sub-millimeter tolerances and flawless finishes.</p>
                 </div>
-                <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 space-y-2">
-                    <h3 class="font-bold text-white text-sm">🎨 Scelta dei Colori</h3>
-                    <p class="text-gray-400">Ampia gamma di colorazioni e materiali tecnici configurabili direttamente dal nostro catalogo o su richiesta.</p>
+                <div class="bg-dark-bg p-5 rounded-xl border border-gray-800/80 space-y-2">
+                    <h3 class="font-bold text-white text-sm flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4 text-brand-400"></i> Color Customization</h3>
+                    <p class="text-gray-400">Wide variety of filaments and technical materials configurable directly through our catalog.</p>
                 </div>
-                <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 space-y-2">
-                    <h3 class="font-bold text-white text-sm">📄 Trasparenza Fiscale</h3>
-                    <p class="text-gray-400">Ogni ordine è accompagnato da fatturazione chiara, PDF e tracciato XML conforme alle normative vigenti.</p>
+                <div class="bg-dark-bg p-5 rounded-xl border border-gray-800/80 space-y-2">
+                    <h3 class="font-bold text-white text-sm flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-400"></i> Tax Compliance</h3>
+                    <p class="text-gray-400">Fully structured invoices, PDF generation, and XML records fully aligned with compliance standards.</p>
                 </div>
             </div>
-            <p class="pt-4">
-                Che tu stia cercando un componente di design unico o un prototipo industriale per il tuo business, siamo pronti a dare forma alle tue idee. Contattaci per qualsiasi esigenza o progetto su misura!
+            <p class="pt-2">
+                Whether you need a unique piece of home design or functional industrial prototypes, we are equipped to bring your blueprints to life. Get in touch for custom projects!
             </p>
         </div>
 
         <div class="text-center">
-            <a href="info.html" class="inline-block px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-transform hover:scale-105">
-                Contattaci per un Progetto
+            <a href="info.html" class="inline-block px-8 py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg shadow-brand-500/10">
+                Contact Us for a Project
             </a>
         </div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-gray-950 border-t border-gray-800 py-8 text-xs text-gray-500">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-            <p class="font-bold text-white">LS3Dmaker © 2026</p>
-            <div class="flex gap-4 font-mono">
-                <a href="index.html" class="hover:underline">Home</a>
-                <a href="info.html" class="hover:underline">Richiedi Info</a>
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <p class="font-bold text-white">LS3DMAKER © 2026</p>
+            <div class="flex gap-6 font-mono">
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Catalog</a>
+                <a href="info.html" class="hover:text-brand-400 transition-colors">Contact</a>
             </div>
         </div>
     </footer>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
