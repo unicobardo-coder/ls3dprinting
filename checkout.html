@@ -15,7 +15,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <script type="text/javascript">
-       (function(){ emailjs.init("TUA_PUBLIC_KEY"); })();
+       (function(){ 
+          // INSERISCI QUI LA TUA PUBLIC KEY DI EMAILJS
+          emailjs.init("TUA_PUBLIC_KEY"); 
+       })();
     </script>
 
     <script>
@@ -25,6 +28,7 @@
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     colors: {
                         brand: { 500: '#10b981', 600: '#059669', 400: '#34d399', 900: '#064e3b' },
+                        accent: { 500: '#06b6d4', 400: '#22d3ee' },
                         dark: { bg: '#090d16', card: '#111827', surface: '#151e32' }
                     }
                 }
@@ -34,15 +38,24 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between">
 
-    <!-- Header Navigation -->
+    <!-- Header Navigation Completa -->
     <header class="sticky top-0 z-40 bg-dark-card/90 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-14 object-contain">
             </a>
-            <a href="index.html" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700 hover:border-brand-500 transition-colors">
-                ← Torna al Catalogo
-            </a>
+
+            <nav class="hidden md:flex items-center gap-6 font-medium text-sm text-gray-300">
+                <a href="index.html#prodotti" class="hover:text-brand-400 transition-colors">Prodotti</a>
+                <a href="index.html#info-section" class="hover:text-brand-400 transition-colors">Richiedi Info</a>
+                <a href="index.html#traccia-section" class="hover:text-brand-400 transition-colors">Traccia Spedizione</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-mono border border-gray-700 hover:border-brand-500 transition-colors flex items-center gap-1.5">
+                    ← Torna al Catalogo
+                </a>
+            </div>
         </div>
     </header>
 
@@ -86,7 +99,7 @@
                 </form>
             </div>
 
-            <!-- SEZIONE IN ATTESA DI PAGAMENTO (Nessuna fattura emessa qui) -->
+            <!-- SEZIONE IN ATTESA DI PAGAMENTO (Nessuna fattura emessa finché non si paga) -->
             <div id="pending-payment-section" class="hidden bg-dark-card border border-brand-500/50 rounded-2xl p-6 sm:p-8 shadow-xl text-center space-y-4 font-mono">
                 <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">⏳</div>
                 <h3 class="text-xl font-bold text-white font-sans">In Attesa di Pagamento</h3>
@@ -96,25 +109,25 @@
                     <span class="text-brand-400 font-bold select-all text-sm">unicobardo@gmail.com</span>
                 </p>
                 <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-[11px] text-left">
-                    ⚠️ <strong>Regola fiscale:</strong> La fattura e la mail di conferma verranno generate e inviate <strong>soltanto dopo l'effettivo riscontro del pagamento</strong> sul conto PayPal.
+                    ⚠️ <strong>Regola fiscale:</strong> La fattura e la mail di conferma con allegato verranno generate e inviate <strong>soltanto dopo l'effettivo riscontro del pagamento</strong>.
                 </div>
                 <div class="flex flex-col gap-3 pt-2">
                     <a href="https://www.paypal.com/signin" target="_blank" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs font-sans">
                         Apri PayPal per Pagare
                     </a>
-                    <!-- Pulsante protetto: cliccabile solo a pagamento avvenuto -->
+                    <!-- Pulsante di sblocco protetto -->
                     <button onclick="verifyAndEmitInvoice()" class="w-full py-3 bg-brand-500 text-black font-bold rounded-xl text-xs font-sans">
                         Ho pagato (Genera Fattura & Invia Mail)
                     </button>
                 </div>
             </div>
 
-            <!-- ANTEPRIMA FATTURA E DOWNLOAD (Sbloccata solo dopo il pagamento) -->
+            <!-- ANTEPRIMA FATTURA E DOWNLOAD (Sbloccata solo dopo conferma) -->
             <div id="invoice-preview-section" class="hidden bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
                 <div class="text-center">
                     <div class="w-12 h-12 bg-brand-500/20 text-brand-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-2">✓</div>
                     <h3 class="text-xl font-bold text-white">Pagamento Verificato & Fattura Emessa!</h3>
-                    <p class="text-xs text-gray-400">La fattura è stata emessa legalmente e la copia è stata inviata via email al cliente.</p>
+                    <p class="text-xs text-gray-400">La fattura è stata emessa e inviata via email con allegato PDF.</p>
                 </div>
 
                 <!-- Modello Fattura stampabile -->
@@ -153,9 +166,9 @@
                     </div>
                 </div>
 
-                <!-- Pulsanti Azione (Stampa, XML e Ritorno) -->
+                <!-- Pulsanti Azione (Stampa, XML e Home) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
-                    <button onclick="window.print()" class="py-3 bg-brand-500 text-black font-bold rounded-xl text-xs">Stampa / Salva PDF</button>
+                    <button onclick="window.print()" class="py-3 bg-brand-500 text-black font-bold rounded-xl text-xs font-bold">Stampa / Salva PDF</button>
                     <button onclick="downloadFatturaXML()" class="py-3 bg-accent-500 hover:bg-accent-400 text-black font-bold rounded-xl text-xs font-mono">📥 Scarica XML (SdI)</button>
                     <a href="index.html" class="py-3 bg-gray-800 text-gray-300 font-bold rounded-xl text-xs text-center flex items-center justify-center">Torna alla Home</a>
                 </div>
@@ -212,7 +225,6 @@
             const shippingCost = parseFloat(document.getElementById('chk-shipping').value);
             const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
 
-            // Salviamo temporaneamente l'ordine senza emettere la fattura
             currentOrderData = {
                 id: `LS-${Math.floor(1000 + Math.random()*9000)}`,
                 number: `${lastInvoiceNum}/2026`,
@@ -237,7 +249,6 @@
         function verifyAndEmitInvoice() {
             if (!currentOrderData) return;
 
-            // Registrazione ufficiale dell'ordine pagato
             orders.unshift(currentOrderData);
             localStorage.setItem('ls3d_orders', JSON.stringify(orders));
             localStorage.removeItem('ls3d_cart');
@@ -263,7 +274,7 @@
             }
             document.getElementById('inv-items').innerHTML = html;
 
-            // Generazione PDF e invio email con allegato via EmailJS
+            // Generazione PDF e invio con allegato tramite EmailJS
             const element = document.getElementById('invoice-paper');
             const opt = {
                 margin: 10,
@@ -284,21 +295,21 @@
                     message_details: itemsDescription + ` (Spedizione: €${currentOrderData.shipping.toFixed(2)})`,
                     order_total: `€${currentOrderData.total.toFixed(2)}`,
                     content_pdf: pdfBase64
-                }).then(() => console.log("Fattura emessa e email inviata con successo!"));
+                }).then(() => console.log("Fattura emessa e email con allegato inviata con successo!"));
             });
 
             document.getElementById('pending-payment-section').classList.add('hidden');
             document.getElementById('invoice-preview-section').classList.remove('hidden');
         }
 
-        // Funzione per generare e scaricare l'XML conforme all'Agenzia delle Entrate
+        // Funzione per generare e scaricare l'XML conforme all'Agenzia delle Entrate (FatturaPA)
         function downloadFatturaXML() {
             if (!currentOrderData) return;
 
             const today = new Date().toISOString().split('T')[0];
             const numeroFattura = currentOrderData.number.split('/')[0];
             const imponibile = currentOrderData.subtotal.toFixed(2);
-            const aliquotaIVA = "22.00"; // Modificabile a 0.00 se forfettario
+            const aliquotaIVA = "22.00"; // Modificabile a 0.00 se regime forfettario
             const ivamgr = (currentOrderData.subtotal * 0.22).toFixed(2);
 
             let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -378,7 +389,7 @@
                 xmlContent += `
             <DettaglioLinee>
                 <NumeroLinea>${currentOrderData.items.length + 1}</NumeroLinea>
-                <Descrizione>Spese di Spedizione</Descrizione>
+                <Descrizione>Spese di Spedizione Tracciabile</Descrizione>
                 <Quantita>1.00</Quantita>
                 <PrezzoUnitario>${currentOrderData.shipping.toFixed(2)}</PrezzoUnitario>
                 <PrezzoTotale>${currentOrderData.shipping.toFixed(2)}</PrezzoTotale>
