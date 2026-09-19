@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About | LS3Dmaker</title>
+    <title>Chi Siamo | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
+    
     <script>
         tailwind.config = {
             theme: {
@@ -25,64 +25,71 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
-        <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-                <a href="index.html" class="flex items-center gap-3 group">
-                    <img src="logo.png" alt="LS3Dmaker Logo" class="h-12 sm:h-14 object-contain">
-                </a>
+    <!-- HEADER CON SELETTORE LINGUA -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
 
             <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
-                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
-                <a href="chisiamo.html" class="text-white hover:text-brand-400 transition-colors" data-i18n="navAbout">Chi Siamo</a>
+                <a href="catalog.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti & Catalogo</a>
+                <a href="chisiamo.html" class="text-white font-bold hover:text-brand-400 transition-colors" data-i18n="navAbout">Chi Siamo</a>
                 <a href="info.html" class="hover:text-brand-400 transition-colors" data-i18n="navQuote">Preventivi</a>
             </nav>
 
-            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all" data-i18n="backToCatalog">
-                ← Torna al Catalogo
-            </a>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- SELETTORE LINGUA -->
+                <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-dark-surface border border-gray-800 text-xs font-mono text-gray-300">
+                    <select id="lang-select" onchange="setLanguage(this.value)" class="bg-transparent text-gray-300 focus:outline-none cursor-pointer">
+                        <option value="it" class="bg-dark-bg text-white">🇮🇹 IT</option>
+                        <option value="en" class="bg-dark-bg text-white">🇬🇧 EN</option>
+                        <option value="es" class="bg-dark-bg text-white">🇪🇸 ES</option>
+                        <option value="fr" class="bg-dark-bg text-white">🇫🇷 FR</option>
+                    </select>
+                </div>
+
+                <a href="admin.html" class="hidden sm:flex px-3.5 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 transition-all items-center gap-2 text-xs font-medium text-gray-300">
+                    <i data-lucide="user" class="w-4 h-4 text-gray-400"></i>
+                    <span data-i18n="navAdmin">Admin</span>
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="py-20 px-4 flex-grow max-w-4xl mx-auto space-y-12">
+    <!-- CONTENUTO PAGINA CHI SIAMO -->
+    <main class="py-16 px-4 sm:px-6 flex-grow max-w-4xl mx-auto w-full space-y-12">
         <div class="text-center space-y-4">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-dark-surface border border-brand-500/30 text-brand-400 text-xs font-mono uppercase tracking-wider">
-                <span>About Our Workshop</span>
-            </div>
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">Precision, Passion & Technology</h1>
+            <h1 class="text-4xl font-extrabold text-white tracking-tight" data-i18n="aboutTitle">Chi è LS3DMAKER</h1>
+            <p class="text-brand-400 font-mono text-sm" data-i18n="aboutSubtitle">Artigianato digitale, prototipazione rapida e passione per la stampa 3D a Bologna.</p>
         </div>
 
-        <div class="bg-dark-card border border-brand-500/30 p-8 sm:p-10 rounded-2xl space-y-6 text-sm text-gray-300 leading-relaxed shadow-2xl backdrop-blur-md">
-            <p>
-                Welcome to <strong>LS3Dmaker</strong>, your premier destination for rapid prototyping, design objects, and customized 3D printing solutions. 
-                Rooted in a deep passion for digital manufacturing and precision engineering, our workshop bridges the gap between digital concepts and functional physical reality.
+        <div class="bg-dark-card border border-gray-800/80 p-8 rounded-2xl space-y-6 shadow-xl leading-relaxed text-gray-300">
+            <p data-i18n="aboutText1">
+                Siamo un laboratorio di manifattura digitale e prototipazione 3D con sede a Bologna. Trasformiamo idee, progetti e concept geometrici in oggetti reali, funzionali e di altissimo design.
             </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 font-mono text-xs">
-                <div class="bg-dark-bg p-5 rounded-xl border border-gray-800/80 space-y-2">
-                    <h3 class="font-bold text-white text-sm flex items-center gap-2"><i data-lucide="cpu" class="w-4 h-4 text-brand-400"></i> Advanced Tech</h3>
-                    <p class="text-gray-400">High-performance printers and top-tier filaments for sub-millimeter tolerances and flawless finishes.</p>
-                </div>
-                <div class="bg-dark-bg p-5 rounded-xl border border-gray-800/80 space-y-2">
-                    <h3 class="font-bold text-white text-sm flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4 text-brand-400"></i> Color Customization</h3>
-                    <p class="text-gray-400">Wide variety of filaments and technical materials configurable directly through our catalog.</p>
-                </div>
-                <div class="bg-dark-bg p-5 rounded-xl border border-gray-800/80 space-y-2">
-                    <h3 class="font-bold text-white text-sm flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-400"></i> Tax Compliance</h3>
-                    <p class="text-gray-400">Fully structured invoices, PDF generation, and XML records fully aligned with compliance standards.</p>
-                </div>
-            </div>
+            <p data-i18n="aboutText2">
+                Utilizziamo stampanti di ultima generazione e una vasta gamma di filamenti tecnici e decorativi per garantire precisione millimetrica e finiture impeccabili, sia per singoli pezzi unici che per piccole serie.
+            </p>
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <p class="font-bold text-white">LS3DMAKER © 2026</p>
             <div class="flex gap-6 font-mono">
-                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
-                <a href="info.html" class="hover:text-brand-400 transition-colors" data-i18n="navQuote">Preventivi</a>
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Home</a>
+                <a href="catalog.html" class="hover:text-brand-400 transition-colors">Prodotti</a>
+                <a href="admin.html" class="hover:text-brand-400 text-brand-400 font-bold">Admin</a>
             </div>
         </div>
     </footer>
+
+    <!-- COLLEGAMENTO AL TUO SCRIPT LINGUE ESISTENTE -->
     <script src="i18n.js"></script>
-    <script>lucide.createIcons();</script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
