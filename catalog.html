@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo Prodotti | LS3Dmaker</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        brand: { 500: '#10b981', 400: '#34d399', 600: '#059669' },
+                        dark: { bg: '#070b14', card: '#0d1322', surface: '#131c31' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
+                <a href="catalog.html" class="text-white font-bold hover:text-brand-400 transition-colors">Prodotti & Catalogo</a>
+                <a href="chisiamo.html" class="hover:text-brand-400 transition-colors">Chi Siamo</a>
+                <a href="info.html" class="hover:text-brand-400 transition-colors">Preventivi</a>
+            </nav>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-dark-surface border border-gray-800 text-xs font-mono text-gray-300">
+                    <select id="lang-select" onchange="setLanguage(this.value)" class="bg-transparent text-gray-300 focus:outline-none cursor-pointer">
+                        <option value="it" class="bg-dark-bg text-white">🇮🇹 IT</option>
+                        <option value="en" class="bg-dark-bg text-white">🇬🇧 EN</option>
+                        <option value="es" class="bg-dark-bg text-white">🇪🇸 ES</option>
+                        <option value="fr" class="bg-dark-bg text-white">🇫🇷 FR</option>
+                    </select>
+                </div>
+
+                <button onclick="openCartModal()" class="relative px-3 sm:px-4 py-2 bg-dark-surface rounded-xl border border-gray-800 hover:border-brand-500/55 transition-all flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i>
+                    <span class="hidden sm:inline">Carrello</span>
+                    <span id="cart-badge" class="bg-brand-500 text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center font-mono">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENUTO CATALOGO & FILTRI CATEGORIA -->
+    <main class="py-12 px-4 sm:px-6 flex-grow max-w-7xl mx-auto w-full space-y-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-800 pb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight">Catalogo 3D</h1>
+                <p class="text-xs text-gray-400 mt-1 font-mono">Sfoglia i nostri modelli o filtra per categoria.</p>
+            </div>
+
+            <!-- FILTRI DINAMICI PER CATEGORIA -->
+            <div id="category-filters" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <!-- MODALE DETTAGLIO PRODOTTO -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-brand-500/30 w-full max-w-2xl rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg cursor-pointer">✕</button>
+            <div id="modal-content" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- CARRELLO MODALE -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-lg rounded-2xl p-6 space-y-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h3 class="text-lg font-bold text-white">Carrello</h3>
+                <button onclick="closeCartModal()" class="text-gray-400 hover:text-white cursor-pointer">✕</button>
+            </div>
+            <div id="cart-items-container" class="space-y-4 max-h-60 overflow-y-auto font-mono text-xs"></div>
+            <div class="border-t border-gray-800 pt-4 flex justify-between items-center font-bold text-sm">
+                <span>Totale Carrello:</span>
+                <span id="cart-total-price" class="text-brand-400">€0.00</span>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeCartModal()" class="flex-1 py-3 bg-gray-800 text-gray-300 rounded-xl text-xs hover:bg-gray-700 cursor-pointer">Continua Shopping</button>
+                <a href="checkout.html" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs text-center flex items-center justify-center transition-all">Vai al Checkout →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <p class="font-bold text-white">LS3DMAKER © 2026</p>
+            <div class="flex gap-6 font-mono">
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Home</a>
+                <a href="chisiamo.html" class="hover:text-brand-400 transition-colors">Chi Siamo</a>
+                <a href="admin.html" class="hover:text-brand-400 text-brand-400 font-bold">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="colors.js"></script>
+    <script src="i18n.js"></script>
+    <script>
+        const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
+        let products = JSON.parse(localStorage.getItem('ls3d_products')) || [];
+        let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Design", "Mechanical", "Prototypes"];
+        let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
+        let currentCategoryFilter = 'Tutti';
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters');
+            const allCats = ['Tutti', ...categories];
+
+            container.innerHTML = allCats.map(cat => `
+                <button onclick="filterByCategory('${cat}')" class="px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${currentCategoryFilter === cat ? 'bg-brand-500 text-black shadow-md' : 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-gray-800'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(cat) {
+            currentCategoryFilter = cat;
+            renderCategoryFilters();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            let activeProducts = products.filter(p => !p.hidden);
+
+            if (currentCategoryFilter !== 'Tutti') {
+                activeProducts = activeProducts.filter(p => {
+                    const pCats = p.categories || (p.category ? [p.category] : []);
+                    return pCats.includes(currentCategoryFilter);
+                });
+            }
+
+            if (activeProducts.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 text-xs font-mono col-span-full text-center py-12">Nessun prodotto trovato in questa categoria.</p>`;
+                return;
+            }
+
+            const colorsList = (typeof filamentColors !== 'undefined' && filamentColors.length > 0) 
+                ? filamentColors 
+                : [{name: "Standard", code: "#10b981"}];
+
+            grid.innerHTML = activeProducts.map(p => {
+                const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
+                const cats = Array.isArray(p.categories) ? p.categories.join(' • ') : (p.category || 'Generale');
+                
+                const availableColors = (p.colors && p.colors.length > 0) 
+                    ? colorsList.filter(c => p.colors.includes(c.name))
+                    : colorsList;
+
+                return `
+                    <div class="bg-dark-card border border-gray-800/80 hover:border-brand-500/40 transition-all rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group">
+                        <div>
+                            <div class="relative overflow-hidden cursor-pointer" onclick="openProductModal(${p.id})">
+                                <img src="${mainImg}" alt="${p.title}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur text-[10px] font-mono text-brand-400 border border-brand-500/30">${cats}</span>
+                            </div>
+                            <div class="p-5 space-y-2">
+                                <h3 class="font-bold text-white text-base cursor-pointer hover:text-brand-400" onclick="openProductModal(${p.id})">${p.title}</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">${p.shortDesc || ''}</p>
+                                <p class="font-mono font-bold text-brand-400 text-sm pt-1">€${p.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-mono text-gray-400 mb-1">Colore Filamento:</label>
+                                <select id="color-select-${p.id}" class="w-full bg-dark-bg border border-gray-700/80 text-white rounded-xl px-3 py-2 text-xs font-mono focus:border-brand-500 focus:outline-none cursor-pointer">
+                                    ${availableColors.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <button onclick="addToCart(${p.id})" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openProductModal(id) {
+            const p = products.find(item => item.id === id);
+            if (!p) return;
+            const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
+            const cats = Array.isArray(p.categories) ? p.categories.join(' • ') : (p.category || 'Generale');
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="space-y-4">
+                    <img src="${mainImg}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        ${(p.images || [defaultImg]).map((img, idx) => `
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-lg border cursor-pointer ${idx === (p.mainImageIndex || 0) ? 'border-brand-500' : 'border-gray-800'}">
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h2 class="text-2xl font-bold text-white">${p.title}</h2>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-bg text-xs font-mono text-brand-400 border border-gray-800">${cats}</span>
+                    </div>
+                    <p class="text-brand-400 font-mono text-lg font-bold">€${p.price.toFixed(2)}</p>
+                    <div class="space-y-2 pt-2 border-t border-gray-800">
+                        <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Descrizione Dettagliata</h4>
+                        <p class="text-sm text-gray-300 leading-relaxed">${p.longDesc || 'Nessuna descrizione dettagliata disponibile per questo prodotto.'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function addToCart(prodId) {
+            const product = products.find(p => p.id === prodId);
+            if (!product) return;
+            const colorSelect = document.getElementById(`color-select-${prodId}`);
+            const selectedColor = colorSelect ? colorSelect.value : "Standard";
+
+            const existing = cart.find(item => item.id === prodId && item.color === selectedColor);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ id: product.id, title: product.title, price: product.price, color: selectedColor, qty: 1 });
+            }
+            saveCart();
+            openCartModal();
+        }
+
+        function saveCart() {
+            localStorage.setItem('ls3d_cart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            if(badge) badge.innerText = cart.reduce((acc, i) => acc + i.qty, 0);
+        }
+
+        function openCartModal() {
+            const container = document.getElementById('cart-items-container');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-4">Il carrello è vuoto.</p>`;
+                document.getElementById('cart-total-price').innerText = "€0.00";
+            } else {
+                let subtotal = 0;
+                container.innerHTML = cart.map((i, idx) => {
+                    subtotal += i.price * i.qty;
+                    return `
+                        <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                            <div>
+                                <p class="font-bold text-white">${i.qty}x ${i.title}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color}</span></p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-brand-400">€${(i.price * i.qty).toFixed(2)}</span>
+                                <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 cursor-pointer">✕</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('cart-total-price').innerText = `€${subtotal.toFixed(2)}`;
+            }
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        function removeFromCart(index) { cart.splice(index, 1); saveCart(); openCartModal(); }
+
+        renderCategoryFilters();
+        renderProducts();
+        updateCartBadge();
+        lucide.createIcons();
+    </script>
+</body>
+</html>
