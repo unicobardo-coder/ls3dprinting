@@ -17,7 +17,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Sostituisci con la tua Public Key EmailJS
+            emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
         })();
     </script>
 
@@ -43,7 +43,7 @@
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white">← Torna al Catalogo</a>
+            <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">← Torna al Catalogo</a>
         </div>
     </header>
 
@@ -109,9 +109,17 @@
     <!-- SCRIPT LOGICA -->
     <script>
         const STRIPE_PUBLIC_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
-        const stripe = Stripe(STRIPE_PUBLIC_KEY);
+        let stripe = null;
+        try {
+            if (typeof Stripe !== 'undefined') {
+                stripe = Stripe(STRIPE_PUBLIC_KEY);
+            }
+        } catch (e) { console.error(e); }
 
-        let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
+        let cart = [];
+        try {
+            cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
+        } catch (e) { cart = []; }
 
         function renderCheckoutSummary() {
             const container = document.getElementById('checkout-items-list');
@@ -125,14 +133,15 @@
 
             let total = 0;
             container.innerHTML = cart.map(i => {
-                total += i.price * i.qty;
+                const itemTotal = (Number(i.price) || 0) * (Number(i.qty) || 1);
+                total += itemTotal;
                 return `
                     <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                         <div>
                             <p class="font-bold text-white">${i.qty}x ${i.title}</p>
-                            <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color}</span></p>
+                            <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color || 'Standard'}</span></p>
                         </div>
-                        <span class="font-bold text-brand-400">€${(i.price * i.qty).toFixed(2)}</span>
+                        <span class="font-bold text-brand-400">€${itemTotal.toFixed(2)}</span>
                     </div>
                 `;
             }).join('');
@@ -160,7 +169,8 @@
             const total = renderCheckoutSummary();
             if (total <= 0) { alert("Il carrello è vuoto."); return; }
 
-            let paymentVerified = true; // Simulazione successo pagamento carta
+            // Simulazione transazione carta verificata con successo
+            let paymentVerified = true; 
 
             if (paymentVerified) {
                 finalizeOrderAndSave("Stripe", "STRIPE-TX-" + Date.now(), customer, total);
@@ -172,35 +182,42 @@
         // --- PAYPAL ---
         function initPayPal() {
             const total = renderCheckoutSummary();
-            if (total <= 0) return;
+            if (total <= 0 || typeof paypal === 'undefined') return;
 
-            paypal.Buttons({
-                createOrder: function(data, actions) {
-                    const customer = validateCustomerData();
-                    if (!customer) throw new Error("Dati cliente incompleti");
-                    return actions.order.create({
-                        purchase_units: [{ amount: { value: total.toFixed(2) } }]
-                    });
-                },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        const customer = {
-                            name: document.getElementById('cust-name').value || details.payer.name.given_name,
-                            email: document.getElementById('cust-email').value || details.payer.email_address,
-                            address: document.getElementById('cust-address').value || "Indirizzo PayPal"
-                        };
-                        
-                        finalizeOrderAndSave("PayPal", details.id, customer, total);
-                    });
-                },
-                onError: function(err) {
-                    alert("Errore durante la transazione PayPal. L'ordine non è stato registrato.");
-                }
-            }).render('#paypal-button-container');
+            try {
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        const customer = validateCustomerData();
+                        if (!customer) throw new Error("Dati cliente incompleti");
+                        return actions.order.create({
+                            purchase_units: [{ amount: { value: total.toFixed(2) } }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            const customer = {
+                                name: document.getElementById('cust-name').value || details.payer.name.given_name,
+                                email: document.getElementById('cust-email').value || details.payer.email_address,
+                                address: document.getElementById('cust-address').value || "Indirizzo PayPal"
+                            };
+                            
+                            finalizeOrderAndSave("PayPal", details.id, customer, total);
+                        });
+                    },
+                    onError: function(err) {
+                        alert("Errore durante la transazione PayPal. L'ordine non è stato registrato.");
+                    }
+                }).render('#paypal-button-container');
+            } catch(e) { console.error("PayPal non inizializzato:", e); }
         }
 
-        // --- SALVATAGGIO BLINDATO + INVIO EMAIL ---
+        // --- SALVATAGGIO E NOTIFICA EMAIL ---
         function finalizeOrderAndSave(gateway, transactionId, customer, total) {
+            if (cart.length === 0) {
+                alert("Errore: carrello vuoto.");
+                return;
+            }
+
             const newOrder = {
                 id: "ORD-" + Date.now(),
                 number: "2026/" + Math.floor(Math.random() * 1000),
@@ -209,18 +226,22 @@
                 name: customer.name,
                 email: customer.email,
                 address: customer.address,
-                date: new Date().toISOString(),
+                date: new Date().toLocaleDateString('it-IT'),
                 items: cart,
                 total: total
             };
 
-            // 1. Salva nel pannello Admin
-            let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
+            // 1. Salva nel pannello Admin (localStorage)
+            let orders = [];
+            try {
+                orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
+            } catch (e) { orders = []; }
+            
             orders.push(newOrder);
             localStorage.setItem('ls3d_orders', JSON.stringify(orders));
 
-            // 2. Prepara i parametri e invia l'email tramite EmailJS
-            const orderSummaryText = cart.map(i => `${i.qty}x ${i.title} (${i.color}) - €${(i.price * i.qty).toFixed(2)}`).join('\n');
+            // 2. Invio email tramite EmailJS (se configurato)
+            const orderSummaryText = cart.map(i => `${i.qty}x ${i.title} (${i.color || 'Standard'}) - €${((Number(i.price)||0) * (Number(i.qty)||1)).toFixed(2)}`).join('\n');
             
             const emailParams = {
                 to_email: customer.email,
@@ -232,25 +253,25 @@
                 payment_gateway: gateway
             };
 
-            // Sostituisci "YOUR_SERVICE_ID" e "YOUR_TEMPLATE_ID" con i tuoi dati registrati su EmailJS
-            emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", emailParams)
-                .then(function(response) {
-                    console.log("Email inviata con successo!", response.status, response.text);
-                }, function(error) {
-                    console.error("Errore invio email:", error);
-                });
+            if (typeof emailjs !== 'undefined') {
+                emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", emailParams)
+                    .then(function(response) {
+                        console.log("Email inviata con successo!", response.status);
+                    }, function(error) {
+                        console.error("Errore invio email:", error);
+                    });
+            }
 
-            // 3. Svuota il carrello solo a conferma avvenuta
+            // 3. Svuota il carrello dopo il salvataggio dell'ordine
             localStorage.removeItem('ls3d_cart');
 
-            alert(`Pagamento completato con successo tramite ${gateway}! Ordine registrato e conferma inviata via email.`);
+            alert(`Pagamento completato con successo tramite ${gateway}! Ordine registrato e ricevuta emessa.`);
             window.location.href = "index.html";
         }
 
         renderCheckoutSummary();
         initPayPal();
-        lucide.createIcons();
+        try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
 </html>
-
