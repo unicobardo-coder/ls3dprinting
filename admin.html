@@ -1,19 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="it" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | LS3Dmaker</title>
+    <title>Catalogo Prodotti | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-       (function(){ emailjs.init("TUA_PUBLIC_KEY"); })();
-    </script>
-
     <script>
         tailwind.config = {
             theme: {
@@ -28,627 +24,362 @@
         }
     </script>
 </head>
-<body class="bg-dark-bg text-gray-100 font-sans min-h-screen p-4 sm:p-8 flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- SEZIONE LOGIN (PASSWORD OBBLIGATORIA: ls3d2026) -->
-    <div id="login-section" class="max-w-md mx-auto my-auto w-full bg-dark-card border border-brand-500/30 p-8 rounded-2xl space-y-6 shadow-2xl backdrop-blur-md">
-        <div class="text-center space-y-2">
-            <h1 class="text-2xl font-bold text-white tracking-tight">Area Riservata Admin</h1>
-            <p class="text-xs text-gray-400">Inserisci la password obbligatoria per accedere.</p>
-        </div>
-        <form onsubmit="checkPassword(event)" class="space-y-4 text-xs">
-            <div>
-                <input type="password" id="admin-pass" required placeholder="Password Admin" class="w-full bg-dark-bg border border-brand-500/50 rounded-xl p-3 text-white placeholder-gray-500 focus:border-brand-400 focus:outline-none">
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
+                <a href="catalog.html" class="text-white font-bold hover:text-brand-400 transition-colors">Prodotti & Catalogo</a>
+                <a href="chisiamo.html" class="hover:text-brand-400 transition-colors">Chi Siamo</a>
+                <a href="info.html" class="hover:text-brand-400 transition-colors">Preventivi</a>
+            </nav>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- ACCEDI -->
+                <button onclick="openAuthModal()" class="px-3 sm:px-4 py-2 bg-dark-surface rounded-xl border border-gray-800 hover:border-brand-500/55 transition-all flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <i data-lucide="user" class="w-4 h-4 text-brand-400"></i>
+                    <span id="user-status-label" class="hidden sm:inline">Accedi</span>
+                </button>
+
+                <!-- CARRELLO -->
+                <button onclick="openCartModal()" class="relative px-3 sm:px-4 py-2 bg-dark-surface rounded-xl border border-gray-800 hover:border-brand-500/55 transition-all flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i>
+                    <span class="hidden sm:inline">Carrello</span>
+                    <span id="cart-badge" class="bg-brand-500 text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center font-mono">0</span>
+                </button>
             </div>
-            <button type="submit" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Accedi al Pannello</button>
-            <a href="index.html" class="block text-center text-gray-400 hover:text-white pt-2 transition-colors">← Torna al Sito</a>
-        </form>
+        </div>
+    </header>
+
+    <!-- CONTENUTO CATALOGO & FILTRI -->
+    <main class="py-12 px-4 sm:px-6 flex-grow max-w-7xl mx-auto w-full space-y-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-800 pb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight">Catalogo 3D</h1>
+                <p class="text-xs text-gray-400 mt-1 font-mono">Sfoglia i nostri modelli o filtra per categoria.</p>
+            </div>
+            <div id="category-filters" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <!-- MODALE DETTAGLIO PRODOTTO & RECENSIONI -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-brand-500/30 w-full max-w-2xl rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg cursor-pointer">✕</button>
+            <div id="modal-content" class="space-y-4"></div>
+        </div>
     </div>
 
-    <!-- DASHBOARD ADMIN -->
-    <div id="admin-dashboard" class="max-w-6xl mx-auto space-y-6 w-full hidden">
-        
-        <div class="flex flex-col sm:flex-row justify-between items-center bg-dark-card border border-brand-500/30 p-6 rounded-2xl shadow-2xl backdrop-blur-md gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-white tracking-tight">LS3Dmaker - Gestione Centrale</h1>
-                <p class="text-xs text-gray-400">Pannello amministrativo protetto.</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs font-mono border border-red-500/30 hover:bg-red-500/30 transition-colors">Esci</button>
-                <a href="index.html" class="px-4 py-2 bg-dark-surface hover:bg-gray-800 text-gray-300 rounded-xl text-xs font-mono border border-gray-700 transition-colors">Vedi Sito →</a>
-            </div>
-        </div>
-
-        <!-- NAVIGAZIONE A SCHEDE -->
-        <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-3">
-            <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg">📦 Prodotti</button>
-            <button onclick="switchTab('categories')" id="tab-btn-categories" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">🗂️ Categorie</button>
-            <button onclick="switchTab('colors')" id="tab-btn-colors" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">🎨 Colori</button>
-            <button onclick="switchTab('invoices')" id="tab-btn-invoices" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">📄 Fatture & Email</button>
-        </div>
-
-        <!-- SCHEDA 1: PRODOTTI -->
-        <div id="tab-content-products" class="admin-tab-content space-y-6">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 id="form-title" class="text-lg font-bold text-white">Aggiungi / Modifica Prodotto</h2>
-                <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs">
-                    <input type="hidden" id="prod-id">
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="sm:col-span-1">
-                            <label class="block text-gray-400 mb-1 font-mono">Nome Prodotto *</label>
-                            <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Prezzo Listino (€) *</label>
-                            <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Prezzo Scontato (€ - Opzionale)</label>
-                            <input type="number" step="0.01" id="prod-saleprice" placeholder="Lascia vuoto se nessun sconto" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                    </div>
-
-                    <!-- OPZIONE VETRINA HOME -->
-                    <div class="bg-dark-bg p-3 rounded-xl border border-gray-700/80 flex items-center gap-3">
-                        <input type="checkbox" id="prod-featured" class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
-                        <label for="prod-featured" class="text-gray-300 font-mono cursor-pointer select-none">⭐ Metti in evidenza nella <strong>Vetrina in Home</strong></label>
-                    </div>
-
-                    <!-- SELEZIONE CATEGORIE MULTIPLE -->
-                    <div>
-                        <label class="block text-gray-400 mb-2 font-mono">Categorie (Seleziona una o più categorie) *</label>
-                        <div id="categories-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-dark-bg p-3 rounded-xl border border-gray-700/80 max-h-36 overflow-y-auto"></div>
-                    </div>
-
-                    <!-- SELEZIONE COLORI -->
-                    <div>
-                        <label class="block text-gray-400 mb-2 font-mono">Colori Filamento Disponibili</label>
-                        <div id="colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-dark-bg p-3 rounded-xl border border-gray-700/80 max-h-36 overflow-y-auto"></div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Carica Immagini dal PC</label>
-                        <input type="file" id="prod-images-file" multiple accept="image/*" onchange="handleImageUpload(event)" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2 text-gray-300 text-xs cursor-pointer">
-                    </div>
-
-                    <div id="image-preview-container" class="hidden space-y-2 p-3 bg-dark-bg rounded-xl border border-gray-800">
-                        <p class="text-gray-400 text-[11px] font-mono">Seleziona l'immagine <strong class="text-brand-400">principale</strong>:</p>
-                        <div id="preview-thumbs" class="flex flex-wrap gap-3"></div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Descrizione Breve (Visibile in Home) *</label>
-                        <input type="text" id="prod-shortdesc" required placeholder="Breve riassunto..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Descrizione Lunga (Visibile aprendo il prodotto)</label>
-                        <textarea id="prod-longdesc" rows="4" placeholder="Specifiche tecniche dettagliate..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button type="submit" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
-                        <button type="button" onclick="resetForm()" class="px-4 py-3 bg-dark-surface text-gray-300 rounded-xl text-xs hover:bg-gray-800 transition-colors">Annulla</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">Elenco Prodotti nel Catalogo</h2>
-                <div id="admin-products-list" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- SCHEDA 2: GESTIONE CATEGORIE -->
-        <div id="tab-content-categories" class="admin-tab-content space-y-6 hidden">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">Gestione Categorie</h2>
-                <div class="flex gap-3">
-                    <input type="text" id="new-category-name" placeholder="Nome nuova categoria (es. Gadget Tech)" class="flex-1 bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
-                    <button type="button" onclick="addNewCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Crea Categoria</button>
+    <!-- MODALE ACCESSO / REGISTRAZIONE -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-6 space-y-6 shadow-2xl relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer">✕</button>
+            <h3 class="text-lg font-bold text-white">Registrati o Accedi</h3>
+            
+            <div id="auth-form" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1 font-mono">Nome Utente *</label>
+                    <input type="text" id="auth-username" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                 </div>
-                <div id="categories-list-container" class="space-y-2 pt-2"></div>
-            </div>
-        </div>
-
-        <!-- SCHEDA 3: COLORI -->
-        <div id="tab-content-colors" class="admin-tab-content space-y-6 hidden">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">Gestione Colori Filamento</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <input type="text" id="new-color-name" placeholder="Nome Colore" class="bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
-                    <div class="flex items-center gap-2 bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-1">
-                        <label class="text-xs text-gray-400">Colore:</label>
-                        <input type="color" id="new-color-code" value="#10b981" class="w-8 h-8 bg-transparent cursor-pointer">
-                    </div>
-                    <button type="button" onclick="addNewColorItem()" class="py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Aggiungi Colore</button>
+                <div>
+                    <label class="block text-gray-400 mb-1 font-mono">Email *</label>
+                    <input type="email" id="auth-email" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                 </div>
-                <div id="admin-colors-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-4"></div>
-            </div>
-        </div>
-
-        <!-- SCHEDA 4: FATTURE E EMAIL -->
-        <div id="tab-content-invoices" class="admin-tab-content space-y-6 hidden">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">📄 Riepilogo Fatture, XML & Invio Email</h2>
-                <p class="text-xs text-gray-400">Gestisci gli ordini, invia la fattura via email con EmailJS o scarica il tracciato XML per l'AdE.</p>
-                <div id="admin-orders-list" class="space-y-3 text-xs font-mono"></div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MODALE ANTEPRIMA FATTURA CON LOGO INGRANDITO -->
-    <div id="invoice-modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white text-gray-900 w-full max-w-2xl p-8 rounded-2xl shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
-            <div id="invoice-printable-content" class="space-y-6">
-                <!-- Intestazione con Logo Ingrandito -->
-                <div class="flex justify-between items-start border-b pb-4">
-                    <div class="flex items-center gap-4">
-                        <img src="logo.png" alt="LS3Dmaker Logo" class="w-24 h-24 object-contain">
-                        <div>
-                            <h2 class="text-xl font-bold">LS3Dmaker</h2>
-                            <p class="text-xs text-gray-600">Servizi di Stampa 3D Professionali</p>
-                            <p class="text-[10px] text-gray-500">Bologna, Italia | P.IVA: 00000000000</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <h3 id="inv-modal-number" class="text-lg font-bold text-emerald-600">Fattura N. --</h3>
-                        <p id="inv-modal-date" class="text-xs text-gray-500">Data: --/--/----</p>
-                    </div>
+                <div>
+                    <label class="block text-gray-400 mb-1 font-mono">Password *</label>
+                    <input type="password" id="auth-password" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                 </div>
                 
-                <!-- Dati Cliente -->
-                <div class="bg-gray-50 p-4 rounded-xl text-xs space-y-1">
-                    <p class="font-bold text-gray-700">Dati Cliente:</p>
-                    <p id="inv-modal-client">Nome Cognome</p>
-                    <p id="inv-modal-email" class="text-gray-500">email@client.com</p>
-                    <p id="inv-modal-address" class="text-gray-500">Indirizzo spedizione</p>
+                <div class="flex items-start gap-2 pt-1">
+                    <input type="checkbox" id="privacy-check" class="mt-0.5 accent-brand-500 cursor-pointer">
+                    <label for="privacy-check" class="text-gray-400 font-sans leading-tight cursor-pointer">
+                        Ho letto e accetto l'informativa sulla <a href="privacy.html" target="_blank" class="text-brand-400 underline hover:text-brand-300">Privacy e trattamento dei dati (GDPR)</a> *
+                    </label>
                 </div>
 
-                <!-- Tabella Prodotti -->
-                <div class="space-y-2">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="border-b text-gray-500">
-                                <th class="pb-2">Prodotto / Colore</th>
-                                <th class="pb-2 text-center">Q.ta</th>
-                                <th class="pb-2 text-right">Prezzo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inv-modal-items">
-                            <!-- Inserito via JS -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Totali -->
-                <div class="border-t pt-4 flex justify-between items-center font-bold text-sm">
-                    <span>Totale Ordine:</span>
-                    <span id="inv-modal-total" class="text-emerald-600 text-lg">€0.00</span>
-                </div>
+                <button onclick="handleUserAuth()" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all cursor-pointer">Conferma e Registrati</button>
             </div>
 
-            <!-- Bottoni Azione Modale -->
-            <div class="flex gap-3 pt-4 border-t">
-                <button onclick="window.print()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs cursor-pointer">🖨️ Stampa / Salva PDF</button>
-                <button onclick="closeInvoiceModal()" class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-xs cursor-pointer">Chiudi</button>
+            <div id="user-logged-info" class="hidden space-y-4 text-xs">
+                <p class="text-gray-300">Benvenuto, <span id="logged-username" class="font-bold text-brand-400"></span>!</p>
+                <button onclick="handleUserLogout()" class="w-full py-3 bg-red-500/20 border border-red-500/40 text-red-400 font-bold rounded-xl text-xs hover:bg-red-500/30 cursor-pointer">Esci dall'account</button>
             </div>
         </div>
     </div>
 
-    <footer class="text-center py-6 text-xs text-gray-600 font-mono">
-        LS3DMAKER Admin Panel © 2026
+    <!-- CARRELLO MODALE -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-lg rounded-2xl p-6 space-y-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h3 class="text-lg font-bold text-white">Carrello</h3>
+                <button onclick="closeCartModal()" class="text-gray-400 hover:text-white cursor-pointer">✕</button>
+            </div>
+            <div id="cart-items-container" class="space-y-4 max-h-60 overflow-y-auto font-mono text-xs"></div>
+            <div class="border-t border-gray-800 pt-4 flex justify-between items-center font-bold text-sm">
+                <span>Totale Carrello:</span>
+                <span id="cart-total-price" class="text-brand-400">€0.00</span>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeCartModal()" class="flex-1 py-3 bg-gray-800 text-gray-300 rounded-xl text-xs hover:bg-gray-700 cursor-pointer">Continua Shopping</button>
+                <a href="checkout.html" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs text-center flex items-center justify-center transition-all">Vai al Checkout →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <p class="font-bold text-white">LS3DMAKER © 2026</p>
+            <div class="flex gap-6 font-mono">
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Home</a>
+                <a href="chisiamo.html" class="hover:text-brand-400 transition-colors">Chi Siamo</a>
+                <a href="privacy.html" class="hover:text-brand-400 transition-colors">Privacy & GDPR</a>
+                <a href="admin.html" class="hover:text-brand-400 text-brand-400 font-bold">Admin</a>
+            </div>
+        </div>
     </footer>
 
+    <!-- SCRIPT -->
+    <script src="colors.js"></script>
+    <script src="i18n.js"></script>
+    <script src="auth.js"></script>
     <script>
-        const ADMIN_PASSWORD = "ls3d2026";
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
         
-        let products = JSON.parse(localStorage.getItem('ls3d_products')) || [];
-        let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Design", "Mechanical", "Prototypes"];
-        let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
-        
-        let filamentColors = JSON.parse(localStorage.getItem('ls3d_filament_colors')) || [
-            { name: "Nero Opaco", code: "#111827" },
-            { name: "Bianco Perla", code: "#f3f4f6" },
-            { name: "Grigio Techno", code: "#6b7280" },
-            { name: "Verde Brand", code: "#10b981" },
-            { name: "Rosso Fuoco", code: "#ef4444" },
-            { name: "Blu Elettrico", code: "#3b82f6" },
-            { name: "Oro Seta", code: "#eab308" },
-            { name: "Argento Metallico", code: "#9ca3af" }
-        ];
+        let products = [];
+        try { products = JSON.parse(localStorage.getItem('ls3d_products')) || []; } catch (e) { products = []; }
 
-        function persistColors() {
-            localStorage.setItem('ls3d_filament_colors', JSON.stringify(filamentColors));
-        }
-        
-        let currentTempImages = [];
-        let currentMainImageIndex = 0;
+        let categories = ["Design", "Mechanical", "Prototypes"];
+        try { categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Design", "Mechanical", "Prototypes"]; } catch (e) {}
 
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-        });
+        let cart = [];
+        try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
 
-        function checkPassword(e) {
-            e.preventDefault();
-            const passInput = document.getElementById('admin-pass').value;
-            if (passInput === ADMIN_PASSWORD) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                showAdminDashboard();
-            } else {
-                alert("Password errata! Accesso negato.");
-                document.getElementById('admin-pass').value = '';
-            }
-        }
+        let currentCategoryFilter = 'Tutti';
 
-        function logoutAdmin() {
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-            document.getElementById('admin-pass').value = '';
-        }
-
-        function showAdminDashboard() {
-            renderCategoriesCheckboxes();
-            renderAdminColorsWithDots();
-            renderAdminProducts();
-            renderAdminCategories();
-            renderAdminOrders();
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
-
-            ['products', 'categories', 'colors', 'invoices'].forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                btn.className = t === tabName ? "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg" : "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800";
-            });
-        }
-
-        function renderAdminColorsWithDots() {
-            const container = document.getElementById('admin-colors-container');
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters');
             if (!container) return;
-            
-            if (filamentColors.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-xs font-mono col-span-full">Nessun colore configurato.</p>`;
+            const allCats = ['Tutti', ...categories];
+
+            container.innerHTML = allCats.map(cat => `
+                <button onclick="filterByCategory('${cat}')" class="px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${currentCategoryFilter === cat ? 'bg-brand-500 text-black shadow-md' : 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-gray-800'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(cat) {
+            currentCategoryFilter = cat;
+            renderCategoryFilters();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+
+            let activeProducts = products.filter(p => !p.hidden);
+
+            if (currentCategoryFilter !== 'Tutti') {
+                activeProducts = activeProducts.filter(p => {
+                    const pCats = p.categories || (p.category ? [p.category] : []);
+                    return pCats.includes(currentCategoryFilter);
+                });
+            }
+
+            if (activeProducts.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 text-xs font-mono col-span-full text-center py-12">Nessun prodotto trovato in questa categoria.</p>`;
                 return;
             }
 
-            container.innerHTML = filamentColors.map((c, index) => `
-                <div class="flex items-center justify-between bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
-                    <div class="flex items-center gap-2">
-                        <span class="w-4 h-4 rounded-full border border-gray-600 inline-block shadow" style="background-color: ${c.code || '#10b981'}"></span>
-                        <span class="text-white font-mono">${c.name}</span>
-                    </div>
-                    <button type="button" onclick="deleteColorItem(${index})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 cursor-pointer">✕</button>
-                </div>
-            `).join('');
+            const colorsList = (typeof filamentColors !== 'undefined' && filamentColors.length > 0) 
+                ? filamentColors 
+                : [{name: "Standard", code: "#10b981"}];
 
-            renderColorsCheckboxes();
-        }
-
-        function addNewColorItem() {
-            const nameInput = document.getElementById('new-color-name');
-            const codeInput = document.getElementById('new-color-code');
-            const name = nameInput.value.trim();
-            const code = codeInput.value;
-
-            if (!name) { alert("Inserisci un nome per il colore."); return; }
-            if (filamentColors.some(c => c.name.toLowerCase() === name.toLowerCase())) { alert("Questo colore esiste già!"); return; }
-
-            filamentColors.push({ name, code });
-            persistColors();
-            nameInput.value = '';
-            codeInput.value = '#10b981';
-            renderAdminColorsWithDots();
-        }
-
-        function deleteColorItem(index) {
-            if (confirm(`Vuoi davvero eliminare questo colore?`)) {
-                filamentColors.splice(index, 1);
-                persistColors();
-                renderAdminColorsWithDots();
-            }
-        }
-
-        function renderColorsCheckboxes(selectedColors = []) {
-            const container = document.getElementById('colors-checkboxes');
-            if (!container) return;
-            container.innerHTML = filamentColors.map(c => `
-                <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white select-none">
-                    <input type="checkbox" name="product-colors" value="${c.name}" ${selectedColors.length === 0 || selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
-                    <span class="w-3 h-3 rounded-full inline-block border border-gray-600" style="background-color: ${c.code || '#10b981'}"></span>
-                    <span>${c.name}</span>
-                </label>
-            `).join('');
-        }
-
-        function renderCategoriesCheckboxes(selectedCategories = []) {
-            const container = document.getElementById('categories-checkboxes');
-            if(!container) return;
-            container.innerHTML = categories.map(cat => `
-                <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white select-none">
-                    <input type="checkbox" name="product-categories" value="${cat}" ${selectedCategories.includes(cat) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
-                    <span>${cat}</span>
-                </label>
-            `).join('');
-        }
-
-        function handleImageUpload(e) {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
-            currentTempImages = [];
-            let loadedCount = 0;
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(uploadEvent) {
-                    currentTempImages.push(uploadEvent.target.result);
-                    loadedCount++;
-                    if (loadedCount === files.length) {
-                        currentMainImageIndex = 0;
-                        renderImagePreviews();
-                    }
-                };
-                reader.readAsDataURL(files[i]);
-            }
-        }
-
-        function renderImagePreviews() {
-            const container = document.getElementById('image-preview-container');
-            const thumbs = document.getElementById('preview-thumbs');
-            container.classList.remove('hidden');
-            thumbs.innerHTML = currentTempImages.map((img, idx) => `
-                <div class="relative group cursor-pointer" onclick="setMainImage(${idx})">
-                    <img src="${img}" class="w-20 h-20 object-cover rounded-xl border-2 ${idx === currentMainImageIndex ? 'border-brand-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'border-gray-700 opacity-60'}">
-                    <span class="absolute bottom-1 left-1 bg-black/80 text-[9px] font-mono px-1.5 py-0.5 rounded text-white">
-                        ${idx === currentMainImageIndex ? 'Principale' : 'Foto ' + (idx+1)}
-                    </span>
-                </div>
-            `).join('');
-        }
-
-        function setMainImage(index) {
-            currentMainImageIndex = index;
-            renderImagePreviews();
-        }
-
-        function renderAdminCategories() {
-            const container = document.getElementById('categories-list-container');
-            if(!container) return;
-            container.innerHTML = categories.map(cat => `
-                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
-                    <span class="text-brand-400 font-bold">${cat}</span>
-                    <button type="button" onclick="deleteCategory('${cat}')" class="text-red-400 hover:text-red-300 cursor-pointer">Elimina</button>
-                </div>
-            `).join('');
-            renderCategoriesCheckboxes();
-        }
-
-        function addNewCategory() {
-            const input = document.getElementById('new-category-name');
-            const val = input.value.trim();
-            if (val && !categories.includes(val)) {
-                categories.push(val);
-                localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-                input.value = '';
-                renderAdminCategories();
-            }
-        }
-
-        function deleteCategory(catName) {
-            if (categories.length <= 1) { alert("Mantieni almeno una categoria."); return; }
-            categories = categories.filter(c => c !== catName);
-            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-            renderAdminCategories();
-        }
-
-        function renderAdminProducts() {
-            const container = document.getElementById('admin-products-list');
-            if (!container) return;
-            if (products.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-xs font-mono">Nessun prodotto in catalogo.</p>`;
-                return;
-            }
-            container.innerHTML = products.map(p => {
+            grid.innerHTML = activeProducts.map(p => {
                 const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
-                const cats = Array.isArray(p.categories) ? p.categories.join(', ') : (p.category || 'Generale');
-                const priceDisplay = p.salePrice ? `<span class="line-through text-gray-500">€${p.price.toFixed(2)}</span> <span class="text-red-400 font-bold">€${p.salePrice.toFixed(2)}</span>` : `€${p.price.toFixed(2)}`;
-                const badgeFeatured = p.featured ? `<span class="bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded text-[10px] font-mono border border-brand-500/30">⭐ In Vetrina</span>` : '';
+                const cats = Array.isArray(p.categories) ? p.categories.join(' • ') : (p.category || 'Generale');
+                
+                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${Number(p.price || 0).toFixed(2)}</span>`;
+                let effectivePrice = p.price;
+                if (p.salePrice && p.salePrice < p.price) {
+                    effectivePrice = p.salePrice;
+                    priceHtml = `
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs text-gray-500 line-through">€${Number(p.price).toFixed(2)}</span>
+                            <span class="font-mono font-bold text-red-400 text-base">€${Number(p.salePrice).toFixed(2)}</span>
+                            <span class="bg-red-500/20 text-red-400 text-[10px] font-mono px-1.5 py-0.5 rounded border border-red-500/30">OFFERTA</span>
+                        </div>
+                    `;
+                }
+
+                const availableColors = (p.colors && p.colors.length > 0) 
+                    ? colorsList.filter(c => p.colors.includes(c.name))
+                    : colorsList;
 
                 return `
-                    <div class="flex justify-between items-center p-4 bg-dark-bg rounded-xl border border-gray-800 text-xs gap-3">
-                        <div class="flex items-center gap-3">
-                            <img src="${mainImg}" class="w-12 h-12 object-cover rounded-lg border border-gray-700">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <p class="font-bold text-white text-sm">${p.title}</p>
-                                    ${badgeFeatured}
-                                </div>
-                                <p class="text-brand-400 font-mono">${priceDisplay} | Categorie: ${cats}</p>
+                    <div class="bg-dark-card border border-gray-800/80 hover:border-brand-500/40 transition-all rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group">
+                        <div>
+                            <div class="relative overflow-hidden cursor-pointer" onclick="openProductModal(${p.id})">
+                                <img src="${mainImg}" alt="${p.title}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur text-[10px] font-mono text-brand-400 border border-brand-500/30">${cats}</span>
+                            </div>
+                            <div class="p-5 space-y-2">
+                                <h3 class="font-bold text-white text-base cursor-pointer hover:text-brand-400" onclick="openProductModal(${p.id})">${p.title}</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">${p.shortDesc || ''}</p>
+                                <div class="pt-1">${priceHtml}</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="editProduct(${p.id})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
-                            <button type="button" onclick="deleteProduct(${p.id})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+                        <div class="p-5 pt-0 space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-mono text-gray-400 mb-1">Colore Filamento:</label>
+                                <select id="color-select-${p.id}" class="w-full bg-dark-bg border border-gray-700/80 text-white rounded-xl px-3 py-2 text-xs font-mono focus:border-brand-500 focus:outline-none cursor-pointer">
+                                    ${availableColors.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <button onclick="addToCartCatalog(${p.id}, ${effectivePrice})" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                         </div>
                     </div>
                 `;
             }).join('');
+            lucide.createIcons();
         }
 
-        function saveProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById('prod-id').value;
-            const title = document.getElementById('prod-title').value;
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const salePriceInput = document.getElementById('prod-saleprice').value;
-            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
-            const featured = document.getElementById('prod-featured').checked;
-            const shortDesc = document.getElementById('prod-shortdesc').value;
-            const longDesc = document.getElementById('prod-longdesc').value;
-
-            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(cb => cb.value);
-            if (selectedCategories.length === 0) {
-                alert("Seleziona almeno una categoria per il prodotto.");
-                return;
-            }
-
-            const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(cb => cb.value);
-
-            let imagesToSave = currentTempImages;
-            let mainIndexToSave = currentMainImageIndex;
-
-            if (id) {
-                const p = products.find(i => i.id == id);
-                if (p) {
-                    p.title = title;
-                    p.price = price;
-                    p.salePrice = salePrice;
-                    p.featured = featured;
-                    p.categories = selectedCategories;
-                    p.colors = selectedColors;
-                    p.shortDesc = shortDesc;
-                    p.longDesc = longDesc;
-                    if (imagesToSave.length > 0) {
-                        p.images = imagesToSave;
-                        p.mainImageIndex = mainIndexToSave;
-                    }
-                }
-            } else {
-                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                products.push({
-                    id: newId,
-                    title,
-                    price,
-                    salePrice,
-                    featured,
-                    categories: selectedCategories,
-                    colors: selectedColors,
-                    shortDesc,
-                    longDesc,
-                    images: imagesToSave.length > 0 ? imagesToSave : [defaultImg],
-                    mainImageIndex: mainIndexToSave,
-                    hidden: false
-                });
-            }
-
-            localStorage.setItem('ls3d_products', JSON.stringify(products));
-            resetForm();
-            renderAdminProducts();
-        }
-
-        function editProduct(id) {
-            const p = products.find(i => i.id === id);
+        function openProductModal(id) {
+            const p = products.find(item => item.id === id);
             if (!p) return;
-            document.getElementById('prod-id').value = p.id;
-            document.getElementById('prod-title').value = p.title;
-            document.getElementById('prod-price').value = p.price;
-            document.getElementById('prod-saleprice').value = p.salePrice || '';
-            document.getElementById('prod-featured').checked = p.featured || false;
-            document.getElementById('prod-shortdesc').value = p.shortDesc || '';
-            document.getElementById('prod-longdesc').value = p.longDesc || '';
+            const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
+            const cats = Array.isArray(p.categories) ? p.categories.join(' • ') : (p.category || 'Generale');
             
-            const prodCats = p.categories || (p.category ? [p.category] : [categories[0]]);
-            renderCategoriesCheckboxes(prodCats);
+            if (!p.reviews) p.reviews = [];
 
-            const prodCols = p.colors || [];
-            renderColorsCheckboxes(prodCols);
-
-            currentTempImages = p.images || [];
-            currentMainImageIndex = p.mainImageIndex || 0;
-            if (currentTempImages.length > 0) {
-                renderImagePreviews();
-            }
-
-            document.getElementById('form-title').innerText = "Modifica Prodotto";
-            switchTab('products');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function deleteProduct(id) {
-            if (confirm("Eliminare il prodotto?")) {
-                products = products.filter(i => i.id !== id);
-                localStorage.setItem('ls3d_products', JSON.stringify(products));
-                renderAdminProducts();
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('prod-featured').checked = false;
-            document.getElementById('image-preview-container').classList.add('hidden');
-            currentTempImages = [];
-            currentMainImageIndex = 0;
-            renderCategoriesCheckboxes();
-            renderColorsCheckboxes();
-            document.getElementById('form-title').innerText = "Aggiungi / Modifica Prodotto";
-        }
-
-        function renderAdminOrders() {
-            const container = document.getElementById('admin-orders-list');
-            if (!container) return;
-            if (orders.length === 0) {
-                container.innerHTML = `<p class="text-gray-500">Nessun ordine registrato.</p>`;
-                return;
-            }
-            container.innerHTML = orders.map((o, idx) => `
-                <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
-                    <div class="flex justify-between text-white font-bold">
-                        <span>Fattura n. ${o.number} (${o.id})</span>
-                        <span class="text-brand-400">€${o.total.toFixed(2)}</span>
+            let priceModalHtml = `<p class="text-brand-400 font-mono text-lg font-bold">€${Number(p.price || 0).toFixed(2)}</p>`;
+            if (p.salePrice && p.salePrice < p.price) {
+                priceModalHtml = `
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-sm text-gray-500 line-through">€${Number(p.price).toFixed(2)}</span>
+                        <span class="font-mono font-bold text-red-400 text-xl">€${Number(p.salePrice).toFixed(2)}</span>
+                        <span class="bg-red-500/20 text-red-400 text-xs font-mono px-2 py-0.5 rounded border border-red-500/30">OFFERTA</span>
                     </div>
-                    <p class="text-gray-400">Cliente: ${o.name} (${o.email})</p>
-                    <div class="flex gap-2 pt-2">
-                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
-                        <button type="button" onclick="sendInvoiceEmail(${idx})" class="px-3 py-1.5 bg-brand-500 text-black font-bold rounded-lg text-xs cursor-pointer">📧 Invia Email</button>
-                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">📥 XML AdE</button>
+                `;
+            }
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="space-y-6 max-h-[75vh] overflow-y-auto pr-2">
+                    <img src="${mainImg}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        ${(p.images || [defaultImg]).map((img, idx) => `
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-lg border cursor-pointer ${idx === (p.mainImageIndex || 0) ? 'border-brand-500' : 'border-gray-800'}">
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h2 class="text-2xl font-bold text-white">${p.title}</h2>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-bg text-xs font-mono text-brand-400 border border-gray-800">${cats}</span>
+                    </div>
+                    <div>${priceModalHtml}</div>
+                    <div class="space-y-2 pt-2 border-t border-gray-800">
+                        <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Descrizione Dettagliata</h4>
+                        <p class="text-sm text-gray-300 leading-relaxed">${p.longDesc || 'Nessuna descrizione dettagliata disponibile.'}</p>
+                    </div>
+
+                    <!-- SEZIONE RECENSIONI -->
+                    <div class="space-y-4 pt-4 border-t border-gray-800">
+                        <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Recensioni (${p.reviews.length})</h4>
+                        <div class="space-y-3">
+                            ${p.reviews.length === 0 ? '<p class="text-xs text-gray-500 font-mono">Nessun commento. Sii il primo a recensire!</p>' : 
+                              p.reviews.map(r => `
+                                <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 space-y-1 font-mono text-xs">
+                                    <div class="flex justify-between text-gray-400 text-[10px]">
+                                        <span class="text-brand-400 font-bold">${r.user}</span>
+                                        <span>${r.date}</span>
+                                    </div>
+                                    <p class="text-gray-200 font-sans">${r.comment}</p>
+                                </div>
+                              `).join('')}
+                        </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            document.getElementById('product-modal').classList.remove('hidden');
         }
 
-        function viewInvoiceModal(idx) {
-            const o = orders[idx];
-            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
-            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
-            document.getElementById('inv-modal-client').innerText = o.name;
-            document.getElementById('inv-modal-email').innerText = o.email;
-            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
-            document.getElementById('inv-modal-total').innerText = `€${o.total.toFixed(2)}`;
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
 
-            const itemsContainer = document.getElementById('inv-modal-items');
-            itemsContainer.innerHTML = o.items.map(item => `
-                <tr class="border-b border-gray-100">
-                    <td class="py-2">
-                        <p class="font-bold">${item.title}</p>
-                        <p class="text-[10px] text-gray-500">Colore: ${item.color || 'Standard'}</p>
-                    </td>
-                    <td class="py-2 text-center">${item.quantity}</td>
-                    <td class="py-2 text-right font-mono">€${(item.price * item.quantity).toFixed(2)}</td>
-                </tr>
-            `).join('');
+        function addToCartCatalog(prodId, finalPrice) {
+            const product = products.find(p => p.id === prodId);
+            if (!product) return;
+            const colorSelect = document.getElementById(`color-select-${prodId}`);
+            const selectedColor = colorSelect ? colorSelect.value : "Standard";
 
-            document.getElementById('invoice-modal').classList.remove('hidden');
+            const existing = cart.find(item => item.id === prodId && item.color === selectedColor);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ id: product.id, title: product.title, price: finalPrice, color: selectedColor, qty: 1 });
+            }
+            saveCart();
+            openCartModal();
         }
 
-        function closeInvoiceModal() {
-            document.getElementById('invoice-modal').classList.add('hidden');
+        function saveCart() {
+            localStorage.setItem('ls3d_cart', JSON.stringify(cart));
+            updateCartBadge();
         }
 
-        function sendInvoiceEmail(idx) {
-            const o = orders[idx];
-            alert(`Invio email a ${o.email} tramite EmailJS avviato con successo.`);
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            if(badge) badge.innerText = cart.reduce((acc, i) => acc + i.qty, 0);
         }
 
-        function downloadXmlAdmin(idx) {
-            alert("Download tracciato XML Agenzia delle Entrate avviato.");
+        function openCartModal() {
+            const container = document.getElementById('cart-items-container');
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-4">Il carrello è vuoto.</p>`;
+                document.getElementById('cart-total-price').innerText = "€0.00";
+            } else {
+                let subtotal = 0;
+                container.innerHTML = cart.map((i, idx) => {
+                    subtotal += (i.price || 0) * (i.qty || 1);
+                    return `
+                        <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                            <div>
+                                <p class="font-bold text-white">${i.qty}x ${i.title}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color || 'Standard'}</span></p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-brand-400">€${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
+                                <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 cursor-pointer">✕</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('cart-total-price').innerText = `€${subtotal.toFixed(2)}`;
+            }
+            document.getElementById('cart-modal').classList.remove('hidden');
         }
+
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        
+        function removeFromCart(index) { 
+            cart.splice(index, 1); 
+            saveCart(); 
+            openCartModal(); 
+        }
+
+        renderCategoryFilters();
+        renderProducts();
+        updateCartBadge();
+        try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
 </html>
