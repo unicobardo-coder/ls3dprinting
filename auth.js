@@ -1,4 +1,4 @@
-// --- GESTIONE UTENTE, PASSWORD E RECENSIONI (auth.js) ---
+// --- GESTIONE UTENTE, PASSWORD, PRIVACY E RECENSIONI (auth.js) ---
 
 let currentUser = JSON.parse(localStorage.getItem('ls3d_current_user')) || null;
 
@@ -37,39 +37,47 @@ function handleUserAuth() {
     const usernameEl = document.getElementById('auth-username');
     const emailEl = document.getElementById('auth-email');
     const passwordEl = document.getElementById('auth-password');
+    const privacyCheck = document.getElementById('privacy-check');
     
     const username = usernameEl ? usernameEl.value.trim() : "";
     const email = emailEl ? emailEl.value.trim() : "";
     const password = passwordEl ? passwordEl.value.trim() : "";
 
+    // 1. Controllo campi obbligatori
     if (!username || !email || !password) {
         alert("Per favore, compila tutti i campi (Username, Email e Password).");
         return;
     }
 
-    // Recupera la lista degli utenti registrati salvati nel browser
+    // 2. Controllo obbligatorio accettazione privacy (GDPR)
+    if (privacyCheck && !privacyCheck.checked) {
+        alert("Devi leggere e accettare l'informativa sulla privacy per procedere.");
+        return;
+    }
+
+    // 3. Gestione utenti registrati nel browser
     let users = JSON.parse(localStorage.getItem('ls3d_users')) || [];
     let existingUser = users.find(u => u.email === email);
 
     if (existingUser) {
-        // Se l'utente esiste già, verifica che la password corrisponda
+        // Se l'utente esiste già, verifica la password inserita
         if (existingUser.password !== password) {
             alert("Password errata! Riprova.");
             return;
         }
         currentUser = existingUser;
     } else {
-        // Se non esiste, crea un nuovo account e salvalo
+        // Se è un nuovo utente, lo registra salvando i dati
         currentUser = { username, email, password };
         users.push(currentUser);
         localStorage.setItem('ls3d_users', JSON.stringify(users));
     }
 
-    // Salva l'utente corrente attivo
+    // 4. Salva la sessione attiva
     localStorage.setItem('ls3d_current_user', JSON.stringify(currentUser));
     updateAuthUI();
     closeAuthModal();
-    alert(`Bentornato, ${currentUser.username}! Accesso effettuato con successo.`);
+    alert(`Accesso effettuato con successo. Benvenuto, ${currentUser.username}!`);
 }
 
 function handleUserLogout() {
@@ -115,7 +123,7 @@ function addProductReview(prodId) {
     }
 }
 
-// Inizializzazione automatica UI utente al caricamento
+// Inizializzazione automatica UI utente al caricamento della pagina
 document.addEventListener("DOMContentLoaded", () => {
     updateAuthUI();
 });
