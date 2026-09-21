@@ -222,6 +222,44 @@
             if(badge) badge.innerText = cart.reduce((acc, i) => acc + i.qty, 0);
         }
 
+        function openCartModal() {
+            const container = document.getElementById('cart-items-container');
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-4">Il carrello è vuoto.</p>`;
+                document.getElementById('cart-total-price').innerText = "€0.00";
+            } else {
+                let subtotal = 0;
+                container.innerHTML = cart.map((i, idx) => {
+                    subtotal += (i.price || 0) * (i.qty || 1);
+                    return `
+                        <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                            <div>
+                                <p class="font-bold text-white">${i.qty}x ${i.title}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color || 'Standard'}</span></p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-brand-400">€${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
+                                <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 cursor-pointer">✕</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('cart-total-price').innerText = `€${subtotal.toFixed(2)}`;
+            }
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        
+        function removeFromCart(index) { 
+            cart.splice(index, 1); 
+            localStorage.setItem('ls3d_cart', JSON.stringify(cart)); 
+            updateCartBadge(); 
+            openCartModal(); 
+        }
+
         function renderFeaturedProducts() {
             const grid = document.getElementById('featured-products-grid');
             if (!grid) return;
@@ -294,7 +332,6 @@
             const colorSelect = document.getElementById(`home-color-select-${prodId}`);
             const selectedColor = colorSelect ? colorSelect.value : "Standard";
 
-            let cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
             const existing = cart.find(item => item.id === prodId && item.color === selectedColor);
             if (existing) {
                 existing.qty += 1;
@@ -305,36 +342,6 @@
             updateCartBadge();
             openCartModal();
         }
-
-        function openCartModal() {
-            const container = document.getElementById('cart-items-container');
-            if (cart.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center py-4">Il carrello è vuoto.</p>`;
-                document.getElementById('cart-total-price').innerText = "€0.00";
-            } else {
-                let subtotal = 0;
-                container.innerHTML = cart.map((i, idx) => {
-                    subtotal += i.price * i.qty;
-                    return `
-                        <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
-                            <div>
-                                <p class="font-bold text-white">${i.qty}x ${i.title}</p>
-                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color}</span></p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-brand-400">€${(i.price * i.qty).toFixed(2)}</span>
-                                <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 cursor-pointer">✕</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('cart-total-price').innerText = `€${subtotal.toFixed(2)}`;
-            }
-            document.getElementById('cart-modal').classList.remove('hidden');
-        }
-
-        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
-        function removeFromCart(index) { cart.splice(index, 1); localStorage.setItem('ls3d_cart', JSON.stringify(cart)); updateCartBadge(); openCartModal(); }
 
         renderFeaturedProducts();
         updateCartBadge();
