@@ -176,19 +176,9 @@
         }
 
         function filterByCategory(cat) {
-// Gestione Prezzo Scontato vs Prezzo Normale Barrato
-                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${Number(p.price || 0).toFixed(2)}</span>`;
-                let effectivePrice = p.price;
-                if (p.salePrice && p.salePrice < p.price) {
-                    effectivePrice = p.salePrice;
-                    priceHtml = `
-                        <div class="flex items-center gap-2">
-                            <span class="font-mono text-xs text-gray-500 line-through">€${Number(p.price).toFixed(2)}</span>
-                            <span class="font-mono font-bold text-red-400 text-base">€${Number(p.salePrice).toFixed(2)}</span>
-                            <span class="bg-red-500/20 text-red-400 text-[10px] font-mono px-1.5 py-0.5 rounded border border-red-500/30">OFFERTA</span>
-                        </div>
-                    `;
-                }
+            currentCategoryFilter = cat;
+            renderCategoryFilters();
+            renderProducts();
         }
 
         function renderProducts() {
@@ -217,6 +207,19 @@
                 const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
                 const cats = Array.isArray(p.categories) ? p.categories.join(' • ') : (p.category || 'Generale');
                 
+                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${Number(p.price || 0).toFixed(2)}</span>`;
+                let effectivePrice = p.price;
+                if (p.salePrice && p.salePrice < p.price) {
+                    effectivePrice = p.salePrice;
+                    priceHtml = `
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs text-gray-500 line-through">€${Number(p.price).toFixed(2)}</span>
+                            <span class="font-mono font-bold text-red-400 text-base">€${Number(p.salePrice).toFixed(2)}</span>
+                            <span class="bg-red-500/20 text-red-400 text-[10px] font-mono px-1.5 py-0.5 rounded border border-red-500/30">OFFERTA</span>
+                        </div>
+                    `;
+                }
+
                 const availableColors = (p.colors && p.colors.length > 0) 
                     ? colorsList.filter(c => p.colors.includes(c.name))
                     : colorsList;
@@ -231,7 +234,7 @@
                             <div class="p-5 space-y-2">
                                 <h3 class="font-bold text-white text-base cursor-pointer hover:text-brand-400" onclick="openProductModal(${p.id})">${p.title}</h3>
                                 <p class="text-xs text-gray-400 leading-relaxed">${p.shortDesc || ''}</p>
-                                <p class="font-mono font-bold text-brand-400 text-sm pt-1">€${Number(p.price || 0).toFixed(2)}</p>
+                                <div class="pt-1">${priceHtml}</div>
                             </div>
                         </div>
                         <div class="p-5 pt-0 space-y-3">
@@ -241,7 +244,7 @@
                                     ${availableColors.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
                                 </select>
                             </div>
-                            <button onclick="addToCart(${p.id})" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
+                            <button onclick="addToCartCatalog(${p.id}, ${effectivePrice})" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                         </div>
                     </div>
                 `;
@@ -257,6 +260,17 @@
             
             if (!p.reviews) p.reviews = [];
 
+            let priceModalHtml = `<p class="text-brand-400 font-mono text-lg font-bold">€${Number(p.price || 0).toFixed(2)}</p>`;
+            if (p.salePrice && p.salePrice < p.price) {
+                priceModalHtml = `
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-sm text-gray-500 line-through">€${Number(p.price).toFixed(2)}</span>
+                        <span class="font-mono font-bold text-red-400 text-xl">€${Number(p.salePrice).toFixed(2)}</span>
+                        <span class="bg-red-500/20 text-red-400 text-xs font-mono px-2 py-0.5 rounded border border-red-500/30">OFFERTA</span>
+                    </div>
+                `;
+            }
+
             document.getElementById('modal-content').innerHTML = `
                 <div class="space-y-6 max-h-[75vh] overflow-y-auto pr-2">
                     <img src="${mainImg}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
@@ -269,7 +283,7 @@
                         <h2 class="text-2xl font-bold text-white">${p.title}</h2>
                         <span class="px-2.5 py-1 rounded-lg bg-dark-bg text-xs font-mono text-brand-400 border border-gray-800">${cats}</span>
                     </div>
-                    <p class="text-brand-400 font-mono text-lg font-bold">€${Number(p.price || 0).toFixed(2)}</p>
+                    <div>${priceModalHtml}</div>
                     <div class="space-y-2 pt-2 border-t border-gray-800">
                         <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Descrizione Dettagliata</h4>
                         <p class="text-sm text-gray-300 leading-relaxed">${p.longDesc || 'Nessuna descrizione dettagliata disponibile.'}</p>
@@ -278,7 +292,6 @@
                     <!-- SEZIONE RECENSIONI -->
                     <div class="space-y-4 pt-4 border-t border-gray-800">
                         <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Recensioni (${p.reviews.length})</h4>
-                        
                         <div class="space-y-3">
                             ${p.reviews.length === 0 ? '<p class="text-xs text-gray-500 font-mono">Nessun commento. Sii il primo a recensire!</p>' : 
                               p.reviews.map(r => `
@@ -291,11 +304,6 @@
                                 </div>
                               `).join('')}
                         </div>
-
-                        <div class="space-y-3 pt-2">
-                            <textarea id="new-comment-text" placeholder="Scrivi una recensione o un commento..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white text-xs focus:border-brand-500 focus:outline-none" rows="2"></textarea>
-                            <button onclick="addProductReview(${p.id})" class="py-2.5 px-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all cursor-pointer">Invia Recensione</button>
-                        </div>
                     </div>
                 </div>
             `;
@@ -304,7 +312,7 @@
 
         function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
 
-        function addToCart(prodId) {
+        function addToCartCatalog(prodId, finalPrice) {
             const product = products.find(p => p.id === prodId);
             if (!product) return;
             const colorSelect = document.getElementById(`color-select-${prodId}`);
@@ -314,7 +322,7 @@
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({ id: product.id, title: product.title, price: product.price, color: selectedColor, qty: 1 });
+                cart.push({ id: product.id, title: product.title, price: finalPrice, color: selectedColor, qty: 1 });
             }
             saveCart();
             openCartModal();
@@ -345,7 +353,7 @@
                         <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                             <div>
                                 <p class="font-bold text-white">${i.qty}x ${i.title}</p>
-                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color}</span></p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${i.color || 'Standard'}</span></p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-bold text-brand-400">€${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
@@ -360,7 +368,12 @@
         }
 
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
-        function removeFromCart(index) { cart.splice(index, 1); saveCart(); openCartModal(); }
+        
+        function removeFromCart(index) { 
+            cart.splice(index, 1); 
+            saveCart(); 
+            openCartModal(); 
+        }
 
         renderCategoryFilters();
         renderProducts();
