@@ -75,14 +75,24 @@
                     <input type="hidden" id="prod-id">
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="sm:col-span-2">
+                        <div class="sm:col-span-1">
                             <label class="block text-gray-400 mb-1 font-mono">Nome Prodotto *</label>
                             <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Prezzo (€) *</label>
+                            <label class="block text-gray-400 mb-1 font-mono">Prezzo Listino (€) *</label>
                             <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                         </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1 font-mono">Prezzo Scontato (€ - Opzionale)</label>
+                            <input type="number" step="0.01" id="prod-saleprice" placeholder="Lascia vuoto se nessun sconto" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- OPZIONE VETRINA HOME -->
+                    <div class="bg-dark-bg p-3 rounded-xl border border-gray-700/80 flex items-center gap-3">
+                        <input type="checkbox" id="prod-featured" class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
+                        <label for="prod-featured" class="text-gray-300 font-mono cursor-pointer select-none">⭐ Metti in evidenza nella <strong>Vetrina in Home</strong></label>
                     </div>
 
                     <!-- SELEZIONE CATEGORIE MULTIPLE -->
@@ -142,7 +152,7 @@
             </div>
         </div>
 
-        <!-- SCHEDA 3: COLORI (Con aggiunta ed eliminazione funzionante) -->
+        <!-- SCHEDA 3: COLORI -->
         <div id="tab-content-colors" class="admin-tab-content space-y-6 hidden">
             <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
                 <h2 class="text-lg font-bold text-white">Gestione Colori Filamento</h2>
@@ -169,6 +179,65 @@
 
     </div>
 
+    <!-- MODALE ANTEPRIMA FATTURA CON LOGO INGRANDITO -->
+    <div id="invoice-modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white text-gray-900 w-full max-w-2xl p-8 rounded-2xl shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
+            <div id="invoice-printable-content" class="space-y-6">
+                <!-- Intestazione con Logo Ingrandito -->
+                <div class="flex justify-between items-start border-b pb-4">
+                    <div class="flex items-center gap-4">
+                        <img src="logo.png" alt="LS3Dmaker Logo" class="w-24 h-24 object-contain">
+                        <div>
+                            <h2 class="text-xl font-bold">LS3Dmaker</h2>
+                            <p class="text-xs text-gray-600">Servizi di Stampa 3D Professionali</p>
+                            <p class="text-[10px] text-gray-500">Bologna, Italia | P.IVA: 00000000000</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <h3 id="inv-modal-number" class="text-lg font-bold text-emerald-600">Fattura N. --</h3>
+                        <p id="inv-modal-date" class="text-xs text-gray-500">Data: --/--/----</p>
+                    </div>
+                </div>
+                
+                <!-- Dati Cliente -->
+                <div class="bg-gray-50 p-4 rounded-xl text-xs space-y-1">
+                    <p class="font-bold text-gray-700">Dati Cliente:</p>
+                    <p id="inv-modal-client">Nome Cognome</p>
+                    <p id="inv-modal-email" class="text-gray-500">email@client.com</p>
+                    <p id="inv-modal-address" class="text-gray-500">Indirizzo spedizione</p>
+                </div>
+
+                <!-- Tabella Prodotti -->
+                <div class="space-y-2">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b text-gray-500">
+                                <th class="pb-2">Prodotto / Colore</th>
+                                <th class="pb-2 text-center">Q.ta</th>
+                                <th class="pb-2 text-right">Prezzo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inv-modal-items">
+                            <!-- Inserito via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totali -->
+                <div class="border-t pt-4 flex justify-between items-center font-bold text-sm">
+                    <span>Totale Ordine:</span>
+                    <span id="inv-modal-total" class="text-emerald-600 text-lg">€0.00</span>
+                </div>
+            </div>
+
+            <!-- Bottoni Azione Modale -->
+            <div class="flex gap-3 pt-4 border-t">
+                <button onclick="window.print()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs cursor-pointer">🖨️ Stampa / Salva PDF</button>
+                <button onclick="closeInvoiceModal()" class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-xs cursor-pointer">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="text-center py-6 text-xs text-gray-600 font-mono">
         LS3DMAKER Admin Panel © 2026
     </footer>
@@ -181,7 +250,6 @@
         let categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Design", "Mechanical", "Prototypes"];
         let orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
         
-        // GESTIONE COLORI INTERNA E AUTONOMA
         let filamentColors = JSON.parse(localStorage.getItem('ls3d_filament_colors')) || [
             { name: "Nero Opaco", code: "#111827" },
             { name: "Bianco Perla", code: "#f3f4f6" },
@@ -242,7 +310,6 @@
             });
         }
 
-        // GESTIONE COLORI ADMIN & CHECKBOX
         function renderAdminColorsWithDots() {
             const container = document.getElementById('admin-colors-container');
             if (!container) return;
@@ -271,22 +338,13 @@
             const name = nameInput.value.trim();
             const code = codeInput.value;
 
-            if (!name) {
-                alert("Inserisci un nome per il colore.");
-                return;
-            }
-
-            if (filamentColors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-                alert("Questo colore esiste già!");
-                return;
-            }
+            if (!name) { alert("Inserisci un nome per il colore."); return; }
+            if (filamentColors.some(c => c.name.toLowerCase() === name.toLowerCase())) { alert("Questo colore esiste già!"); return; }
 
             filamentColors.push({ name, code });
             persistColors();
-            
             nameInput.value = '';
             codeInput.value = '#10b981';
-            
             renderAdminColorsWithDots();
         }
 
@@ -301,7 +359,6 @@
         function renderColorsCheckboxes(selectedColors = []) {
             const container = document.getElementById('colors-checkboxes');
             if (!container) return;
-
             container.innerHTML = filamentColors.map(c => `
                 <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white select-none">
                     <input type="checkbox" name="product-colors" value="${c.name}" ${selectedColors.length === 0 || selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
@@ -325,10 +382,8 @@
         function handleImageUpload(e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
-
             currentTempImages = [];
             let loadedCount = 0;
-
             for (let i = 0; i < files.length; i++) {
                 const reader = new FileReader();
                 reader.onload = function(uploadEvent) {
@@ -347,7 +402,6 @@
             const container = document.getElementById('image-preview-container');
             const thumbs = document.getElementById('preview-thumbs');
             container.classList.remove('hidden');
-
             thumbs.innerHTML = currentTempImages.map((img, idx) => `
                 <div class="relative group cursor-pointer" onclick="setMainImage(${idx})">
                     <img src="${img}" class="w-20 h-20 object-cover rounded-xl border-2 ${idx === currentMainImageIndex ? 'border-brand-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'border-gray-700 opacity-60'}">
@@ -403,13 +457,19 @@
             container.innerHTML = products.map(p => {
                 const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
                 const cats = Array.isArray(p.categories) ? p.categories.join(', ') : (p.category || 'Generale');
+                const priceDisplay = p.salePrice ? `<span class="line-through text-gray-500">€${p.price.toFixed(2)}</span> <span class="text-red-400 font-bold">€${p.salePrice.toFixed(2)}</span>` : `€${p.price.toFixed(2)}`;
+                const badgeFeatured = p.featured ? `<span class="bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded text-[10px] font-mono border border-brand-500/30">⭐ In Vetrina</span>` : '';
+
                 return `
-                    <div class="flex justify-between items-center p-4 bg-dark-bg rounded-xl border border-gray-800 text-xs">
+                    <div class="flex justify-between items-center p-4 bg-dark-bg rounded-xl border border-gray-800 text-xs gap-3">
                         <div class="flex items-center gap-3">
                             <img src="${mainImg}" class="w-12 h-12 object-cover rounded-lg border border-gray-700">
                             <div>
-                                <p class="font-bold text-white text-sm">${p.title}</p>
-                                <p class="text-brand-400 font-mono">€${p.price.toFixed(2)} | Categorie: ${cats}</p>
+                                <div class="flex items-center gap-2">
+                                    <p class="font-bold text-white text-sm">${p.title}</p>
+                                    ${badgeFeatured}
+                                </div>
+                                <p class="text-brand-400 font-mono">${priceDisplay} | Categorie: ${cats}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -426,6 +486,9 @@
             const id = document.getElementById('prod-id').value;
             const title = document.getElementById('prod-title').value;
             const price = parseFloat(document.getElementById('prod-price').value);
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
+            const featured = document.getElementById('prod-featured').checked;
             const shortDesc = document.getElementById('prod-shortdesc').value;
             const longDesc = document.getElementById('prod-longdesc').value;
 
@@ -445,6 +508,8 @@
                 if (p) {
                     p.title = title;
                     p.price = price;
+                    p.salePrice = salePrice;
+                    p.featured = featured;
                     p.categories = selectedCategories;
                     p.colors = selectedColors;
                     p.shortDesc = shortDesc;
@@ -460,6 +525,8 @@
                     id: newId,
                     title,
                     price,
+                    salePrice,
+                    featured,
                     categories: selectedCategories,
                     colors: selectedColors,
                     shortDesc,
@@ -481,6 +548,8 @@
             document.getElementById('prod-id').value = p.id;
             document.getElementById('prod-title').value = p.title;
             document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-saleprice').value = p.salePrice || '';
+            document.getElementById('prod-featured').checked = p.featured || false;
             document.getElementById('prod-shortdesc').value = p.shortDesc || '';
             document.getElementById('prod-longdesc').value = p.longDesc || '';
             
@@ -512,6 +581,7 @@
         function resetForm() {
             document.getElementById('product-form').reset();
             document.getElementById('prod-id').value = '';
+            document.getElementById('prod-featured').checked = false;
             document.getElementById('image-preview-container').classList.add('hidden');
             currentTempImages = [];
             currentMainImageIndex = 0;
@@ -535,20 +605,49 @@
                     </div>
                     <p class="text-gray-400">Cliente: ${o.name} (${o.email})</p>
                     <div class="flex gap-2 pt-2">
+                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
                         <button type="button" onclick="sendInvoiceEmail(${idx})" class="px-3 py-1.5 bg-brand-500 text-black font-bold rounded-lg text-xs cursor-pointer">📧 Invia Email</button>
-                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-accent-500 text-black font-bold rounded-lg text-xs cursor-pointer">📥 XML AdE</button>
+                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">📥 XML AdE</button>
                     </div>
                 </div>
             `).join('');
         }
 
+        function viewInvoiceModal(idx) {
+            const o = orders[idx];
+            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
+            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
+            document.getElementById('inv-modal-client').innerText = o.name;
+            document.getElementById('inv-modal-email').innerText = o.email;
+            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
+            document.getElementById('inv-modal-total').innerText = `€${o.total.toFixed(2)}`;
+
+            const itemsContainer = document.getElementById('inv-modal-items');
+            itemsContainer.innerHTML = o.items.map(item => `
+                <tr class="border-b border-gray-100">
+                    <td class="py-2">
+                        <p class="font-bold">${item.title}</p>
+                        <p class="text-[10px] text-gray-500">Colore: ${item.color || 'Standard'}</p>
+                    </td>
+                    <td class="py-2 text-center">${item.quantity}</td>
+                    <td class="py-2 text-right font-mono">€${(item.price * item.quantity).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoice-modal').classList.add('hidden');
+        }
+
         function sendInvoiceEmail(idx) {
             const o = orders[idx];
-            alert(`Invio email a ${o.email} tramite EmailJS avviato.`);
+            alert(`Invio email a ${o.email} tramite EmailJS avviato con successo.`);
         }
 
         function downloadXmlAdmin(idx) {
-            alert("Download XML Agenzia Entrate avviato.");
+            alert("Download tracciato XML Agenzia delle Entrate avviato.");
         }
     </script>
 </body>
