@@ -176,9 +176,19 @@
         }
 
         function filterByCategory(cat) {
-            currentCategoryFilter = cat;
-            renderCategoryFilters();
-            renderProducts();
+// Gestione Prezzo Scontato vs Prezzo Normale Barrato
+                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${Number(p.price || 0).toFixed(2)}</span>`;
+                let effectivePrice = p.price;
+                if (p.salePrice && p.salePrice < p.price) {
+                    effectivePrice = p.salePrice;
+                    priceHtml = `
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs text-gray-500 line-through">€${Number(p.price).toFixed(2)}</span>
+                            <span class="font-mono font-bold text-red-400 text-base">€${Number(p.salePrice).toFixed(2)}</span>
+                            <span class="bg-red-500/20 text-red-400 text-[10px] font-mono px-1.5 py-0.5 rounded border border-red-500/30">OFFERTA</span>
+                        </div>
+                    `;
+                }
         }
 
         function renderProducts() {
