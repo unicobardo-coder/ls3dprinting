@@ -1,4 +1,4 @@
-// --- GESTIONE UTENTE, REGISTRAZIONE E RECENSIONI (auth.js) ---
+// --- GESTIONE UTENTE, PASSWORD E RECENSIONI (auth.js) ---
 
 let currentUser = JSON.parse(localStorage.getItem('ls3d_current_user')) || null;
 
@@ -36,20 +36,40 @@ function closeAuthModal() {
 function handleUserAuth() {
     const usernameEl = document.getElementById('auth-username');
     const emailEl = document.getElementById('auth-email');
+    const passwordEl = document.getElementById('auth-password');
     
     const username = usernameEl ? usernameEl.value.trim() : "";
     const email = emailEl ? emailEl.value.trim() : "";
+    const password = passwordEl ? passwordEl.value.trim() : "";
 
-    if (!username || !email) {
-        alert("Inserisci username ed email per registrarti.");
+    if (!username || !email || !password) {
+        alert("Per favore, compila tutti i campi (Username, Email e Password).");
         return;
     }
 
-    currentUser = { username, email };
+    // Recupera la lista degli utenti registrati salvati nel browser
+    let users = JSON.parse(localStorage.getItem('ls3d_users')) || [];
+    let existingUser = users.find(u => u.email === email);
+
+    if (existingUser) {
+        // Se l'utente esiste già, verifica che la password corrisponda
+        if (existingUser.password !== password) {
+            alert("Password errata! Riprova.");
+            return;
+        }
+        currentUser = existingUser;
+    } else {
+        // Se non esiste, crea un nuovo account e salvalo
+        currentUser = { username, email, password };
+        users.push(currentUser);
+        localStorage.setItem('ls3d_users', JSON.stringify(users));
+    }
+
+    // Salva l'utente corrente attivo
     localStorage.setItem('ls3d_current_user', JSON.stringify(currentUser));
     updateAuthUI();
     closeAuthModal();
-    alert(`Registrazione effettuata con successo! Benvenuto, ${username}.`);
+    alert(`Bentornato, ${currentUser.username}! Accesso effettuato con successo.`);
 }
 
 function handleUserLogout() {
@@ -63,7 +83,7 @@ function handleUserLogout() {
 // --- AGGIUNTA RECENSIONE PRODOTTO ---
 function addProductReview(prodId) {
     if (!currentUser) {
-        alert("Devi prima registrarti o effettuare l'accesso per poter lasciare un commento.");
+        alert("Devi prima effettuare l'accesso per poter lasciare un commento.");
         openAuthModal();
         return;
     }
@@ -90,7 +110,6 @@ function addProductReview(prodId) {
 
     localStorage.setItem('ls3d_products', JSON.stringify(products));
 
-    // Aggiorna la modale aperta se esiste la funzione
     if (typeof openProductModal === 'function') {
         openProductModal(prodId);
     }
