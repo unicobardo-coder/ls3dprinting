@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informativa Privacy & GDPR | LS3Dmaker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { brand: { 500: '#10b981', 400: '#34d399' }, dark: { bg: '#070b14', card: '#0d1322' } }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between">
+
+    <header class="border-b border-gray-800 p-6">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-white text-lg font-mono">LS3DMAKER</a>
+            <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white">← Torna alla Home</a>
+        </div>
+    </header>
+
+    <main class="py-12 px-6 max-w-4xl mx-auto space-y-8 flex-grow leading-relaxed text-gray-300 text-sm">
+        <h1 class="text-3xl font-extrabold text-white">Informativa sulla Privacy e GDPR</h1>
+        <p class="text-xs font-mono text-brand-400">Ultimo aggiornamento: Settembre 2026</p>
+
+        <section class="space-y-3 bg-dark-card border border-gray-800 p-6 rounded-2xl">
+            <h2 class="text-base font-bold text-white">1. Titolare del Trattamento</h2>
+            <p>Il titolare del trattamento dei dati per il sito <strong>LS3DMAKER</strong> è il gestore del laboratorio di stampa 3D con sede a Bologna.</p>
+        </section>
+
+        <section class="space-y-3 bg-dark-card border border-gray-800 p-6 rounded-2xl">
+            <h2 class="text-base font-bold text-white">2. Quali dati raccogliamo e perché</h2>
+            <p>Raccogliamo unicamente i dati necessari al funzionamento del servizio e all'evasione degli ordini:</p>
+            <ul class="list-disc pl-5 space-y-1 font-mono text-xs text-gray-400">
+                <li><strong>Dati di spedizione e contatto (Nome, Email, Indirizzo):</strong> Raccolti esclusivamente in fase di checkout per consentire la spedizione dei prodotti stampati in 3D e l'invio della ricevuta/fattura.</li>
+                <li><strong>Dati di registrazione e recensioni:</strong> Nome utente ed email forniti volontariamente per l'accesso e la pubblicazione di commenti sui prodotti.</li>
+                <li><strong>Dati tecnici (localStorage):</strong> Utilizzati unicamente dal browser per memorizzare i prodotti nel carrello e la lingua selezionata durante la navigazione. Non utilizziamo cookie di profilazione di terze parti invasivi.</li>
+            </ul>
+        </section>
+
+        <section class="space-y-3 bg-dark-card border border-gray-800 p-6 rounded-2xl">
+            <h2 class="text-base font-bold text-white">3. Conservazione dei dati</h2>
+            <p>I dati degli ordini vengono salvati localmente per la gestione amministrativa del laboratorio. I dati non vengono ceduti a terzi per scopi commerciali o pubblicitari.</p>
+        </section>
+
+        <section class="space-y-3 bg-dark-card border border-gray-800 p-6 rounded-2xl">
+            <h2 class="text-base font-bold text-white">4. Diritti dell'utente</h2>
+            <p>Gli utenti possono in qualsiasi momento richiedere la cancellazione dei propri dati salvati o la rimozione delle recensioni inviate contattandoci direttamente.</p>
+        </section>
+    </main>
+
+    <footer class="border-t border-gray-800 py-6 text-center text-xs text-gray-500 font-mono">
+        LS3DMAKER © 2026 - Tutti i diritti riservati
+    </footer>
+</body>
+</html>
