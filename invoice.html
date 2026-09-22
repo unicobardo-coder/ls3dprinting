@@ -1,0 +1,129 @@
+// --- GESTIONE FATTURE, ANTEPRIMA E INVIO EMAIL ---
+
+function renderAdminOrders() {
+    let orders = [];
+    try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+
+    const container = document.getElementById('admin-orders-list');
+    if (!container) return;
+    
+    if (orders.length === 0) {
+        container.innerHTML = `<p class="text-gray-500">Nessun ordine registrato.</p>`;
+        return;
+    }
+    
+    container.innerHTML = orders.map((o, idx) => `
+        <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
+            <div class="flex justify-between text-white font-bold">
+                <span>Fattura n. ${o.number} (${o.id})</span>
+                <span class="text-brand-400">€${Number(o.total || 0).toFixed(2)}</span>
+            </div>
+            <p class="text-gray-400">Cliente: ${o.name} (${o.email}) - Pagamento: <strong class="text-white">${o.gateway}</strong></p>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
+                <button type="button" onclick="sendInvoiceEmail(${idx})" class="px-3 py-1.5 bg-brand-500 text-black font-bold rounded-lg text-xs cursor-pointer">📧 Invia Email</button>
+                <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">📥 XML AdE</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function viewInvoiceModal(idx) {
+    let orders = [];
+    try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+    const o = orders[idx];
+    if (!o) return;
+
+    document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
+    document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
+    document.getElementById('inv-modal-client').innerText = o.name;
+    document.getElementById('inv-modal-email').innerText = o.email;
+    document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
+    document.getElementById('inv-modal-total').innerText = `€${Number(o.total || 0).toFixed(2)}`;
+
+    const itemsContainer = document.getElementById('inv-modal-items');
+    itemsContainer.innerHTML = (o.items || []).map(item => `
+        <tr class="border-b border-gray-100">
+            <td class="py-2">
+                <p class="font-bold">${item.title}</p>
+                <p class="text-[10px] text-gray-500">Colore: ${item.color || 'Standard'}</p>
+            </td>
+            <td class="py-2 text-center">${item.quantity || item.qty || 1}</td>
+            <td class="py-2 text-right font-mono">€${(((Number(item.price) || 0) * (Number(item.quantity || item.qty) || 1))).toFixed(2)}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById('invoice-modal').classList.remove('hidden');
+}
+
+function closeInvoiceModal() {
+    document.getElementById('invoice-modal').classList.add('hidden');
+}
+
+function sendInvoiceEmail(idx) {
+    let orders = [];
+    try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+    const o = orders[idx];
+    if (!o) return;
+
+    const orderSummaryText = (o.items || []).map(i => `${i.qty || 1}x ${i.title} (${i.color || 'Standard'}) - €${((i.price || 0) * (i.qty || 1)).toFixed(2)}`).join('\n');
+    
+    const emailParams = {
+        to_email: o.email,
+        customer_name: o.name,
+        customer_address: o.address,
+        order_id: o.id,
+        order_total: Number(o.total || 0).toFixed(2),
+        order_items: orderSummaryText,
+        payment_gateway: o.gateway
+    };
+
+    if (typeof emailjs !== 'undefined') {
+        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", emailParams)
+            .then(function(response) {
+                alert(`Email inviata con successo a ${o.email}!`);
+            }, function(error) {
+                alert("Errore durante l'invio dell'email. Controlla la console.");
+                console.error("Errore EmailJS:", error);
+            });
+    } else {
+        alert("SDK EmailJS non disponibile.");
+    }
+}
+
+function downloadXmlAdmin(idx) {
+    let orders = [];
+    try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+    const o = orders[idx];
+    if (!o) return;
+
+    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<FatturaElettronica versione="FPR12">
+    <FatturaElettronicaHeader>
+        <DatiTrasmissione>
+            <IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdTrasmittente>
+            <ProgressivoInvio>${o.id}</ProgressivoInvio>
+            <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+        </DatiTrasmissione>
+        <CedentePrestatore>
+            <DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3Dmaker</Denominazione></Anagrafica></DatiAnagrafici>
+        </CedentePrestatore>
+        <CessionarioCommittente>
+            <DatiAnagrafici><Anagrafica><Denominazione>${o.name}</Denominazione></Anagrafica></DatiAnagrafici>
+        </CessionarioCommittente>
+    </FatturaElettronicaHeader>
+    <FatturaElettronicaBody>
+        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${o.date}</Data><Numero>${o.number}</Numero><ImportoTotaleDocumento>${o.total.toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
+    </FatturaElettronicaBody>
+</FatturaElettronica>`;
+
+    const blob = new Blob([xmlContent], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Fattura_${o.number.replace('/', '_')}.xml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
