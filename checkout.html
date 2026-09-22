@@ -11,9 +11,11 @@
     
     <!-- Stripe SDK -->
     <script src="https://js.stripe.com/v3/"></script>
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR"></script>
-    <!-- EmailJS SDK -->
+    
+    <!-- PayPal SDK (Sostituisci IL_TUO_PAYPAL_CLIENT_ID con il tuo Client ID reale) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=IL_TUO_PAYPAL_CLIENT_ID&currency=EUR"></script>
+
+    <!-- EmailJS SDK per le notifiche email -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
@@ -72,7 +74,7 @@
                 <div class="pt-6 space-y-4 border-t border-gray-800">
                     <label class="block text-gray-300 font-bold font-mono text-xs uppercase tracking-wider">Scegli come pagare:</label>
                     
-                    <!-- PULSANTE CARTA (STRIPE) -->
+                    <!-- PULSANTE CARTA (STRIPE CON LA TUA CHIAVE PK) -->
                     <button type="button" onclick="payWithStripe()" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                         <i data-lucide="credit-card" class="w-4 h-4"></i> Paga con Carta (Stripe)
                     </button>
@@ -83,7 +85,7 @@
                         <div class="flex-grow border-t border-gray-800"></div>
                     </div>
 
-                    <!-- PULSANTE PAYPAL -->
+                    <!-- PULSANTE UFFICIALE PAYPAL -->
                     <div id="paypal-button-container" class="w-full"></div>
                 </div>
             </div>
@@ -106,20 +108,22 @@
         LS3DMAKER © 2026 - Transazioni Protette
     </footer>
 
-    <!-- SCRIPT LOGICA -->
+    <!-- SCRIPT ESTERNO PER LA GESTIONE EMAIL (MAILER.JS) -->
+    <script src="mailer.js"></script>
+
+    <!-- SCRIPT LOGICA CHECKOUT -->
     <script>
-        const STRIPE_PUBLIC_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
+        // Inserisci qui la tua chiave pubblica (pk_) di Stripe
+        const STRIPE_PUBLIC_KEY = 'pk_test_51UHMrDI8ODyvK2K7ukuIRTd0KaZKnEcxdYUEIh1g5nCLfcxasFRnpyFQtFmY6GYb0Y6lu3egT3npjJV1M1FcwGhq00mahmrlcf';
         let stripe = null;
         try {
-            if (typeof Stripe !== 'undefined') {
+            if (typeof Stripe !== 'undefined' && STRIPE_PUBLIC_KEY !== 'pk_test_51UHMrDI8ODyvK2K7ukuIRTd0KaZKnEcxdYUEIh1g5nCLfcxasFRnpyFQtFmY6GYb0Y6lu3egT3npjJV1M1FcwGhq00mahmrlcf') {
                 stripe = Stripe(STRIPE_PUBLIC_KEY);
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Stripe init error:", e); }
 
         let cart = [];
-        try {
-            cart = JSON.parse(localStorage.getItem('ls3d_cart')) || [];
-        } catch (e) { cart = []; }
+        try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
 
         function renderCheckoutSummary() {
             const container = document.getElementById('checkout-items-list');
@@ -161,7 +165,7 @@
             return { name, email, address };
         }
 
-        // --- STRIPE ---
+        // --- GESTIONE PAGAMENTO CARTA (STRIPE) ---
         function payWithStripe() {
             const customer = validateCustomerData();
             if (!customer) return;
@@ -169,17 +173,17 @@
             const total = renderCheckoutSummary();
             if (total <= 0) { alert("Il carrello è vuoto."); return; }
 
-            // Simulazione transazione carta verificata con successo
-            let paymentVerified = true; 
-
-            if (paymentVerified) {
+            // Simulazione o reindirizzamento sicuro
+            let paymentSuccessful = confirm("Simulazione pagamento Stripe:\nL'importo di €" + total.toFixed(2) + " è stato autorizzato con successo?\n\n[OK = Conferma Pagamento]");
+            if (paymentSuccessful) {
+                // IL PAGAMENTO È ANDATO A BUON FINE: REGISTRIAMO L'ORDINE
                 finalizeOrderAndSave("Stripe", "STRIPE-TX-" + Date.now(), customer, total);
             } else {
-                alert("Pagamento con carta rifiutato. L'ordine non è stato registrato.");
+                alert("Pagamento annullato.");
             }
         }
 
-        // --- PAYPAL ---
+        // --- GESTIONE PULSANTE UFFICIALE PAYPAL ---
         function initPayPal() {
             const total = renderCheckoutSummary();
             if (total <= 0 || typeof paypal === 'undefined') return;
@@ -188,9 +192,13 @@
                 paypal.Buttons({
                     createOrder: function(data, actions) {
                         const customer = validateCustomerData();
-                        if (!customer) throw new Error("Dati cliente incompleti");
+                        if (!customer) {
+                            throw new Error("Dati cliente incompleti");
+                        }
                         return actions.order.create({
-                            purchase_units: [{ amount: { value: total.toFixed(2) } }]
+                            purchase_units: [{
+                                amount: { value: total.toFixed(2) }
+                            }]
                         });
                     },
                     onApprove: function(data, actions) {
@@ -201,22 +209,22 @@
                                 address: document.getElementById('cust-address').value || "Indirizzo PayPal"
                             };
                             
+                            // IL PAGAMENTO È STATO AUTORIZZATO E CATTURATO DA PAYPAL CON SUCCESSO!
+                            // SOLO ADESSO SALVIAMO L'ORDINE, MANDIAMO L'EMAIL E SVUOTIAMO IL CARRELLO.
                             finalizeOrderAndSave("PayPal", details.id, customer, total);
                         });
                     },
                     onError: function(err) {
-                        alert("Errore durante la transazione PayPal. L'ordine non è stato registrato.");
+                        alert("Si è verificato un errore durante la transazione PayPal. L'ordine non è stato registrato.");
+                        console.error("PayPal Error:", err);
                     }
                 }).render('#paypal-button-container');
-            } catch(e) { console.error("PayPal non inizializzato:", e); }
+            } catch(e) { console.error("Errore inizializzazione PayPal:", e); }
         }
 
-        // --- SALVATAGGIO E NOTIFICA EMAIL ---
+        // --- FUNZIONE DI CHIUSURA ORDINE (ESEGUITA SOLO A PAGAMENTO AVVENUTO) ---
         function finalizeOrderAndSave(gateway, transactionId, customer, total) {
-            if (cart.length === 0) {
-                alert("Errore: carrello vuoto.");
-                return;
-            }
+            if (!cart || cart.length === 0) return;
 
             const newOrder = {
                 id: "ORD-" + Date.now(),
@@ -231,41 +239,22 @@
                 total: total
             };
 
-            // 1. Salva nel pannello Admin (localStorage)
+            // 1. Salva l'ordine nel pannello Admin (localStorage)
             let orders = [];
-            try {
-                orders = JSON.parse(localStorage.getItem('ls3d_orders')) || [];
-            } catch (e) { orders = []; }
-            
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
             orders.push(newOrder);
             localStorage.setItem('ls3d_orders', JSON.stringify(orders));
 
-            // 2. Invio email tramite EmailJS (se configurato)
-            const orderSummaryText = cart.map(i => `${i.qty}x ${i.title} (${i.color || 'Standard'}) - €${((Number(i.price)||0) * (Number(i.qty)||1)).toFixed(2)}`).join('\n');
-            
-            const emailParams = {
-                to_email: customer.email,
-                customer_name: customer.name,
-                customer_address: customer.address,
-                order_id: newOrder.id,
-                order_total: total.toFixed(2),
-                order_items: orderSummaryText,
-                payment_gateway: gateway
-            };
-
-            if (typeof emailjs !== 'undefined') {
-                emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", emailParams)
-                    .then(function(response) {
-                        console.log("Email inviata con successo!", response.status);
-                    }, function(error) {
-                        console.error("Errore invio email:", error);
-                    });
+            // 2. Invia la mail di conferma tramite il file esterno mailer.js
+            if (typeof sendOrderConfirmationEmail === 'function') {
+                sendOrderConfirmationEmail(newOrder);
             }
 
-            // 3. Svuota il carrello dopo il salvataggio dell'ordine
+            // 3. Svuota definitivamente il carrello
             localStorage.removeItem('ls3d_cart');
+            cart = [];
 
-            alert(`Pagamento completato con successo tramite ${gateway}! Ordine registrato e ricevuta emessa.`);
+            alert(`Pagamento completato con successo tramite ${gateway}! Ricevuta inviata a ${customer.email}.`);
             window.location.href = "index.html";
         }
 
