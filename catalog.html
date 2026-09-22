@@ -108,7 +108,7 @@
             
             // Prodotti di fallback se il localStorage è vuoto
             return [
-                { id: 1, title: "Supporto Cuffie Premium", price: 24.99, oldPrice: 29.99, desc: "Supporto ergonomico stampato in PLA rinforzato.", image: "https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600", colors: ["Nero Opaco", "Grigio Titanio", "Bianco Perla"] },
+                { id: 1, title: "Supporto Cuffie Premium", price: 24.99, oldPrice: 34.99, desc: "Supporto ergonomico stampato in PLA rinforzato.", image: "https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600", colors: ["Nero Opaco", "Grigio Titanio", "Bianco Perla"] },
                 { id: 2, title: "Organizzatore Scrivania Modulare", price: 19.50, oldPrice: 0, desc: "Sistema componibile per penne, smartphone e accessori.", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600", colors: ["Nero", "Verde Foresta", "Legno PLA"] }
             ];
         }
@@ -131,15 +131,19 @@
                 const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
                 
                 const currentPrice = Number(p.price) || 0;
-                const oldPrice = Number(p.oldPrice) || 0;
+                // Gestisce sia 'oldPrice' che eventuali varianti di nome usate nell'admin (es. 'originalPrice' o 'comparePrice')
+                const oldPrice = Number(p.oldPrice || p.originalPrice || p.comparePrice) || 0;
+                
                 const hasDiscount = oldPrice > currentPrice;
 
                 let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${currentPrice.toFixed(2)}</span>`;
                 if (hasDiscount) {
+                    const discountPercent = Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
                     priceHtml = `
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2.5">
                             <span class="font-mono font-bold text-brand-400 text-sm">€${currentPrice.toFixed(2)}</span>
                             <span class="font-mono text-gray-500 text-xs line-through">€${oldPrice.toFixed(2)}</span>
+                            <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-mono px-1.5 py-0.5 rounded font-bold">-${discountPercent}%</span>
                         </div>
                     `;
                 }
@@ -149,7 +153,7 @@
                         <div>
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
                                 <img src="${p.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'">
-                                ${hasDiscount ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-md">Promo</span>' : ''}
+                                ${hasDiscount ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
                             </div>
                             <div class="p-5 space-y-3">
                                 <h3 class="font-bold text-white text-base">${p.title}</h3>
