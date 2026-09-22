@@ -108,8 +108,8 @@
             
             // Prodotti di fallback se il localStorage è vuoto
             return [
-                { id: 1, title: "Supporto Cuffie Premium", price: 24.99, desc: "Supporto ergonomico stampato in PLA rinforzato.", image: "https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600", colors: ["Nero Opaco", "Grigio Titanio", "Bianco Perla"] },
-                { id: 2, title: "Organizzatore Scrivania Modulare", price: 19.50, desc: "Sistema componibile per penne, smartphone e accessori.", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600", colors: ["Nero", "Verde Foresta", "Legno PLA"] }
+                { id: 1, title: "Supporto Cuffie Premium", price: 24.99, oldPrice: 29.99, desc: "Supporto ergonomico stampato in PLA rinforzato.", image: "https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600", colors: ["Nero Opaco", "Grigio Titanio", "Bianco Perla"] },
+                { id: 2, title: "Organizzatore Scrivania Modulare", price: 19.50, oldPrice: 0, desc: "Sistema componibile per penne, smartphone e accessori.", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600", colors: ["Nero", "Verde Foresta", "Legno PLA"] }
             ];
         }
 
@@ -130,11 +130,28 @@
                 const colors = p.colors || ["Standard"];
                 const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
                 
+                const currentPrice = Number(p.price) || 0;
+                const oldPrice = Number(p.oldPrice) || 0;
+                const hasDiscount = oldPrice > currentPrice;
+
+                // Gestione HTML prezzo e sconti
+                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${currentPrice.toFixed(2)}</span>`;
+                if (hasDiscount) {
+                    priceHtml = `
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-brand-400 text-sm">€${currentPrice.toFixed(2)}</span>
+                            <span class="font-mono text-gray-500 text-xs line-through">€${oldPrice.toFixed(2)}</span>
+                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-mono px-1.5 py-0.5 rounded">Sconto</span>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all">
                         <div>
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
                                 <img src="${p.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'">
+                                ${hasDiscount ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider">Promo</span>' : ''}
                             </div>
                             <div class="p-5 space-y-3">
                                 <h3 class="font-bold text-white text-base">${p.title}</h3>
@@ -150,8 +167,8 @@
                         </div>
 
                         <div class="p-5 pt-0 flex items-center justify-between border-t border-gray-800/60 mt-4">
-                            <span class="font-mono font-bold text-brand-400 text-sm">€${Number(p.price).toFixed(2)}</span>
-                            <button onclick="addToCart('${p.title.replace(/'/g, "\\'")}', ${p.price}, 'color-${idx}')" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer">
+                            <div>${priceHtml}</div>
+                            <button onclick="addToCart('${p.title.replace(/'/g, "\\'")}', ${currentPrice}, 'color-${idx}')" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer">
                                 <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
                             </button>
                         </div>
@@ -229,6 +246,7 @@
 
         function saveCart() {
             try {
+                localStorage.getItem('ls3d_cart'); // sanity check
                 localStorage.setItem('ls3d_cart', JSON.stringify(cart));
             } catch (e) { console.error(e); }
         }
