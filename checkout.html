@@ -165,7 +165,7 @@
             return { name, email, address };
         }
 
-        // --- GESTIONE PAGAMENTO CARTA (STRIPE) ---
+        // --- GESTIONE PAGAMENTO CARTA (STRIPE) --
         function payWithStripe() {
             const customer = validateCustomerData();
             if (!customer) return;
@@ -173,13 +173,22 @@
             const total = renderCheckoutSummary();
             if (total <= 0) { alert("Il carrello è vuoto."); return; }
 
-            // Simulazione o reindirizzamento sicuro
-            let paymentSuccessful = confirm("Simulazione pagamento Stripe:\nL'importo di €" + total.toFixed(2) + " è stato autorizzato con successo?\n\n[OK = Conferma Pagamento]");
-            if (paymentSuccessful) {
-                // IL PAGAMENTO È ANDATO A BUON FINE: REGISTRIAMO L'ORDINE
-                finalizeOrderAndSave("Stripe", "STRIPE-TX-" + Date.now(), customer, total);
+            // Salva temporaneamente i dati cliente nel localStorage così, 
+            // quando l'utente torna da Stripe dopo aver pagato, possiamo registrare l'ordine.
+            localStorage.setItem('ls3d_pending_customer', JSON.stringify(customer));
+            localStorage.setItem('ls3d_pending_gateway', 'Stripe');
+
+            // OPZIONE A: Se hai creato un Payment Link fisso per un importo o un prodotto specifico su Stripe:
+            // const stripePaymentLink = 'https://buy.stripe.com/tuo_link_reale';
+            // window.location.href = stripePaymentLink;
+
+            // OPZIONE B: Se usi Stripe Checkout via API pubblica (richiede configurazione link o backend):
+            if (stripe && STRIPE_PUBLIC_KEY !== 'pk_test_51UHMrDI8ODyvK2K7ukuIRTd0KaZKnEcxdYUEIh1g5nCLfcxasFRnpyFQtFmY6GYb0Y6lu3egT3npjJV1M1FcwGhq00mahmrlcf') {
+                // Se usi i Payment Links diretti generati dalla dashboard di Stripe:
+                alert("Verrai reindirizzato al server sicuro di Stripe per completare il pagamento.");
+                window.location.href = "https://buy.stripe.com/IL_TUO_LINK_DI_PAGAMENTO"; 
             } else {
-                alert("Pagamento annullato.");
+                alert("Inserisci prima la tua chiave pubblica 'pk_' di Stripe o un Payment Link valido.");
             }
         }
 
