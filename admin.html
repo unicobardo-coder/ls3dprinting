@@ -9,9 +9,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
+    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
-       (function(){ emailjs.init("TUA_PUBLIC_KEY"); })();
+       (function(){ emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); })();
     </script>
 
     <script>
@@ -54,17 +55,17 @@
                 <p class="text-xs text-gray-400">Pannello amministrativo protetto.</p>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs font-mono border border-red-500/30 hover:bg-red-500/30 transition-colors">Esci</button>
+                <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs font-mono border border-red-500/30 hover:bg-red-500/30 transition-colors cursor-pointer">Esci</button>
                 <a href="index.html" class="px-4 py-2 bg-dark-surface hover:bg-gray-800 text-gray-300 rounded-xl text-xs font-mono border border-gray-700 transition-colors">Vedi Sito →</a>
             </div>
         </div>
 
         <!-- NAVIGAZIONE A SCHEDE -->
         <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-3">
-            <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg">📦 Prodotti</button>
-            <button onclick="switchTab('categories')" id="tab-btn-categories" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">🗂️ Categorie</button>
-            <button onclick="switchTab('colors')" id="tab-btn-colors" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">🎨 Colori</button>
-            <button onclick="switchTab('invoices')" id="tab-btn-invoices" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800">📄 Fatture & Email</button>
+            <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg cursor-pointer">📦 Prodotti</button>
+            <button onclick="switchTab('categories')" id="tab-btn-categories" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer">🗂️ Categorie</button>
+            <button onclick="switchTab('colors')" id="tab-btn-colors" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer">🎨 Colori</button>
+            <button onclick="switchTab('invoices')" id="tab-btn-invoices" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer">📄 Fatture & Email</button>
         </div>
 
         <!-- SCHEDA 1: PRODOTTI -->
@@ -129,7 +130,7 @@
 
                     <div class="flex gap-3 pt-2">
                         <button type="submit" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
-                        <button type="button" onclick="resetForm()" class="px-4 py-3 bg-dark-surface text-gray-300 rounded-xl text-xs hover:bg-gray-800 transition-colors">Annulla</button>
+                        <button type="button" onclick="resetForm()" class="px-4 py-3 bg-dark-surface text-gray-300 rounded-xl text-xs hover:bg-gray-800 transition-colors cursor-pointer">Annulla</button>
                     </div>
                 </form>
             </div>
@@ -217,9 +218,7 @@
                                 <th class="pb-2 text-right">Prezzo</th>
                             </tr>
                         </thead>
-                        <tbody id="inv-modal-items">
-                            <!-- Inserito via JS -->
-                        </tbody>
+                        <tbody id="inv-modal-items"></tbody>
                     </table>
                 </div>
 
@@ -242,6 +241,9 @@
         LS3DMAKER Admin Panel © 2026
     </footer>
 
+    <!-- INCLUSIONE DEL FILE ESTERNO PER FATTURE E EMAIL -->
+    <script src="invoice.js"></script>
+
     <script>
         const ADMIN_PASSWORD = "ls3d2026";
         const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
@@ -251,9 +253,6 @@
 
         let categories = ["Design", "Mechanical", "Prototypes"];
         try { categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Design", "Mechanical", "Prototypes"]; } catch (e) {}
-
-        let orders = [];
-        try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
         
         let filamentColors = [];
         try {
@@ -267,18 +266,7 @@
                 { name: "Oro Seta", code: "#eab308" },
                 { name: "Argento Metallico", code: "#9ca3af" }
             ];
-        } catch (e) {
-            filamentColors = [
-                { name: "Nero Opaco", code: "#111827" },
-                { name: "Bianco Perla", code: "#f3f4f6" },
-                { name: "Grigio Techno", code: "#6b7280" },
-                { name: "Verde Brand", code: "#10b981" },
-                { name: "Rosso Fuoco", code: "#ef4444" },
-                { name: "Blu Elettrico", code: "#3b82f6" },
-                { name: "Oro Seta", code: "#eab308" },
-                { name: "Argento Metallico", code: "#9ca3af" }
-            ];
-        }
+        } catch (e) { filamentColors = []; }
 
         function persistColors() {
             localStorage.setItem('ls3d_filament_colors', JSON.stringify(filamentColors));
@@ -316,7 +304,7 @@
             renderAdminColorsWithDots();
             renderAdminProducts();
             renderAdminCategories();
-            renderAdminOrders();
+            if (typeof renderAdminOrders === 'function') renderAdminOrders();
         }
 
         function switchTab(tabName) {
@@ -325,7 +313,7 @@
 
             ['products', 'categories', 'colors', 'invoices'].forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
-                btn.className = t === tabName ? "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg" : "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800";
+                btn.className = t === tabName ? "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg cursor-pointer" : "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer";
             });
         }
 
@@ -476,7 +464,7 @@
             container.innerHTML = products.map(p => {
                 const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
                 const cats = Array.isArray(p.categories) ? p.categories.join(', ') : (p.category || 'Generale');
-                const priceDisplay = p.salePrice ? `<span class="line-through text-gray-500">€${p.price.toFixed(2)}</span> <span class="text-red-400 font-bold">€${p.salePrice.toFixed(2)}</span>` : `€${p.price.toFixed(2)}`;
+                const priceDisplay = p.salePrice ? `<span class="line-through text-gray-500">€${Number(p.price).toFixed(2)}</span> <span class="text-red-400 font-bold">€${Number(p.salePrice).toFixed(2)}</span>` : `€${Number(p.price || 0).toFixed(2)}`;
                 const badgeFeatured = p.featured ? `<span class="bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded text-[10px] font-mono border border-brand-500/30">⭐ In Vetrina</span>` : '';
 
                 return `
@@ -607,65 +595,6 @@
             renderCategoriesCheckboxes();
             renderColorsCheckboxes();
             document.getElementById('form-title').innerText = "Aggiungi / Modifica Prodotto";
-        }
-
-        function renderAdminOrders() {
-            const container = document.getElementById('admin-orders-list');
-            if (!container) return;
-            if (orders.length === 0) {
-                container.innerHTML = `<p class="text-gray-500">Nessun ordine registrato.</p>`;
-                return;
-            }
-            container.innerHTML = orders.map((o, idx) => `
-                <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
-                    <div class="flex justify-between text-white font-bold">
-                        <span>Fattura n. ${o.number} (${o.id})</span>
-                        <span class="text-brand-400">€${o.total.toFixed(2)}</span>
-                    </div>
-                    <p class="text-gray-400">Cliente: ${o.name} (${o.email})</p>
-                    <div class="flex gap-2 pt-2">
-                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
-                        <button type="button" onclick="sendInvoiceEmail(${idx})" class="px-3 py-1.5 bg-brand-500 text-black font-bold rounded-lg text-xs cursor-pointer">📧 Invia Email</button>
-                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">📥 XML AdE</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function viewInvoiceModal(idx) {
-            const o = orders[idx];
-            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
-            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
-            document.getElementById('inv-modal-client').innerText = o.name;
-            document.getElementById('inv-modal-email').innerText = o.email;
-            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
-            document.getElementById('inv-modal-total').innerText = `€${o.total.toFixed(2)}`;
-
-            const itemsContainer = document.getElementById('inv-modal-items');
-            itemsContainer.innerHTML = o.items.map(item => `
-                <tr class="border-b border-gray-100">
-                    <td class="py-2">
-                        <p class="font-bold">${item.title}</p>
-                        <p class="text-[10px] text-gray-500">Colore: ${item.color || 'Standard'}</p>
-                    </td>
-                    <td class="py-2 text-center">${item.quantity || item.qty}</td>
-                    <td class="py-2 text-right font-mono">€${((item.price || 0) * (item.quantity || item.qty || 1)).toFixed(2)}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('invoice-modal').classList.remove('hidden');
-        }
-
-        function closeInvoiceModal() {
-            document.getElementById('invoice-modal').classList.add('hidden');
-        }
-
-        function sendInvoiceEmail(idx) {
-            alert("Invio email avviato.");
-        }
-
-        function downloadXmlAdmin(idx) {
-            alert("Download XML avviato.");
         }
     </script>
 </body>
