@@ -134,14 +134,12 @@
                 const oldPrice = Number(p.oldPrice) || 0;
                 const hasDiscount = oldPrice > currentPrice;
 
-                // Gestione HTML prezzo e sconti
                 let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${currentPrice.toFixed(2)}</span>`;
                 if (hasDiscount) {
                     priceHtml = `
                         <div class="flex items-center gap-2">
                             <span class="font-mono font-bold text-brand-400 text-sm">€${currentPrice.toFixed(2)}</span>
                             <span class="font-mono text-gray-500 text-xs line-through">€${oldPrice.toFixed(2)}</span>
-                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-mono px-1.5 py-0.5 rounded">Sconto</span>
                         </div>
                     `;
                 }
@@ -151,7 +149,7 @@
                         <div>
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
                                 <img src="${p.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'">
-                                ${hasDiscount ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider">Promo</span>' : ''}
+                                ${hasDiscount ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-md">Promo</span>' : ''}
                             </div>
                             <div class="p-5 space-y-3">
                                 <h3 class="font-bold text-white text-base">${p.title}</h3>
@@ -246,7 +244,6 @@
 
         function saveCart() {
             try {
-                localStorage.getItem('ls3d_cart'); // sanity check
                 localStorage.setItem('ls3d_cart', JSON.stringify(cart));
             } catch (e) { console.error(e); }
         }
