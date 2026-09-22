@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- PayPal SDK -->
+    <!-- PayPal SDK (Sostituisci IL_TUO_PAYPAL_CLIENT_ID con il tuo effettivo Client ID) -->
     <script src="https://www.paypal.com/sdk/js?client-id=IL_TUO_PAYPAL_CLIENT_ID&currency=EUR"></script>
 
     <!-- EmailJS SDK -->
@@ -47,9 +47,9 @@
     <!-- CONTENUTO CHECKOUT -->
     <main class="py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
         
-        <!-- SEZIONE DATI E PAGAMENTO -->
+        <!-- SEZIONE DATI SPEDIZIONE -->
         <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
-            <h1 class="text-xl font-bold text-white tracking-tight">Dati di Spedizione & Pagamento</h1>
+            <h1 class="text-xl font-bold text-white tracking-tight">Indirizzo di Spedizione & Pagamento</h1>
             
             <div id="checkout-form" class="space-y-4 text-xs">
                 <div>
@@ -65,22 +65,9 @@
                     <textarea id="cust-address" required rows="2" placeholder="Via, n. civico, Città, CAP, Provincia" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- PULSANTI DI PAGAMENTO -->
+                <!-- BOX PAYPAL -->
                 <div class="pt-6 space-y-4 border-t border-gray-800">
-                    <label class="block text-gray-300 font-bold font-mono text-xs uppercase tracking-wider">Scegli come pagare:</label>
-                    
-                    <!-- PULSANTE STRIPE (COLLEGATO AL PAYMENT LINK) -->
-                    <button type="button" onclick="payWithStripe()" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                        <i data-lucide="credit-card" class="w-4 h-4"></i> Paga con Carta (Stripe)
-                    </button>
-
-                    <div class="relative flex py-2 items-center">
-                        <div class="flex-grow border-t border-gray-800"></div>
-                        <span class="flex-shrink mx-4 text-gray-500 font-mono text-[10px]">oppure</span>
-                        <div class="flex-grow border-t border-gray-800"></div>
-                    </div>
-
-                    <!-- PULSANTE PAYPAL -->
+                    <label class="block text-gray-300 font-bold font-mono text-xs uppercase tracking-wider">Completa il pagamento:</label>
                     <div id="paypal-button-container" class="w-full"></div>
                 </div>
             </div>
@@ -117,11 +104,6 @@
     <script src="mailer.js"></script>
 
     <script>
-        // =========================================================================
-        // INCOLLA QUI IL TUO PAYMENT LINK UFFICIALE DI STRIPE (es. https://buy.stripe.com/...)
-        // =========================================================================
-        const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_cNicN5bELbwPbNPgra3oA00';
-
         let cart = [];
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
 
@@ -178,26 +160,6 @@
             return { name, email, address };
         }
 
-        function payWithStripe() {
-            const customer = validateCustomerData();
-            if (!customer) return;
-
-            const { total } = renderCheckoutSummary();
-            if (total <= 0) { alert("Il carrello è vuoto."); return; }
-
-            if (!STRIPE_PAYMENT_LINK || !STRIPE_PAYMENT_LINK.startsWith('http') || STRIPE_PAYMENT_LINK.includes('IL_TUO_LINK_REALE')) {
-                alert("Configura correttamente il Payment Link ufficiale di Stripe nella variabile STRIPE_PAYMENT_LINK del codice.");
-                return;
-            }
-
-            // Salva i dati cliente e il totale per registrarli dopo il pagamento
-            localStorage.setItem('ls3d_pending_customer', JSON.stringify(customer));
-            localStorage.setItem('ls3d_pending_total', total);
-
-            // Reindirizza direttamente alla pagina ufficiale di Stripe
-            window.location.href = STRIPE_PAYMENT_LINK;
-        }
-
         function initPayPal() {
             const { total } = renderCheckoutSummary();
             if (total <= 0 || typeof paypal === 'undefined') return;
@@ -220,9 +182,13 @@
                             };
                             finalizeOrderAndSave("PayPal", details.id, customer, total);
                         });
+                    },
+                    onError: function(err) {
+                        alert("Errore durante la transazione PayPal.");
+                        console.error("PayPal Error:", err);
                     }
                 }).render('#paypal-button-container');
-            } catch(e) { console.error("PayPal error:", e); }
+            } catch(e) { console.error("Errore inizializzazione PayPal:", e); }
         }
 
         function finalizeOrderAndSave(gateway, transactionId, customer, total) {
@@ -251,11 +217,9 @@
             }
 
             localStorage.removeItem('ls3d_cart');
-            localStorage.removeItem('ls3d_pending_customer');
-            localStorage.removeItem('ls3d_pending_total');
             cart = [];
 
-            alert(`Pagamento completato con successo (${gateway})! Ordine registrato e mail inviata.`);
+            alert(`Pagamento completato con successo tramite ${gateway}! Ordine registrato e email inviata.`);
             window.location.href = "index.html";
         }
 
