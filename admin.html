@@ -110,12 +110,12 @@
 
                 <div>
                     <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
-                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione per le anteprime..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
                 <div>
                     <label class="block text-gray-400 mb-1">Descrizione Lunga / Dettagliata *</label>
-                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita, specifiche tecniche e materiali..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
                 <!-- GESTIONE FOTO MULTIPLE (DA PC O URL CON SELEZIONE PRINCIPALE ED ELIMINAZIONE) -->
@@ -136,7 +136,7 @@
                         </div>
                     </div>
 
-                    <!-- Griglia di Anteprima Immagini con tasto Principale ed Elimina -->
+                    <!-- Griglia Anteprima Immagini -->
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
                 </div>
 
@@ -271,7 +271,7 @@
                 };
                 reader.readAsDataURL(file);
             });
-            event.target.value = ''; // Reset input
+            event.target.value = '';
         }
 
         function addImageUrl() {
@@ -500,8 +500,8 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
-                            <button onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+                            <button type="button" onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
+                            <button type="button" onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
                         </div>
                     </div>
                 `;
@@ -531,7 +531,7 @@
                         <p class="font-bold text-white">${r.author} <span class="text-brand-400">(${r.rating}/5 ★)</span> su ${r.productTitle}</p>
                         <p class="text-gray-400 mt-1">${r.comment}</p>
                     </div>
-                    <button onclick="deleteReview(${idx})" class="text-red-400 cursor-pointer">Elimina</button>
+                    <button type="button" onclick="deleteReview(${idx})" class="text-red-400 cursor-pointer">Elimina</button>
                 </div>
             `).join('');
         }
