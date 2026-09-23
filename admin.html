@@ -68,7 +68,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, foto multiple, file STL e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, caricamento foto multiple da PC, file STL e recensioni.</p>
             </div>
         </div>
 
@@ -118,13 +118,22 @@
                     <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
-                <!-- GESTIONE FOTO MULTIPLE (TRAMITE URL CON SCELTA PRINCIPALE ED ELIMINAZIONE) -->
+                <!-- GESTIONE FOTO MULTIPLE (DA PC E URL CON SCELTA PRINCIPALE ED ELIMINAZIONE) -->
                 <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
-                    <label class="block text-white font-bold">Gestione Foto Multiple Prodotto (URL Immagini)</label>
+                    <label class="block text-white font-bold">Gestione Foto Multiple Prodotto</label>
                     
-                    <div class="flex gap-2">
-                        <input type="text" id="new-image-url" placeholder="Incolla URL immagine (es. https://...)" class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none text-xs">
-                        <button type="button" onclick="addImageUrl()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all cursor-pointer">Aggiungi Foto</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-gray-400 mb-1 text-[11px]">Carica Foto dal PC (anche multiple):</label>
+                            <input type="file" id="prod-image-file" accept="image/*" multiple onchange="handleImageFileUpload(event)" class="w-full text-xs text-gray-400 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1 text-[11px]">Oppure Incolla URL Immagine:</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-image-url" placeholder="https://..." class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none text-xs">
+                                <button type="button" onclick="addImageUrl()" class="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl text-xs cursor-pointer">Aggiungi</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Griglia di Anteprima Immagini -->
@@ -248,7 +257,22 @@
             renderAdminProducts();
         }
 
-        // --- GESTIONE FOTO MULTIPLE TRAMITE URL ---
+        // --- GESTIONE FOTO DA PC E URL ---
+        function handleImageFileUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentEditingImages.push(e.target.result);
+                    renderImagesPreview();
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
         function addImageUrl() {
             const input = document.getElementById('new-image-url');
             const url = input.value.trim();
@@ -280,7 +304,7 @@
             }
             container.innerHTML = currentEditingImages.map((img, idx) => `
                 <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500 ring-2 ring-brand-500/50' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
-                    <img src="${img}" class="w-full h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150?text=Errore+URL'">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150?text=Anteprima'">
                     <div class="flex items-center justify-between w-full text-[10px] pt-1">
                         <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold underline' : 'text-gray-400 hover:text-white'} cursor-pointer">Principale</button>
                         <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300 font-bold cursor-pointer">Elimina</button>
@@ -404,7 +428,7 @@
                 resetProductForm();
                 alert("Prodotto salvato con successo!");
             } catch (err) {
-                alert("Errore durante il salvataggio nel browser. Le immagini potrebbero essere troppo pesanti.");
+                alert("Errore di salvataggio: le immagini caricate potrebbero essere troppo pesanti per la memoria del browser.");
                 console.error(err);
             }
         }
