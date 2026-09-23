@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <!-- BARRA FILTRO CATEGORIE (Allineata all'Admin) -->
+        <!-- BARRA FILTRO CATEGORIE -->
         <div id="category-filters" class="flex flex-wrap gap-2 font-mono text-xs"></div>
 
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -98,7 +98,6 @@
                     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                 }
             } catch (e) { console.error(e); }
-            // Categorie predefinite di fallback coerenti con l'Admin
             return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
 
@@ -121,7 +120,6 @@
             const container = document.getElementById('category-filters');
             if (!container) return;
 
-            // Prende le categorie ufficiali configurate nell'Admin + l'opzione "Tutti"
             const categories = ['Tutti', ...getCategories()];
 
             container.innerHTML = categories.map(cat => {
@@ -150,10 +148,14 @@
             const products = getProducts();
             renderCategories();
 
-            // Filtra i prodotti in base alla categoria selezionata nell'Admin
+            // Filtro robusto: confronta le categorie pulendo spazi e ignorando le maiuscole/minuscole
             const filteredProducts = currentCategory === 'Tutti' 
                 ? products 
-                : products.filter(p => (p.category ? p.category.trim() : '') === currentCategory);
+                : products.filter(p => {
+                    const prodCat = (p.category || p.cat || '').trim().toLowerCase();
+                    const targetCat = currentCategory.trim().toLowerCase();
+                    return prodCat === targetCat;
+                });
 
             if (filteredProducts.length === 0) {
                 grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto disponibile in questa categoria.</p>`;
@@ -264,7 +266,7 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-bold text-brand-400">€${itemTotal.toFixed(2)}</span>
-                                <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 cursor-pointer">
+                                <button onclick="removeFromCard(${index})" class="text-red-400 hover:text-red-300 cursor-pointer">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
