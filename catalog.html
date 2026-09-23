@@ -7,7 +7,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Three.js e STLLoader per visualizzare i file STL nel catalogo -->
+    <!-- Three.js e STLLoader per visualizzare i file STL reali nel catalogo -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
 
@@ -126,11 +126,11 @@
             return null;
         }
 
-        // Funzione per ripulire nomi di file STL troppo lunghi o generati da IA
+        // Funzione per ripulire nomi di file STL troppo lunghi
         function cleanStlFilename(filename) {
             if (!filename) return '';
-            if (filename.length > 30) {
-                return "Modello 3D Ottimizzato (.stl)";
+            if (filename.length > 25) {
+                return "Modello 3D (.stl)";
             }
             return filename;
         }
@@ -267,13 +267,13 @@
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
 
-                        <!-- Visualizzatore STL se presente -->
+                        <!-- Visualizzatore STL Reale se presente -->
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
                                 <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${displayStlName})</p>
                                 <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
                                     <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
-                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Reale</span>
                                 </div>
                             </div>
                         ` : ''}
@@ -311,12 +311,12 @@
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
 
-            if (p.stlFileName) {
-                initCatalogStlViewer();
+            if (p.stlFileName && p.stlData) {
+                initCatalogStlViewer(p.stlData);
             }
         }
 
-        function initCatalogStlViewer() {
+        function initCatalogStlViewer(stlDataUrl) {
             const canvas = document.getElementById('catalog-stl-canvas');
             if (!canvas) return;
             if (catalogStlRenderer) catalogStlRenderer.dispose();
@@ -338,18 +338,26 @@
             directionalLight.position.set(1, 1, 1).normalize();
             scene.add(directionalLight);
 
-            const geometry = new THREE.BoxGeometry(50, 50, 50);
-            const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
+            if (stlDataUrl) {
+                const loader = new THREE.STLLoader();
+                loader.load(stlDataUrl, function (geometry) {
+                    geometry.computeVertexNormals();
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    geometry.center();
+                    scene.add(mesh);
 
-            function animate() {
-                requestAnimationFrame(animate);
-                mesh.rotation.x += 0.005;
-                mesh.rotation.y += 0.008;
-                catalogStlRenderer.render(scene, camera);
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        mesh.rotation.x += 0.005;
+                        mesh.rotation.y += 0.008;
+                        catalogStlRenderer.render(scene, camera);
+                    }
+                    animate();
+                }, undefined, function (error) {
+                    console.error("Errore caricamento STL nel catalogo:", error);
+                });
             }
-            animate();
         }
 
         function closeProductModal() {
