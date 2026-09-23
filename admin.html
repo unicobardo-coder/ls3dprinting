@@ -68,7 +68,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, descrizioni, foto multiple, file STL e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, descrizioni, immagini dal PC, file STL e recensioni.</p>
             </div>
         </div>
 
@@ -113,18 +113,28 @@
                     <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione per le anteprime..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
-                <!-- DESCIZIONE LUNGA RIPRISTINATA -->
                 <div>
                     <label class="block text-gray-400 mb-1">Descrizione Lunga / Dettagliata *</label>
-                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita, specifiche tecniche, materiali e consigli di stampa..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita, specifiche tecniche e materiali..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
-                <!-- GESTIONE FOTO MULTIPLE -->
-                <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
-                    <label class="block text-white font-bold">Gestione Foto (URL Immagini)</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-image-url" placeholder="Incolla URL immagine (es. https://...)" class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                        <button type="button" onclick="addImageUrl()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all cursor-pointer">Aggiungi Foto</button>
+                <!-- GESTIONE FOTO (DA PC O URL CON ANTEPRIMA, ELIMINA E SCELTA PRINCIPALE) -->
+                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Gestione Foto Prodotto</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Carica da PC -->
+                        <div>
+                            <label class="block text-gray-400 mb-1 text-[11px]">Carica Immagine dal PC:</label>
+                            <input type="file" id="prod-image-file" accept="image/*" onchange="handleImageFileUpload(event)" class="w-full text-xs text-gray-400 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer">
+                        </div>
+                        <!-- Oppure Incolla URL -->
+                        <div>
+                            <label class="block text-gray-400 mb-1 text-[11px]">Oppure Incolla URL Immagine:</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-image-url" placeholder="https://..." class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none text-xs">
+                                <button type="button" onclick="addImageUrl()" class="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl text-xs cursor-pointer">Aggiungi</button>
+                            </div>
+                        </div>
                     </div>
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
                 </div>
@@ -135,7 +145,6 @@
                     <input type="file" id="prod-stl-input" accept=".stl" onchange="handleStlUpload(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
                     <input type="hidden" id="prod-stl-name" value="">
                     
-                    <!-- Container Anteprima 3D -->
                     <div id="stl-viewer-container" class="w-full h-56 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center justify-center mt-3">
                         <canvas id="stl-canvas" class="w-full h-full rounded-xl"></canvas>
                         <span class="absolute bottom-2 right-2 text-[10px] bg-black/70 px-2 py-1 rounded text-brand-400 font-mono">Anteprima 3D Modello STL</span>
@@ -248,7 +257,19 @@
             renderAdminProducts();
         }
 
-        // --- GESTIONE FOTO MULTIPLE ---
+        // --- GESTIONE FOTO (DA PC O URL CON ANTEPRIMA, ELIMINA E PRINCIPALE) ---
+        function handleImageFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentEditingImages.push(e.target.result); // Base64 dell'immagine locale
+                document.getElementById('prod-image-file').value = '';
+                renderImagesPreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
         function addImageUrl() {
             const input = document.getElementById('new-image-url');
             const url = input.value.trim();
@@ -280,7 +301,7 @@
             }
             container.innerHTML = currentEditingImages.map((img, idx) => `
                 <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500 ring-2 ring-brand-500/50' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
-                    <img src="${img}" class="w-full h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150?text=Errore+URL'">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150?text=Anteprima'">
                     <div class="flex items-center justify-between w-full text-[10px] pt-1">
                         <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold underline' : 'text-gray-400 hover:text-white'}">Principale</button>
                         <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300 font-bold">Elimina</button>
@@ -318,9 +339,7 @@
             const container = document.getElementById('stl-viewer-container');
             const canvas = document.getElementById('stl-canvas');
             
-            if (stlRenderer) {
-                stlRenderer.dispose();
-            }
+            if (stlRenderer) { stlRenderer.dispose(); }
 
             const width = container.clientWidth || 400;
             const height = 220;
@@ -334,9 +353,7 @@
             stlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
             stlRenderer.setSize(width, height);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
-
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
             directionalLight.position.set(1, 1, 1).normalize();
             scene.add(directionalLight);
@@ -359,7 +376,7 @@
                 }
                 animate();
             } catch (err) {
-                console.error("Errore nel parsing del file STL:", err);
+                console.error("Errore nel parsing STL:", err);
             }
         }
 
@@ -379,7 +396,7 @@
             const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
             const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
             const shortDesc = document.getElementById('prod-desc').value.trim();
-            const longDesc = document.getElementById('prod-longdesc').value.trim(); // Salvataggio descrizione lunga
+            const longDesc = document.getElementById('prod-longdesc').value.trim();
             const featured = document.getElementById('prod-featured').checked;
 
             if (currentEditingImages.length === 0) { alert("Aggiungi almeno un'immagine prima di salvare."); return; }
@@ -393,7 +410,7 @@
                 salePrice, 
                 shipping, 
                 shortDesc,
-                longDesc, // Inclusione nel record
+                longDesc,
                 images: [...currentEditingImages], 
                 mainImageIndex: mainImageIdx,
                 colors: selectedColors, 
@@ -422,7 +439,7 @@
             document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
             document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
             document.getElementById('prod-desc').value = p.shortDesc || '';
-            document.getElementById('prod-longdesc').value = p.longDesc || ''; // Caricamento descrizione lunga nel form
+            document.getElementById('prod-longdesc').value = p.longDesc || '';
             document.getElementById('prod-featured').checked = p.featured || false;
             
             currentEditingImages = [...(p.images || [])];
@@ -475,7 +492,7 @@
                             <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150'">
                             <div>
                                 <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
-                                <p class="text-[10px] text-gray-400">Cat: ${catsText} | STL: ${p.stlFileName ? '✓ ' + p.stlFileName : 'Nessuno'} | €${p.price}</p>
+                                <p class="text-[10px] text-gray-400">Cat: ${catsText} | Foto: ${(p.images || []).length} | €${p.price}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
