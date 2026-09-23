@@ -338,28 +338,42 @@
             directionalLight.position.set(1, 1, 1).normalize();
             scene.add(directionalLight);
 
+            let mesh;
+
             if (stlDataUrl) {
                 const loader = new THREE.STLLoader();
                 loader.load(stlDataUrl, function (geometry) {
                     geometry.computeVertexNormals();
                     const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh = new THREE.Mesh(geometry, material);
                     geometry.center();
                     scene.add(mesh);
-
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        mesh.rotation.x += 0.005;
-                        mesh.rotation.y += 0.008;
-                        catalogStlRenderer.render(scene, camera);
-                    }
-                    animate();
                 }, undefined, function (error) {
-                    console.error("Errore caricamento STL nel catalogo:", error);
+                    console.error("Errore caricamento STL, uso forma di esempio:", error);
+                    createFallbackMesh();
                 });
+            } else {
+                // Se non c'è il file binario salvato, mostra una forma 3D stilizzata di anteprima
+                createFallbackMesh();
             }
-        }
 
+            function createFallbackMesh() {
+                const geometry = new THREE.BoxGeometry(50, 50, 50);
+                const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if (mesh) {
+                    mesh.rotation.x += 0.005;
+                    mesh.rotation.y += 0.008;
+                }
+                catalogStlRenderer.render(scene, camera);
+            }
+            animate();
+        }
         function closeProductModal() {
             if (catalogStlRenderer) {
                 catalogStlRenderer.dispose();
