@@ -117,7 +117,7 @@
                     <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
-                <!-- GESTIONE FOTO DA PC (CON COMPRESSIONE AUTOMATICA) -->
+                <!-- GESTIONE FOTO DA PC -->
                 <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
                     <label class="block text-white font-bold">Immagini Prodotto (Carica dal PC)</label>
                     <input type="file" id="prod-file-input" accept="image/*" multiple onchange="handleImageFiles(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
@@ -130,11 +130,10 @@
                     <label class="block text-white font-bold">Modello 3D (.STL)</label>
                     <input type="file" id="prod-stl-input" accept=".stl" onchange="handleStlUpload(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
                     <input type="hidden" id="prod-stl-name" value="">
-                    <input type="hidden" id="prod-stl-data" value="">
                     
-                    <div id="stl-viewer-container" class="w-full h-40 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center justify-center mt-3">
+                    <div id="stl-viewer-container" class="w-full h-12 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center px-4 mt-3">
                         <span id="stl-file-label" class="text-xs font-mono text-brand-400 font-bold">Nessun file caricato</span>
-                        <button type="button" onclick="removeStlFile()" class="absolute top-2 right-2 px-2.5 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer">Rimuovi STL</button>
+                        <button type="button" onclick="removeStlFile()" class="absolute right-3 px-2.5 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer">Rimuovi STL</button>
                     </div>
                 </div>
 
@@ -201,7 +200,6 @@
 
         let currentEditingImages = [];
         let mainImageIdx = 0;
-        let currentStlBase64 = '';
         let currentStlFileName = '';
 
         function getCategories() {
@@ -243,7 +241,7 @@
             renderAdminProducts();
         }
 
-        // --- CARICAMENTO FOTO DA PC CON COMPRESSIONE AUTOMATICA ---
+        // --- CARICAMENTO FOTO DA PC CON COMPRESSIONE OTTIMIZZATA ---
         function handleImageFiles(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -313,29 +311,20 @@
             `).join('');
         }
 
-        // --- GESTIONE FILE STL ---
+        // --- GESTIONE STL ---
         function handleStlUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             currentStlFileName = file.name;
             document.getElementById('prod-stl-name').value = file.name;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentStlBase64 = e.target.result;
-                document.getElementById('prod-stl-data').value = currentStlBase64;
-                document.getElementById('stl-file-label').innerText = "File STL caricato: " + file.name;
-                document.getElementById('stl-viewer-container').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
+            document.getElementById('stl-file-label').innerText = "File STL: " + file.name;
+            document.getElementById('stl-viewer-container').classList.remove('hidden');
         }
 
         function removeStlFile() {
-            currentStlBase64 = '';
             currentStlFileName = '';
             document.getElementById('prod-stl-input').value = '';
             document.getElementById('prod-stl-name').value = '';
-            document.getElementById('prod-stl-data').value = '';
             document.getElementById('stl-viewer-container').classList.add('hidden');
         }
 
@@ -374,8 +363,7 @@
                 mainImageIndex: mainImageIdx,
                 colors: selectedColors, 
                 featured,
-                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : ''),
-                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '')
+                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : '')
             };
 
             const products = getProducts();
@@ -387,7 +375,7 @@
                 resetProductForm();
                 alert("Prodotto salvato con successo!");
             } catch (err) {
-                alert("Spazio di archiviazione pieno nel browser. Riduci il numero di foto caricate.");
+                alert("Memoria LocalStorage esaurita. Riduci il numero o la dimensione delle foto.");
                 console.error(err);
             }
         }
@@ -412,12 +400,9 @@
             renderImagesPreview();
 
             currentStlFileName = p.stlFileName || '';
-            currentStlBase64 = p.stlData || '';
             document.getElementById('prod-stl-name').value = currentStlFileName;
-            document.getElementById('prod-stl-data').value = currentStlBase64;
-            
             if (currentStlFileName) {
-                document.getElementById('stl-file-label').innerText = "File STL associato: " + currentStlFileName;
+                document.getElementById('stl-file-label').innerText = "File STL: " + currentStlFileName;
                 document.getElementById('stl-viewer-container').classList.remove('hidden');
             } else {
                 document.getElementById('stl-viewer-container').classList.add('hidden');
