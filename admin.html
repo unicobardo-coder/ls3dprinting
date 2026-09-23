@@ -68,7 +68,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, foto multiple, file STL e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, descrizioni, foto multiple, file STL e recensioni.</p>
             </div>
         </div>
 
@@ -110,7 +110,13 @@
 
                 <div>
                     <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
-                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione del prodotto..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione per le anteprime..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                </div>
+
+                <!-- DESCIZIONE LUNGA RIPRISTINATA -->
+                <div>
+                    <label class="block text-gray-400 mb-1">Descrizione Lunga / Dettagliata *</label>
+                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita, specifiche tecniche, materiali e consigli di stampa..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
                 <!-- GESTIONE FOTO MULTIPLE -->
@@ -200,7 +206,7 @@
 
         let currentEditingImages = [];
         let mainImageIdx = 0;
-        let currentStlBinary = null; // Memorizza i dati binari temporanei del file STL corrente
+        let currentStlBinary = null;
         let currentStlFileName = '';
 
         function getCategories() {
@@ -373,6 +379,7 @@
             const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
             const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
             const shortDesc = document.getElementById('prod-desc').value.trim();
+            const longDesc = document.getElementById('prod-longdesc').value.trim(); // Salvataggio descrizione lunga
             const featured = document.getElementById('prod-featured').checked;
 
             if (currentEditingImages.length === 0) { alert("Aggiungi almeno un'immagine prima di salvare."); return; }
@@ -386,6 +393,7 @@
                 salePrice, 
                 shipping, 
                 shortDesc,
+                longDesc, // Inclusione nel record
                 images: [...currentEditingImages], 
                 mainImageIndex: mainImageIdx,
                 colors: selectedColors, 
@@ -414,6 +422,7 @@
             document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
             document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
             document.getElementById('prod-desc').value = p.shortDesc || '';
+            document.getElementById('prod-longdesc').value = p.longDesc || ''; // Caricamento descrizione lunga nel form
             document.getElementById('prod-featured').checked = p.featured || false;
             
             currentEditingImages = [...(p.images || [])];
