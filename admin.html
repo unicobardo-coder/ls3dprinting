@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | LS3Dmaker</title>
+    <title>Pannello Admin | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-       (function(){ emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); })();
-    </script>
+
+    <!-- Configurazione Globale -->
+    <script src="config.js"></script>
 
     <script>
         tailwind.config = {
@@ -29,577 +26,334 @@
         }
     </script>
 </head>
-<body class="bg-dark-bg text-gray-100 font-sans min-h-screen p-4 sm:p-8 flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- SEZIONE LOGIN (PASSWORD OBBLIGATORIA: ls3d2026) -->
-    <div id="login-section" class="max-w-md mx-auto my-auto w-full bg-dark-card border border-brand-500/30 p-8 rounded-2xl space-y-6 shadow-2xl backdrop-blur-md">
-        <div class="text-center space-y-2">
-            <h1 class="text-2xl font-bold text-white tracking-tight">Area Riservata Admin</h1>
-            <p class="text-xs text-gray-400">Inserisci la password obbligatoria per accedere.</p>
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Vai al Catalogo</a>
+                <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Home</a>
+            </div>
         </div>
-        <form onsubmit="checkPassword(event)" class="space-y-4 text-xs">
+    </header>
+
+    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12">
+        <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
-                <input type="password" id="admin-pass" required placeholder="Password Admin" class="w-full bg-dark-bg border border-brand-500/50 rounded-xl p-3 text-white placeholder-gray-500 focus:border-brand-400 focus:outline-none">
-            </div>
-            <button type="submit" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Accedi al Pannello</button>
-            <a href="index.html" class="block text-center text-gray-400 hover:text-white pt-2 transition-colors">← Torna al Sito</a>
-        </form>
-    </div>
-
-    <!-- DASHBOARD ADMIN -->
-    <div id="admin-dashboard" class="max-w-6xl mx-auto space-y-6 w-full hidden">
-        
-        <div class="flex flex-col sm:flex-row justify-between items-center bg-dark-card border border-brand-500/30 p-6 rounded-2xl shadow-2xl backdrop-blur-md gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-white tracking-tight">LS3Dmaker - Gestione Centrale</h1>
-                <p class="text-xs text-gray-400">Pannello amministrativo protetto.</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs font-mono border border-red-500/30 hover:bg-red-500/30 transition-colors cursor-pointer">Esci</button>
-                <a href="index.html" class="px-4 py-2 bg-dark-surface hover:bg-gray-800 text-gray-300 rounded-xl text-xs font-mono border border-gray-700 transition-colors">Vedi Sito →</a>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Amministrazione</h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, categorie, foto e recensioni.</p>
             </div>
         </div>
 
-        <!-- NAVIGAZIONE A SCHEDE -->
-        <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-3">
-            <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg cursor-pointer">📦 Prodotti</button>
-            <button onclick="switchTab('categories')" id="tab-btn-categories" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer">🗂️ Categorie</button>
-            <button onclick="switchTab('colors')" id="tab-btn-colors" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer">🎨 Colori</button>
-            <button onclick="switchTab('invoices')" id="tab-btn-invoices" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer">📄 Fatture & Email</button>
-        </div>
+        <!-- GESTIONE CATEGORIE -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white font-mono">Gestione Categorie</h2>
+            <div class="flex gap-3">
+                <input type="text" id="new-category-input" placeholder="Nome nuova categoria..." class="flex-grow bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
+                <button onclick="addCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Aggiungi</button>
+            </div>
+            <div id="admin-categories-list" class="flex flex-wrap gap-2 pt-2"></div>
+        </section>
 
-        <!-- SCHEDA 1: PRODOTTI -->
-        <div id="tab-content-products" class="admin-tab-content space-y-6">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 id="form-title" class="text-lg font-bold text-white">Aggiungi / Modifica Prodotto</h2>
-                <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs">
-                    <input type="hidden" id="prod-id">
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <div class="sm:col-span-1">
-                            <label class="block text-gray-400 mb-1 font-mono">Nome Prodotto *</label>
-                            <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Prezzo Listino (€) *</label>
-                            <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Prezzo Scontato (€)</label>
-                            <input type="number" step="0.01" id="prod-saleprice" placeholder="Opzionale" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 font-mono">Spedizione (€) *</label>
-                            <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                        </div>
-                    </div>
-
-                    <!-- OPZIONE VETRINA HOME -->
-                    <div class="bg-dark-bg p-3 rounded-xl border border-gray-700/80 flex items-center gap-3">
-                        <input type="checkbox" id="prod-featured" class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
-                        <label for="prod-featured" class="text-gray-300 font-mono cursor-pointer select-none">⭐ Metti in evidenza nella <strong>Vetrina in Home</strong></label>
-                    </div>
-
-                    <!-- SELEZIONE CATEGORIE MULTIPLE -->
-                    <div>
-                        <label class="block text-gray-400 mb-2 font-mono">Categorie (Seleziona una o più categorie) *</label>
-                        <div id="categories-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-dark-bg p-3 rounded-xl border border-gray-700/80 max-h-36 overflow-y-auto"></div>
-                    </div>
-
-                    <!-- SELEZIONE COLORI -->
-                    <div>
-                        <label class="block text-gray-400 mb-2 font-mono">Colori Filamento Disponibili</label>
-                        <div id="colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-dark-bg p-3 rounded-xl border border-gray-700/80 max-h-36 overflow-y-auto"></div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Carica Immagini dal PC</label>
-                        <input type="file" id="prod-images-file" multiple accept="image/*" onchange="handleImageUpload(event)" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2 text-gray-300 text-xs cursor-pointer">
-                    </div>
-
-                    <div id="image-preview-container" class="hidden space-y-2 p-3 bg-dark-bg rounded-xl border border-gray-800">
-                        <p class="text-gray-400 text-[11px] font-mono">Seleziona l'immagine <strong class="text-brand-400">principale</strong>:</p>
-                        <div id="preview-thumbs" class="flex flex-wrap gap-3"></div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Descrizione Breve (Visibile in Home) *</label>
-                        <input type="text" id="prod-shortdesc" required placeholder="Breve riassunto..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 mb-1 font-mono">Descrizione Lunga (Visibile aprendo il prodotto)</label>
-                        <textarea id="prod-longdesc" rows="4" placeholder="Specifiche tecniche dettagliate..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button type="submit" class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
-                        <button type="button" onclick="resetForm()" class="px-4 py-3 bg-dark-surface text-gray-300 rounded-xl text-xs hover:bg-gray-800 transition-colors cursor-pointer">Annulla</button>
-                    </div>
-                </form>
+        <!-- GESTIONE PRODOTTI E FOTO -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
+                <button onclick="resetProductForm()" id="cancel-edit-btn" class="hidden text-xs text-gray-400 hover:text-white font-mono underline cursor-pointer">Annulla Modifica</button>
             </div>
 
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">Elenco Prodotti nel Catalogo</h2>
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-mono">
+                <input type="hidden" id="edit-product-index" value="">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Titolo Prodotto *</label>
+                        <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Categoria *</label>
+                        <select id="prod-category" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Prezzo Listino (€) *</label>
+                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Prezzo Scontato (€ opzionale)</label>
+                        <input type="number" step="0.01" id="prod-saleprice" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Spedizione (€) *</label>
+                        <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
+                    <textarea id="prod-desc" required rows="2" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- GESTIONE FOTO MULTIPLE -->
+                <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Gestione Foto (URL Immagini)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-image-url" placeholder="Incolla URL immagine (es. https://...)" class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                        <button type="button" onclick="addImageUrl()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all cursor-pointer">Aggiungi Foto</button>
+                    </div>
+                    <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Colori disponibili (separati da virgola)</label>
+                    <input type="text" id="prod-colors" placeholder="Nero Opaco, Bianco, Rosso" value="Nero Opaco" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
+            </form>
+
+            <div class="pt-8 border-t border-gray-800 space-y-4">
+                <h3 class="text-sm font-bold text-white font-mono">Prodotti Esistenti</h3>
                 <div id="admin-products-list" class="space-y-3"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- SCHEDA 2: GESTIONE CATEGORIE -->
-        <div id="tab-content-categories" class="admin-tab-content space-y-6 hidden">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">Gestione Categorie</h2>
-                <div class="flex gap-3">
-                    <input type="text" id="new-category-name" placeholder="Nome nuova categoria (es. Gadget Tech)" class="flex-1 bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
-                    <button type="button" onclick="addNewCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Crea Categoria</button>
-                </div>
-                <div id="categories-list-container" class="space-y-2 pt-2"></div>
-            </div>
-        </div>
+        <!-- GESTIONE RECENSIONI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white font-mono">Gestione Recensioni / Commenti</h2>
+            <div id="admin-reviews-list" class="space-y-3 font-mono text-xs"></div>
+        </section>
+    </main>
 
-        <!-- SCHEDA 3: COLORI -->
-        <div id="tab-content-colors" class="admin-tab-content space-y-6 hidden">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">Gestione Colori Filamento</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <input type="text" id="new-color-name" placeholder="Nome Colore" class="bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
-                    <div class="flex items-center gap-2 bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-1">
-                        <label class="text-xs text-gray-400">Colore:</label>
-                        <input type="color" id="new-color-code" value="#10b981" class="w-8 h-8 bg-transparent cursor-pointer">
-                    </div>
-                    <button type="button" onclick="addNewColorItem()" class="py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Aggiungi Colore</button>
-                </div>
-                <div id="admin-colors-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-4"></div>
-            </div>
-        </div>
-
-        <!-- SCHEDA 4: FATTURE E EMAIL -->
-        <div id="tab-content-invoices" class="admin-tab-content space-y-6 hidden">
-            <div class="bg-dark-card border border-brand-500/30 p-6 rounded-2xl space-y-4 shadow-2xl backdrop-blur-md">
-                <h2 class="text-lg font-bold text-white">📄 Riepilogo Fatture, XML & Invio Email</h2>
-                <p class="text-xs text-gray-400">Gestisci gli ordini, invia la fattura via email con EmailJS o scarica il tracciato XML per l'AdE.</p>
-                <div id="admin-orders-list" class="space-y-3 text-xs font-mono"></div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MODALE ANTEPRIMA FATTURA -->
-    <div id="invoice-modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white text-gray-900 w-full max-w-2xl p-8 rounded-2xl shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
-            <div id="invoice-printable-content" class="space-y-6">
-                <div class="flex justify-between items-start border-b pb-4">
-                    <div class="flex items-center gap-4">
-                        <img src="logo.png" alt="LS3Dmaker Logo" class="w-24 h-24 object-contain">
-                        <div>
-                            <h2 class="text-xl font-bold">LS3Dmaker</h2>
-                            <p class="text-xs text-gray-600">Servizi di Stampa 3D Professionali</p>
-                            <p class="text-[10px] text-gray-500">Bologna, Italia | P.IVA: 00000000000</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <h3 id="inv-modal-number" class="text-lg font-bold text-emerald-600">Fattura N. --</h3>
-                        <p id="inv-modal-date" class="text-xs text-gray-500">Data: --/--/----</p>
-                    </div>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-xl text-xs space-y-1">
-                    <p class="font-bold text-gray-700">Dati Cliente:</p>
-                    <p id="inv-modal-client">Nome Cognome</p>
-                    <p id="inv-modal-email" class="text-gray-500">email@client.com</p>
-                    <p id="inv-modal-address" class="text-gray-500">Indirizzo spedizione</p>
-                </div>
-
-                <div class="space-y-2">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="border-b text-gray-500">
-                                <th class="pb-2">Prodotto / Colore</th>
-                                <th class="pb-2 text-center">Q.ta</th>
-                                <th class="pb-2 text-right">Prezzo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inv-modal-items"></tbody>
-                    </table>
-                </div>
-
-                <div class="border-t pt-4 flex justify-between items-center font-bold text-sm">
-                    <span>Totale Ordine:</span>
-                    <span id="inv-modal-total" class="text-emerald-600 text-lg">€0.00</span>
-                </div>
-            </div>
-
-            <div class="flex gap-3 pt-4 border-t">
-                <button onclick="window.print()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs cursor-pointer">🖨️ Stampa / Salva PDF</button>
-                <button onclick="closeInvoiceModal()" class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-xs cursor-pointer">Chiudi</button>
-            </div>
-        </div>
-    </div>
-
-    <footer class="text-center py-6 text-xs text-gray-600 font-mono">
-        LS3DMAKER Admin Panel © 2026
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
+        LS3DMAKER © 2026 - Admin Panel
     </footer>
 
-    <script src="invoice.js"></script>
-
     <script>
-        const ADMIN_PASSWORD = "ls3d2026";
-        const defaultImg = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
-        
-        let products = [];
-        try { products = JSON.parse(localStorage.getItem('ls3d_products')) || []; } catch (e) { products = []; }
+        let currentEditingImages = [];
+        let mainImageIdx = 0;
 
-        let categories = ["Design", "Mechanical", "Prototypes"];
-        try { categories = JSON.parse(localStorage.getItem('ls3d_categories')) || ["Design", "Mechanical", "Prototypes"]; } catch (e) {}
-        
-        let filamentColors = [];
-        try {
-            filamentColors = JSON.parse(localStorage.getItem('ls3d_filament_colors')) || [
-                { name: "Nero Opaco", code: "#111827" },
-                { name: "Bianco Perla", code: "#f3f4f6" },
-                { name: "Grigio Techno", code: "#6b7280" },
-                { name: "Verde Brand", code: "#10b981" },
-                { name: "Rosso Fuoco", code: "#ef4444" },
-                { name: "Blu Elettrico", code: "#3b82f6" },
-                { name: "Oro Seta", code: "#eab308" },
-                { name: "Argento Metallico", code: "#9ca3af" }
-            ];
-        } catch (e) { filamentColors = []; }
-
-        function persistColors() {
-            localStorage.setItem('ls3d_filament_colors', JSON.stringify(filamentColors));
-        }
-        
-        let currentTempImages = [];
-        let currentMainImageIndex = 0;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-        });
-
-        function checkPassword(e) {
-            e.preventDefault();
-            const passInput = document.getElementById('admin-pass').value;
-            if (passInput === ADMIN_PASSWORD) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                showAdminDashboard();
-            } else {
-                alert("Password errata! Accesso negato.");
-                document.getElementById('admin-pass').value = '';
-            }
+        function getCategories() {
+            try {
+                const saved = localStorage.getItem('ls3d_categories');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
 
-        function logoutAdmin() {
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-            document.getElementById('admin-pass').value = '';
-        }
-
-        function showAdminDashboard() {
-            renderCategoriesCheckboxes();
-            renderAdminColorsWithDots();
-            renderAdminProducts();
+        function saveCategories(cats) {
+            localStorage.setItem('ls3d_categories', JSON.stringify(cats));
             renderAdminCategories();
-            if (typeof renderAdminOrders === 'function') renderAdminOrders();
+            populateCategoryDropdown();
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
-
-            ['products', 'categories', 'colors', 'invoices'].forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                btn.className = t === tabName ? "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand-500 text-black shadow-lg cursor-pointer" : "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-dark-surface text-gray-400 hover:text-white border border-gray-800 cursor-pointer";
-            });
+        function addCategory() {
+            const input = document.getElementById('new-category-input');
+            const val = input.value.trim();
+            if (!val) return;
+            const cats = getCategories();
+            if (!cats.includes(val)) { cats.push(val); saveCategories(cats); input.value = ''; }
         }
 
-        function renderAdminColorsWithDots() {
-            const container = document.getElementById('admin-colors-container');
-            if (!container) return;
-            
-            if (filamentColors.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-xs font-mono col-span-full">Nessun colore configurato.</p>`;
-                return;
-            }
-
-            container.innerHTML = filamentColors.map((c, index) => `
-                <div class="flex items-center justify-between bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
-                    <div class="flex items-center gap-2">
-                        <span class="w-4 h-4 rounded-full border border-gray-600 inline-block shadow" style="background-color: ${c.code || '#10b981'}"></span>
-                        <span class="text-white font-mono">${c.name}</span>
-                    </div>
-                    <button type="button" onclick="deleteColorItem(${index})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 cursor-pointer">✕</button>
-                </div>
-            `).join('');
-
-            renderColorsCheckboxes();
-        }
-
-        function addNewColorItem() {
-            const nameInput = document.getElementById('new-color-name');
-            const codeInput = document.getElementById('new-color-code');
-            const name = nameInput.value.trim();
-            const code = codeInput.value;
-
-            if (!name) { alert("Inserisci un nome per il colore."); return; }
-            if (filamentColors.some(c => c.name.toLowerCase() === name.toLowerCase())) { alert("Questo colore esiste già!"); return; }
-
-            filamentColors.push({ name, code });
-            persistColors();
-            nameInput.value = '';
-            codeInput.value = '#10b981';
-            renderAdminColorsWithDots();
-        }
-
-        function deleteColorItem(index) {
-            if (confirm(`Vuoi davvero eliminare questo colore?`)) {
-                filamentColors.splice(index, 1);
-                persistColors();
-                renderAdminColorsWithDots();
-            }
-        }
-
-        function renderColorsCheckboxes(selectedColors = []) {
-            const container = document.getElementById('colors-checkboxes');
-            if (!container) return;
-            container.innerHTML = filamentColors.map(c => `
-                <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white select-none">
-                    <input type="checkbox" name="product-colors" value="${c.name}" ${selectedColors.length === 0 || selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
-                    <span class="w-3 h-3 rounded-full inline-block border border-gray-600" style="background-color: ${c.code || '#10b981'}"></span>
-                    <span>${c.name}</span>
-                </label>
-            `).join('');
-        }
-
-        function renderCategoriesCheckboxes(selectedCategories = []) {
-            const container = document.getElementById('categories-checkboxes');
-            if(!container) return;
-            container.innerHTML = categories.map(cat => `
-                <label class="flex items-center gap-2 cursor-pointer text-gray-300 text-xs hover:text-white select-none">
-                    <input type="checkbox" name="product-categories" value="${cat}" ${selectedCategories.includes(cat) ? 'checked' : ''} class="w-4 h-4 rounded border-gray-700 bg-dark-bg text-brand-500 focus:ring-brand-500 cursor-pointer">
-                    <span>${cat}</span>
-                </label>
-            `).join('');
-        }
-
-        function handleImageUpload(e) {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
-            currentTempImages = [];
-            let loadedCount = 0;
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(uploadEvent) {
-                    currentTempImages.push(uploadEvent.target.result);
-                    loadedCount++;
-                    if (loadedCount === files.length) {
-                        currentMainImageIndex = 0;
-                        renderImagePreviews();
-                    }
-                };
-                reader.readAsDataURL(files[i]);
-            }
-        }
-
-        function renderImagePreviews() {
-            const container = document.getElementById('image-preview-container');
-            const thumbs = document.getElementById('preview-thumbs');
-            container.classList.remove('hidden');
-            thumbs.innerHTML = currentTempImages.map((img, idx) => `
-                <div class="relative group cursor-pointer" onclick="setMainImage(${idx})">
-                    <img src="${img}" class="w-20 h-20 object-cover rounded-xl border-2 ${idx === currentMainImageIndex ? 'border-brand-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'border-gray-700 opacity-60'}">
-                    <span class="absolute bottom-1 left-1 bg-black/80 text-[9px] font-mono px-1.5 py-0.5 rounded text-white">
-                        ${idx === currentMainImageIndex ? 'Principale' : 'Foto ' + (idx+1)}
-                    </span>
-                </div>
-            `).join('');
-        }
-
-        function setMainImage(index) {
-            currentMainImageIndex = index;
-            renderImagePreviews();
+        function deleteCategory(cat) {
+            saveCategories(getCategories().filter(c => c !== cat));
         }
 
         function renderAdminCategories() {
-            const container = document.getElementById('categories-list-container');
-            if(!container) return;
-            container.innerHTML = categories.map(cat => `
-                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
-                    <span class="text-brand-400 font-bold">${cat}</span>
-                    <button type="button" onclick="deleteCategory('${cat}')" class="text-red-400 hover:text-red-300 cursor-pointer">Elimina</button>
+            const container = document.getElementById('admin-categories-list');
+            if (!container) return;
+            container.innerHTML = getCategories().map(c => `
+                <div class="flex items-center gap-2 bg-dark-bg px-3 py-1.5 rounded-xl border border-gray-800 font-mono text-xs">
+                    <span>${c}</span>
+                    <button type="button" onclick="deleteCategory('${c}')" class="text-red-400 hover:text-red-300 cursor-pointer">×</button>
                 </div>
             `).join('');
-            renderCategoriesCheckboxes();
         }
 
-        function addNewCategory() {
-            const input = document.getElementById('new-category-name');
-            const val = input.value.trim();
-            if (val && !categories.includes(val)) {
-                categories.push(val);
-                localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-                input.value = '';
-                renderAdminCategories();
+        function populateCategoryDropdown() {
+            const select = document.getElementById('prod-category');
+            if (!select) return;
+            select.innerHTML = getCategories().map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function getProducts() {
+            try {
+                const saved = localStorage.getItem('ls3d_products');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
+            return [
+                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], mainImageIndex: 0, colors: ["Nero Opaco"] }
+            ];
+        }
+
+        function saveProducts(prods) {
+            localStorage.setItem('ls3d_products', JSON.stringify(prods));
+            renderAdminProducts();
+        }
+
+        function addImageUrl() {
+            const input = document.getElementById('new-image-url');
+            const url = input.value.trim();
+            if (!url) return;
+            currentEditingImages.push(url);
+            input.value = '';
+            renderImagesPreview();
+        }
+
+        function removeImageUrl(idx) {
+            currentEditingImages.splice(idx, 1);
+            if (mainImageIdx >= currentEditingImages.length) mainImageIdx = Math.max(0, currentEditingImages.length - 1);
+            renderImagesPreview();
+        }
+
+        function setMainImage(idx) { mainImageIdx = idx; renderImagesPreview(); }
+
+        function renderImagesPreview() {
+            const container = document.getElementById('admin-images-preview');
+            if (!container) return;
+            if (currentEditingImages.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-gray-500 font-mono text-xs">Nessuna foto aggiunta.</p>`;
+                return;
             }
+            container.innerHTML = currentEditingImages.map((img, idx) => `
+                <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg">
+                    <div class="flex items-center justify-between w-full text-[10px]">
+                        <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold' : 'text-gray-400 hover:text-white'}">Principale</button>
+                        <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function deleteCategory(catName) {
-            if (categories.length <= 1) { alert("Mantieni almeno una categoria."); return; }
-            categories = categories.filter(c => c !== catName);
-            localStorage.setItem('ls3d_categories', JSON.stringify(categories));
-            renderAdminCategories();
+        function saveProduct(e) {
+            e.preventDefault();
+            const index = document.getElementById('edit-product-index').value;
+            const title = document.getElementById('prod-title').value.trim();
+            const category = document.getElementById('prod-category').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
+            const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
+            const shortDesc = document.getElementById('prod-desc').value.trim();
+            const colors = document.getElementById('prod-colors').value.split(',').map(c => c.trim()).filter(Boolean);
+
+            if (currentEditingImages.length === 0) { alert("Aggiungi almeno un'immagine."); return; }
+
+            const productData = {
+                id: index !== '' ? getProducts()[index].id : Date.now(),
+                title, category, price, salePrice, shipping, shortDesc,
+                images: [...currentEditingImages],
+                mainImageIndex: mainImageIdx,
+                colors: colors.length > 0 ? colors : ["Standard"]
+            };
+
+            const products = getProducts();
+            if (index !== '') products[index] = productData;
+            else products.push(productData);
+
+            saveProducts(products);
+            resetProductForm();
+        }
+
+        function editProduct(idx) {
+            const p = getProducts()[idx];
+            document.getElementById('edit-product-index').value = idx;
+            document.getElementById('prod-title').value = p.title;
+            document.getElementById('prod-category').value = p.category || getCategories()[0];
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
+            document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
+            document.getElementById('prod-desc').value = p.shortDesc || p.desc || '';
+            document.getElementById('prod-colors').value = (p.colors || []).join(', ');
+            
+            currentEditingImages = [...(p.images || [])];
+            mainImageIdx = p.mainImageIndex || 0;
+            renderImagesPreview();
+
+            document.getElementById('product-form-title').innerText = "Modifica Prodotto";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetProductForm() {
+            document.getElementById('product-form').reset();
+            document.getElementById('edit-product-index').value = '';
+            document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            currentEditingImages = [];
+            mainImageIdx = 0;
+            renderImagesPreview();
+        }
+
+        function deleteProduct(idx) {
+            if (confirm("Vuoi eliminare questo prodotto?")) {
+                const products = getProducts();
+                products.splice(idx, 1);
+                saveProducts(products);
+            }
         }
 
         function renderAdminProducts() {
             const container = document.getElementById('admin-products-list');
             if (!container) return;
-            if (products.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-xs font-mono">Nessun prodotto in catalogo.</p>`;
-                return;
-            }
-            container.innerHTML = products.map(p => {
-                const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : defaultImg;
-                const cats = Array.isArray(p.categories) ? p.categories.join(', ') : (p.category || 'Generale');
-                const priceDisplay = p.salePrice ? `<span class="line-through text-gray-500">€${Number(p.price).toFixed(2)}</span> <span class="text-red-400 font-bold">€${Number(p.salePrice).toFixed(2)}</span>` : `€${Number(p.price || 0).toFixed(2)}`;
-                const badgeFeatured = p.featured ? `<span class="bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded text-[10px] font-mono border border-brand-500/30">⭐ In Vetrina</span>` : '';
-                const shippingDisplay = `Sped: €${Number(p.shipping !== undefined ? p.shipping : 5.00).toFixed(2)}`;
-
-                return `
-                    <div class="flex justify-between items-center p-4 bg-dark-bg rounded-xl border border-gray-800 text-xs gap-3">
-                        <div class="flex items-center gap-3">
-                            <img src="${mainImg}" class="w-12 h-12 object-cover rounded-lg border border-gray-700">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <p class="font-bold text-white text-sm">${p.title}</p>
-                                    ${badgeFeatured}
-                                </div>
-                                <p class="text-brand-400 font-mono">${priceDisplay} | ${shippingDisplay} | Categorie: ${cats}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="editProduct(${p.id})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
-                            <button type="button" onclick="deleteProduct(${p.id})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+            const products = getProducts();
+            if (products.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs font-mono">Nessun prodotto.</p>`; return; }
+            container.innerHTML = products.map((p, idx) => `
+                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.images?.[p.mainImageIndex || 0] || ''}" class="w-10 h-10 object-cover rounded-lg">
+                        <div>
+                            <p class="font-bold text-white">${p.title}</p>
+                            <p class="text-[10px] text-gray-400">Cat: ${p.category || 'Generale'} | €${p.price}</p>
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="flex items-center gap-2">
+                        <button onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer">Modifica</button>
+                        <button onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg cursor-pointer">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function saveProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById('prod-id').value;
-            const title = document.getElementById('prod-title').value;
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const salePriceInput = document.getElementById('prod-saleprice').value;
-            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
-            const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
-            const featured = document.getElementById('prod-featured').checked;
-            const shortDesc = document.getElementById('prod-shortdesc').value;
-            const longDesc = document.getElementById('prod-longdesc').value;
-
-            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(cb => cb.value);
-            if (selectedCategories.length === 0) {
-                alert("Seleziona almeno una categoria per il prodotto.");
-                return;
-            }
-
-            const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(cb => cb.value);
-
-            let imagesToSave = currentTempImages;
-            let mainIndexToSave = currentMainImageIndex;
-
-            if (id) {
-                const p = products.find(i => i.id == id);
-                if (p) {
-                    p.title = title;
-                    p.price = price;
-                    p.salePrice = salePrice;
-                    p.shipping = shipping;
-                    p.featured = featured;
-                    p.categories = selectedCategories;
-                    p.colors = selectedColors;
-                    p.shortDesc = shortDesc;
-                    p.longDesc = longDesc;
-                    if (imagesToSave.length > 0) {
-                        p.images = imagesToSave;
-                        p.mainImageIndex = mainIndexToSave;
-                    }
-                }
-            } else {
-                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                products.push({
-                    id: newId,
-                    title,
-                    price,
-                    salePrice,
-                    shipping,
-                    featured,
-                    categories: selectedCategories,
-                    colors: selectedColors,
-                    shortDesc,
-                    longDesc,
-                    images: imagesToSave.length > 0 ? imagesToSave : [defaultImg],
-                    mainImageIndex: mainIndexToSave,
-                    hidden: false
-                });
-            }
-
-            localStorage.setItem('ls3d_products', JSON.stringify(products));
-            resetForm();
-            renderAdminProducts();
+        function getReviews() {
+            try { const saved = localStorage.getItem('ls3d_reviews'); if (saved) return JSON.parse(saved); } catch (e) {}
+            return [];
         }
 
-        function editProduct(id) {
-            const p = products.find(i => i.id === id);
-            if (!p) return;
-            document.getElementById('prod-id').value = p.id;
-            document.getElementById('prod-title').value = p.title;
-            document.getElementById('prod-price').value = p.price;
-            document.getElementById('prod-saleprice').value = p.salePrice || '';
-            document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
-            document.getElementById('prod-featured').checked = p.featured || false;
-            document.getElementById('prod-shortdesc').value = p.shortDesc || '';
-            document.getElementById('prod-longdesc').value = p.longDesc || '';
-            
-            const prodCats = p.categories || (p.category ? [p.category] : [categories[0]]);
-            renderCategoriesCheckboxes(prodCats);
-
-            const prodCols = p.colors || [];
-            renderColorsCheckboxes(prodCols);
-
-            currentTempImages = p.images || [];
-            currentMainImageIndex = p.mainImageIndex || 0;
-            if (currentTempImages.length > 0) {
-                renderImagePreviews();
-            }
-
-            document.getElementById('form-title').innerText = "Modifica Prodotto";
-            switchTab('products');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function deleteReview(idx) {
+            const revs = getReviews();
+            revs.splice(idx, 1);
+            localStorage.setItem('ls3d_reviews', JSON.stringify(revs));
+            renderAdminReviews();
         }
 
-        function deleteProduct(id) {
-            if (confirm("Eliminare il prodotto?")) {
-                products = products.filter(i => i.id !== id);
-                localStorage.setItem('ls3d_products', JSON.stringify(products));
-                renderAdminProducts();
-            }
+        function renderAdminReviews() {
+            const container = document.getElementById('admin-reviews-list');
+            if (!container) return;
+            const revs = getReviews();
+            if (revs.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessuna recensione.</p>`; return; }
+            container.innerHTML = revs.map((r, idx) => `
+                <div class="flex justify-between items-start bg-dark-bg p-4 rounded-xl border border-gray-800">
+                    <div>
+                        <p class="font-bold text-white">${r.author} <span class="text-brand-400">(${r.rating}/5 ★)</span> su <span class="text-gray-300">${r.productTitle}</span></p>
+                        <p class="text-gray-400 mt-1">${r.comment}</p>
+                        <p class="text-[10px] text-gray-500 mt-2">${r.date}</p>
+                    </div>
+                    <button onclick="deleteReview(${idx})" class="text-red-400 hover:text-red-300 cursor-pointer">Elimina</button>
+                </div>
+            `).join('');
         }
 
-        function resetForm() {
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('prod-shipping').value = '5.00';
-            document.getElementById('prod-featured').checked = false;
-            document.getElementById('image-preview-container').classList.add('hidden');
-            currentTempImages = [];
-            currentMainImageIndex = 0;
-            renderCategoriesCheckboxes();
-            renderColorsCheckboxes();
-            document.getElementById('form-title').innerText = "Aggiungi / Modifica Prodotto";
-        }
+        renderAdminCategories();
+        populateCategoryDropdown();
+        renderAdminProducts();
+        renderAdminReviews();
+        try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
 </html>
