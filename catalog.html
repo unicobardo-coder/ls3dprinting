@@ -13,8 +13,9 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Configurazione Globale -->
+    <!-- Configurazioni e Colori Globali -->
     <script src="config.js"></script>
+    <script src="colors_2.js"></script>
 
     <script>
         tailwind.config = {
@@ -106,9 +107,7 @@
                 const saved = localStorage.getItem('ls3d_products');
                 if (saved) return JSON.parse(saved);
             } catch (e) {}
-            return [
-                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], mainImageIndex: 0, colors: ["Nero Opaco"] },
-            ];
+            return [];
         }
 
         function getReviews() {
@@ -127,10 +126,19 @@
             return null;
         }
 
+        // Funzione per ripulire nomi di file STL troppo lunghi o generati da IA
+        function cleanStlFilename(filename) {
+            if (!filename) return '';
+            if (filename.length > 30) {
+                return "Modello 3D Ottimizzato (.stl)";
+            }
+            return filename;
+        }
+
         let cart = [];
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
         let currentCategory = 'Tutti';
-        let catalogStlRenderer = null; // Riferimento al renderer 3D
+        let catalogStlRenderer = null;
 
         function renderCategories() {
             const container = document.getElementById('category-filters');
@@ -207,8 +215,22 @@
             const modal = document.getElementById('product-modal');
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
-            const colors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
-            const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
+            
+            // Gestione colori con pallini associati da filamentColors
+            const availableColors = (typeof filamentColors !== 'undefined') ? filamentColors : [
+                { name: "Nero Opaco", code: "#111827" },
+                { name: "Bianco Perla", code: "#f3f4f6" },
+                { name: "Grigio Techno", code: "#6b7280" },
+                { name: "Verde Brand", code: "#10b981" }
+            ];
+            
+            const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
+            const colorOptions = productColors.map(colorName => {
+                const found = availableColors.find(c => c.name.toLowerCase() === colorName.toLowerCase());
+                const hex = found ? found.code : '#10b981';
+                return `<option value="${colorName}">● ${colorName}</option>`;
+            }).join('');
+
             const reviews = getReviews().filter(r => r.productTitle === p.title);
             const currentUser = getCurrentUser();
 
@@ -231,6 +253,8 @@
                 </div>
             `;
 
+            const displayStlName = cleanStlFilename(p.stlFileName);
+
             content.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                     <h2 class="text-lg font-bold text-white font-mono">${p.title}</h2>
@@ -246,7 +270,7 @@
                         <!-- Visualizzatore STL se presente -->
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
-                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${p.stlFileName})</p>
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${displayStlName})</p>
                                 <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
                                     <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
                                     <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
@@ -287,7 +311,6 @@
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
 
-            // Se il prodotto ha un STL salvato, generiamo una geometria dimostrativa o placeholder nel canvas 3D
             if (p.stlFileName) {
                 initCatalogStlViewer();
             }
@@ -315,7 +338,6 @@
             directionalLight.position.set(1, 1, 1).normalize();
             scene.add(directionalLight);
 
-            // Creiamo un oggetto mesh dimostrativo rotante per l'anteprima nel catalogo
             const geometry = new THREE.BoxGeometry(50, 50, 50);
             const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
             const mesh = new THREE.Mesh(geometry, material);
