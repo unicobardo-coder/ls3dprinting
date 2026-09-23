@@ -68,7 +68,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, caricamento foto multiple da PC, file STL e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, caricamento foto multiple da PC, file STL reali e recensioni.</p>
             </div>
         </div>
 
@@ -216,6 +216,7 @@
 
         let currentEditingImages = [];
         let mainImageIdx = 0;
+        let currentStlBase64 = '';
         let currentStlFileName = '';
 
         function getCategories() {
@@ -313,7 +314,7 @@
             `).join('');
         }
 
-        // --- GESTIONE FILE STL & ANTEPRIMA 3D ---
+        // --- GESTIONE FILE STL & ANTEPRIMA 3D REALE ---
         function handleStlUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -322,13 +323,15 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
+                currentStlBase64 = e.target.result;
                 document.getElementById('stl-viewer-container').classList.remove('hidden');
-                renderStlPreview(e.target.result);
+                renderStlPreviewFromData(currentStlBase64);
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsDataURL(file);
         }
 
         function removeStlFile() {
+            currentStlBase64 = '';
             currentStlFileName = '';
             document.getElementById('prod-stl-input').value = '';
             document.getElementById('prod-stl-name').value = '';
@@ -336,10 +339,9 @@
         }
 
         let stlRenderer = null;
-        function renderStlPreview(buffer) {
+        function renderStlPreviewFromData(dataUrl) {
             const container = document.getElementById('stl-viewer-container');
             const canvas = document.getElementById('stl-canvas');
-            
             if (stlRenderer) { stlRenderer.dispose(); }
 
             const width = container.clientWidth || 400;
@@ -359,14 +361,11 @@
             directionalLight.position.set(1, 1, 1).normalize();
             scene.add(directionalLight);
 
-            try {
-                const loader = new THREE.STLLoader();
-                const geometry = loader.parse(buffer);
+            const loader = new THREE.STLLoader();
+            loader.load(dataUrl, function (geometry) {
                 geometry.computeVertexNormals();
-
                 const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
                 const mesh = new THREE.Mesh(geometry, material);
-
                 geometry.center();
                 scene.add(mesh);
 
@@ -376,9 +375,9 @@
                     stlRenderer.render(scene, camera);
                 }
                 animate();
-            } catch (err) {
-                console.error("Errore nel parsing STL:", err);
-            }
+            }, undefined, function (error) {
+                console.error("Errore caricamento STL nell'admin:", error);
+            });
         }
 
         function saveProduct(e) {
@@ -416,7 +415,8 @@
                 mainImageIndex: mainImageIdx,
                 colors: selectedColors, 
                 featured,
-                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : '')
+                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : ''),
+                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '')
             };
 
             const products = getProducts();
@@ -428,7 +428,7 @@
                 resetProductForm();
                 alert("Prodotto salvato con successo!");
             } catch (err) {
-                alert("Errore di salvataggio: le immagini caricate potrebbero essere troppo pesanti per la memoria del browser.");
+                alert("Errore di salvataggio: le immagini o il file STL potrebbero essere troppo pesanti per la memoria del browser.");
                 console.error(err);
             }
         }
@@ -453,8 +453,13 @@
             renderImagesPreview();
 
             currentStlFileName = p.stlFileName || '';
+            currentStlBase64 = p.stlData || '';
             document.getElementById('prod-stl-name').value = currentStlFileName;
-            if (currentStlFileName) {
+            
+            if (currentStlBase64) {
+                document.getElementById('stl-viewer-container').classList.remove('hidden');
+                renderStlPreviewFromData(currentStlBase64);
+            } else if (currentStlFileName) {
                 document.getElementById('stl-viewer-container').classList.remove('hidden');
             } else {
                 document.getElementById('stl-viewer-container').classList.add('hidden');
