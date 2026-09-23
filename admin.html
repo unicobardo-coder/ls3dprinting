@@ -9,10 +9,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Configurazione Globale & EmailJS SDK -->
     <script src="config.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="invoice.js"></script>
 
     <script>
         tailwind.config = {
@@ -35,10 +33,10 @@
         <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl font-mono text-xs">
             <div class="text-center space-y-2">
                 <h2 class="text-xl font-bold text-white tracking-tight">Area Riservata Admin</h2>
-                <p class="text-gray-400">Inserisci la password per accedere al gestionale.</p>
+                <p class="text-gray-400">Inserisci la password per accedere (default: admin).</p>
             </div>
             <form onsubmit="checkAdminPassword(event)" class="space-y-4">
-                <input type="password" id="admin-password-input" placeholder="Password di accesso..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                <input type="password" id="admin-password-input" placeholder="Password di accesso..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
                 <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Accedi</button>
             </form>
             <div class="text-center">
@@ -66,7 +64,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Amministrazione</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa prodotti, categorie, colori, foto, fatture elettroniche e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione prodotti, categorie multiple, colori, foto, fatture elettroniche e recensioni.</p>
             </div>
         </div>
 
@@ -74,13 +72,13 @@
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <h2 class="text-lg font-bold text-white font-mono">Gestione Categorie</h2>
             <div class="flex gap-3">
-                <input type="text" id="new-category-input" placeholder="Nome nuova categoria..." class="flex-grow bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:border-brand-500 focus:outline-none">
+                <input type="text" id="new-category-input" placeholder="Nome nuova categoria..." class="flex-grow bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-xs text-white focus:outline-none">
                 <button onclick="addCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Aggiungi</button>
             </div>
             <div id="admin-categories-list" class="flex flex-wrap gap-2 pt-2"></div>
         </section>
 
-        <!-- PRODOTTI, FOTO & COLORI -->
+        <!-- PRODOTTI (Con Categorie Multiple e Descrizione Breve) -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
@@ -96,8 +94,8 @@
                         <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-1">Categoria *</label>
-                        <select id="prod-category" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></select>
+                        <label class="block text-gray-400 mb-1">Categorie Multiple (Seleziona una o più) *</label>
+                        <div id="prod-categories-checkboxes" class="bg-dark-bg border border-gray-700/80 rounded-xl p-3 max-h-36 overflow-y-auto space-y-2"></div>
                     </div>
                 </div>
 
@@ -118,7 +116,7 @@
 
                 <div>
                     <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
-                    <textarea id="prod-desc" required rows="2" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione del prodotto..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
                 <!-- FOTO MULTIPLE -->
@@ -126,22 +124,21 @@
                     <label class="block text-white font-bold">Gestione Foto (URL Immagini)</label>
                     <div class="flex gap-2">
                         <input type="text" id="new-image-url" placeholder="Incolla URL immagine..." class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                        <button type="button" onclick="addImageUrl()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl cursor-pointer">Aggiungi Foto</button>
+                        <button type="button" onclick="addImageUrl()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all cursor-pointer">Aggiungi Foto</button>
                     </div>
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
                 </div>
 
-                <!-- COLORI AVANZATI -->
+                <!-- COLORI -->
                 <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
                     <label class="block text-white font-bold">Gestione Colori Disponibili</label>
                     <div class="flex gap-2">
-                        <input type="text" id="new-color-input" placeholder="Aggiungi colore..." class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                        <button type="button" onclick="addColorTag()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl cursor-pointer">Aggiungi Colore</button>
+                        <input type="text" id="new-color-input" placeholder="Aggiungi colore (es. Nero Opaco...)" class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                        <button type="button" onclick="addColorTag()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all cursor-pointer">Aggiungi Colore</button>
                     </div>
                     <div id="admin-colors-preview" class="flex flex-wrap gap-2 pt-2"></div>
                 </div>
 
-                <!-- VETRINA -->
                 <div class="flex items-center gap-3 pt-2">
                     <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
                     <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
@@ -156,9 +153,11 @@
             </div>
         </section>
 
-        <!-- FATTURE & ORDINI (Gestiti tramite invoice.js) -->
+        <!-- FATTURE & ORDINI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
-            <h2 class="text-lg font-bold text-white font-mono">Gestione Fatture & Ordini</h2>
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h2 class="text-lg font-bold text-white font-mono">Gestione Fatture & Ordini</h2>
+            </div>
             <div id="admin-orders-list" class="space-y-3 font-mono text-xs"></div>
         </section>
 
@@ -171,30 +170,28 @@
 
     <!-- MODALE ANTEPRIMA FATTURA -->
     <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white text-black w-full max-w-2xl rounded-2xl p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto font-sans">
-            <div class="flex justify-between items-center border-b pb-4">
+        <div class="bg-white text-black w-full max-w-2xl rounded-2xl p-8 space-y-6 shadow-2xl font-sans max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start border-b pb-4">
                 <div>
-                    <h3 id="inv-modal-number" class="text-xl font-bold">Fattura N. 000</h3>
-                    <p id="inv-modal-date" class="text-xs text-gray-500">Data: --</p>
+                    <h2 class="text-xl font-extrabold text-gray-900" id="inv-modal-number">Fattura N. --</h2>
+                    <p class="text-xs text-gray-500" id="inv-modal-date">Data: --</p>
                 </div>
-                <button onclick="closeInvoiceModal()" class="text-gray-500 hover:text-black font-bold text-lg cursor-pointer">✕</button>
+                <div class="text-right">
+                    <p class="font-bold text-emerald-600 text-lg">LS3Dmaker</p>
+                    <p class="text-xs text-gray-500">Bologna, Italia</p>
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-4 text-xs">
                 <div>
-                    <p class="font-bold text-gray-700">Cedente:</p>
-                    <p>LS3Dmaker di Schiavello Luigi</p>
-                    <p>Bologna, Italia</p>
-                </div>
-                <div>
-                    <p class="font-bold text-gray-700">Cliente:</p>
-                    <p id="inv-modal-client" class="font-bold">--</p>
-                    <p id="inv-modal-email" class="text-gray-500">--</p>
-                    <p id="inv-modal-address" class="text-gray-500">--</p>
+                    <p class="font-bold text-gray-500 uppercase">Committente:</p>
+                    <p class="font-bold text-gray-900 text-sm" id="inv-modal-client">--</p>
+                    <p class="text-gray-600" id="inv-modal-email">--</p>
+                    <p class="text-gray-600" id="inv-modal-address">--</p>
                 </div>
             </div>
             <table class="w-full text-xs text-left border-collapse">
                 <thead>
-                    <tr class="border-b-2 border-gray-300">
+                    <tr class="border-b text-gray-500 font-bold">
                         <th class="py-2">Prodotto</th>
                         <th class="py-2 text-center">Qt.</th>
                         <th class="py-2 text-right">Totale</th>
@@ -202,12 +199,12 @@
                 </thead>
                 <tbody id="inv-modal-items"></tbody>
             </table>
-            <div class="flex justify-between items-center border-t pt-4 font-bold text-sm">
+            <div class="border-t pt-4 flex justify-between items-center font-bold text-base">
                 <span>Totale Documento:</span>
-                <span id="inv-modal-total" class="text-emerald-600">€0.00</span>
+                <span class="text-emerald-600" id="inv-modal-total">€0.00</span>
             </div>
-            <div class="text-center pt-2">
-                <button onclick="closeInvoiceModal()" class="px-6 py-2.5 bg-black text-white rounded-xl text-xs font-bold cursor-pointer">Chiudi Anteprima</button>
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button type="button" onclick="closeInvoiceModal()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-xs font-bold cursor-pointer">Chiudi</button>
             </div>
         </div>
     </div>
@@ -217,7 +214,7 @@
     </footer>
 
     <script>
-        const ADMIN_PASSWORD = "admin"; // Modifica la password admin a piacimento
+        const ADMIN_PASSWORD = "admin";
 
         function checkAdminPassword(e) {
             e.preventDefault();
@@ -251,14 +248,14 @@
         let currentProductColors = ["Nero Opaco"];
 
         function getCategories() {
-            try { const saved = localStorage.getItem('ls3d_categories'); if (saved) return JSON.parse(saved); } catch (e) {}
+            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
             return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
 
         function saveCategories(cats) {
             localStorage.setItem('ls3d_categories', JSON.stringify(cats));
             renderAdminCategories();
-            populateCategoryDropdown();
+            renderCategoryCheckboxes();
         }
 
         function addCategory() {
@@ -282,16 +279,22 @@
             `).join('');
         }
 
-        function populateCategoryDropdown() {
-            const select = document.getElementById('prod-category');
-            if (!select) return;
-            select.innerHTML = getCategories().map(c => `<option value="${c}">${c}</option>`).join('');
+        function renderCategoryCheckboxes(selectedCategories = []) {
+            const container = document.getElementById('prod-categories-checkboxes');
+            if (!container) return;
+            const cats = getCategories();
+            container.innerHTML = cats.map(c => `
+                <label class="flex items-center gap-2 text-white cursor-pointer">
+                    <input type="checkbox" name="product-categories" value="${c}" ${selectedCategories.includes(c) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
+                    <span>${c}</span>
+                </label>
+            `).join('');
         }
 
         function getProducts() {
-            try { const saved = localStorage.getItem('ls3d_products'); if (saved) return JSON.parse(saved); } catch (e) {}
+            try { const s = localStorage.getItem('ls3d_products'); if (s) return JSON.parse(s); } catch (e) {}
             return [
-                { id: 1, title: "Supporto Cuffie", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?w=600"], mainImageIndex: 0, colors: ["Nero Opaco", "Bianco"], featured: true }
+                { id: 1, title: "Supporto Cuffie", categories: ["Accessori"], price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico stampato in 3D.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?w=600"], mainImageIndex: 0, colors: ["Nero Opaco", "Bianco"], featured: true }
             ];
         }
 
@@ -300,6 +303,7 @@
             renderAdminProducts();
         }
 
+        // FOTO MULTIPLE
         function addImageUrl() {
             const input = document.getElementById('new-image-url');
             const url = input.value.trim();
@@ -320,7 +324,10 @@
         function renderImagesPreview() {
             const container = document.getElementById('admin-images-preview');
             if (!container) return;
-            if (currentEditingImages.length === 0) { container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto.</p>`; return; }
+            if (currentEditingImages.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto.</p>`;
+                return;
+            }
             container.innerHTML = currentEditingImages.map((img, idx) => `
                 <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
                     <img src="${img}" class="w-full h-20 object-cover rounded-lg">
@@ -332,6 +339,7 @@
             `).join('');
         }
 
+        // COLORI
         function addColorTag() {
             const input = document.getElementById('new-color-input');
             const val = input.value.trim();
@@ -363,9 +371,14 @@
             e.preventDefault();
             const index = document.getElementById('edit-product-index').value;
             const title = document.getElementById('prod-title').value.trim();
-            const category = document.getElementById('prod-category').value;
+            
+            // Raccolta categorie multiple selezionate via checkbox
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
+            if (selectedCategories.length === 0) { alert("Seleziona almeno una categoria."); return; }
+
             const price = parseFloat(document.getElementById('prod-price').value);
-            const salePrice = document.getElementById('prod-saleprice').value ? parseFloat(document.getElementById('prod-saleprice').value) : null;
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
             const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
             const shortDesc = document.getElementById('prod-desc').value.trim();
             const featured = document.getElementById('prod-featured').checked;
@@ -374,7 +387,8 @@
 
             const productData = {
                 id: index !== '' ? getProducts()[index].id : Date.now(),
-                title, category, price, salePrice, shipping, shortDesc,
+                title, categories: selectedCategories, category: selectedCategories[0], // Retrocompatibilità
+                price, salePrice, shipping, shortDesc,
                 images: [...currentEditingImages], mainImageIndex: mainImageIdx,
                 colors: [...currentProductColors], featured
             };
@@ -392,7 +406,11 @@
             const p = getProducts()[idx];
             document.getElementById('edit-product-index').value = idx;
             document.getElementById('prod-title').value = p.title;
-            document.getElementById('prod-category').value = p.category || getCategories()[0];
+            
+            // Gestione categorie multiple (supporta anche vecchi prodotti con singola 'category')
+            const prodCats = p.categories || (p.category ? [p.category] : []);
+            renderCategoryCheckboxes(prodCats);
+
             document.getElementById('prod-price').value = p.price;
             document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
             document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
@@ -416,6 +434,7 @@
             document.getElementById('edit-product-index').value = '';
             document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
             document.getElementById('cancel-edit-btn').classList.add('hidden');
+            renderCategoryCheckboxes();
             currentEditingImages = []; mainImageIdx = 0; renderImagesPreview();
             currentProductColors = ["Nero Opaco"]; renderColorsPreview();
         }
@@ -431,30 +450,162 @@
             if (!container) return;
             const products = getProducts();
             if (products.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs">Nessun prodotto.</p>`; return; }
-            container.innerHTML = products.map((p, idx) => `
-                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
-                    <div class="flex items-center gap-3">
-                        <img src="${p.images?.[p.mainImageIndex || 0] || ''}" class="w-10 h-10 object-cover rounded-lg">
-                        <div>
-                            <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
-                            <p class="text-[10px] text-gray-400">Cat: ${p.category} | Colori: ${(p.colors || []).join(', ')} | €${p.price}</p>
+            container.innerHTML = products.map((p, idx) => {
+                const catsText = (p.categories || [p.category || 'Generale']).join(', ');
+                return `
+                    <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.images?.[p.mainImageIndex || 0] || ''}" class="w-10 h-10 object-cover rounded-lg">
+                            <div>
+                                <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
+                                <p class="text-[10px] text-gray-400">Cat: ${catsText} | €${p.price}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
+                            <button onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
-                        <button onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+                `;
+            }).join('');
+        }
+
+        // FATTURE & ORDINI
+        function renderAdminOrders() {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+
+            const container = document.getElementById('admin-orders-list');
+            if (!container) return;
+            
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Nessun ordine registrato.</p>`;
+                return;
+            }
+            
+            container.innerHTML = orders.map((o, idx) => `
+                <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
+                    <div class="flex justify-between text-white font-bold">
+                        <span>Fattura n. ${o.number} (${o.id})</span>
+                        <span class="text-brand-400">€${Number(o.total || 0).toFixed(2)}</span>
+                    </div>
+                    <p class="text-gray-400">Cliente: ${o.name} (${o.email}) - Pagamento: <strong class="text-white">${o.gateway}</strong></p>
+                    ${o.invoice ? `<p class="text-brand-400 text-[11px]">✓ Richiesta Fattura (Rag. Soc: ${o.company}, P.IVA/CF:${o.taxId})</p>` : ''}
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza</button>
+                        <button type="button" onclick="sendInvoiceEmail(${idx})" class="px-3 py-1.5 bg-brand-500 text-black font-bold rounded-lg text-xs cursor-pointer">📧 Invia Email</button>
+                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">📥 XML AdE</button>
                     </div>
                 </div>
             `).join('');
         }
 
+        function viewInvoiceModal(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+            const o = orders[idx];
+            if (!o) return;
+
+            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
+            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
+            document.getElementById('inv-modal-client').innerText = o.name;
+            document.getElementById('inv-modal-email').innerText = o.email;
+            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
+            document.getElementById('inv-modal-total').innerText = `€${Number(o.total || 0).toFixed(2)}`;
+
+            const itemsContainer = document.getElementById('inv-modal-items');
+            itemsContainer.innerHTML = (o.items || []).map(item => `
+                <tr class="border-b border-gray-100">
+                    <td class="py-2">
+                        <p class="font-bold">${item.title}</p>
+                        <p class="text-[10px] text-gray-500">Colore: ${item.color || 'Standard'}</p>
+                    </td>
+                    <td class="py-2 text-center">${item.quantity || item.qty || 1}</td>
+                    <td class="py-2 text-right font-mono">€${(((Number(item.price) || 0) * (Number(item.quantity || item.qty) || 1))).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
+
+        function sendInvoiceEmail(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+            const o = orders[idx];
+            if (!o) return;
+
+            const orderSummaryText = (o.items || []).map(i => `${i.qty || 1}x ${i.title} (${i.color || 'Standard'}) - €${((i.price || 0) * (i.qty || 1)).toFixed(2)}`).join('\n');
+            
+            const emailParams = {
+                to_email: o.email,
+                customer_name: o.name,
+                customer_address: o.address,
+                order_id: o.id,
+                order_total: Number(o.total || 0).toFixed(2),
+                order_items: orderSummaryText,
+                payment_gateway: o.gateway
+            };
+
+            if (typeof emailjs !== 'undefined' && typeof LS3D_CONFIG !== 'undefined') {
+                emailjs.send(LS3D_CONFIG.emailjs.serviceId, LS3D_CONFIG.emailjs.orderTemplateId, emailParams)
+                    .then(response => alert(`Email inviata con successo a ${o.email}!`))
+                    .catch(error => { alert("Errore durante l'invio dell'email."); console.error(error); });
+            } else {
+                alert("Configurazione EmailJS non disponibile.");
+            }
+        }
+
+        function downloadXmlAdmin(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+            const o = orders[idx];
+            if (!o) return;
+
+            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<FatturaElettronica versione="FPR12">
+    <FatturaElettronicaHeader>
+        <DatiTrasmissione>
+            <IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdTrasmittente>
+            <ProgressivoInvio>${o.id}</ProgressivoInvio>
+            <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+        </DatiTrasmissione>
+        <CedentePrestatore>
+            <DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3Dmaker</Denominazione></Anagrafica></DatiAnagrafici>
+        </CedentePrestatore>
+        <CessionarioCommittente>
+            <DatiAnagrafici><Anagrafica><Denominazione>${o.name}</Denominazione></Anagrafica></DatiAnagrafici>
+        </CessionarioCommittente>
+    </FatturaElettronicaHeader>
+    <FatturaElettronicaBody>
+        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${o.date}</Data><Numero>${o.number}</Numero><ImportoTotaleDocumento>${o.total.toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
+    </FatturaElettronicaBody>
+</FatturaElettronica>`;
+
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Fattura_${o.number.replace('/', '_')}.xml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         // RECENSIONI
-        function getReviews() { try { const s = localStorage.getItem('ls3d_reviews'); if(s) return JSON.parse(s); } catch(e){} return []; }
+        function getReviews() {
+            try { const s = localStorage.getItem('ls3d_reviews'); if(s) return JSON.parse(s); } catch(e){}
+            return [];
+        }
+
         function deleteReview(idx) {
             const revs = getReviews(); revs.splice(idx, 1);
             localStorage.setItem('ls3d_reviews', JSON.stringify(revs));
             renderAdminReviews();
         }
+
         function renderAdminReviews() {
             const container = document.getElementById('admin-reviews-list');
             if (!container) return;
@@ -473,9 +624,9 @@
 
         function initAdminDashboard() {
             renderAdminCategories();
-            populateCategoryDropdown();
+            renderCategoryCheckboxes();
             renderAdminProducts();
-            if (typeof renderAdminOrders === 'function') renderAdminOrders();
+            renderAdminOrders();
             renderAdminReviews();
             renderImagesPreview();
             renderColorsPreview();
