@@ -51,6 +51,11 @@
             </div>
         </div>
 
+        <!-- BARRA FILTRO CATEGORIE -->
+        <div id="category-filters" class="flex flex-wrap gap-2 font-mono text-xs">
+            <!-- I bottoni delle categorie verranno iniettati qui dinamicamente -->
+        </div>
+
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
@@ -93,24 +98,59 @@
                 if (saved) return JSON.parse(saved);
             } catch (e) { console.error(e); }
             return [
-                { id: 1, title: "Supporto Cuffie Premium", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], colors: ["Nero Opaco"] },
+                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], colors: ["Nero Opaco"] },
             ];
         }
 
         let cart = [];
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
+        
+        let currentCategory = 'Tutti';
+
+        function renderCategories(products) {
+            const container = document.getElementById('category-filters');
+            if (!container) return;
+
+            // Estrae tutte le categorie uniche dai prodotti (fallback su "Generale" se non specificata)
+            const categories = ['Tutti', ...new Set(products.map(p => p.category ? p.category.trim() : 'Generale'))];
+
+            container.innerHTML = categories.map(cat => {
+                const isActive = currentCategory === cat;
+                const activeClass = isActive 
+                    ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' 
+                    : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white';
+                
+                return `
+                    <button onclick="filterByCategory('${cat}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${activeClass}">
+                        ${cat}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            renderCatalog();
+        }
 
         function renderCatalog() {
             const grid = document.getElementById('products-grid');
             if (!grid) return;
 
             const products = getProducts();
-            if (products.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto disponibile al momento.</p>`;
+            renderCategories(products);
+
+            // Filtra i prodotti in base alla categoria selezionata
+            const filteredProducts = currentCategory === 'Tutti' 
+                ? products 
+                : products.filter(p => (p.category ? p.category.trim() : 'Generale') === currentCategory);
+
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto disponibile in questa categoria.</p>`;
                 return;
             }
 
-            grid.innerHTML = products.map((p, idx) => {
+            grid.innerHTML = filteredProducts.map((p, idx) => {
                 const colors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
                 const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
                 
@@ -188,7 +228,7 @@
 
             let totalQty = 0;
             let productsPrice = 0;
-            let maxShipping = 0; // Prende la spedizione più alta o somma in base alla logica desiderata
+            let maxShipping = 0;
 
             if (cart.length === 0) {
                 if (container) container.innerHTML = `<p class="text-gray-500 text-center py-6">Il carrello è vuoto.</p>`;
