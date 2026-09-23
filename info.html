@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote Request | LS3Dmaker</title>
+    <title>Info & Contatti | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
+    <!-- Configurazione Globale -->
+    <script src="config.js"></script>
+    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-       (function(){ emailjs.init("hopoM4it_MqCl4KlT"); })();
-    </script>
 
     <script>
         tailwind.config = {
@@ -30,79 +30,79 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
-        <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-                <a href="index.html" class="flex items-center gap-3 group">
-                    <img src="logo.png" alt="LS3Dmaker Logo" class="h-12 sm:h-14 object-contain">
-                </a>
-            <nav class="hidden lg:flex items-center gap-8 font-medium text-sm text-gray-300">
-                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
-                <a href="chisiamo.html" class="hover:text-brand-400 transition-colors" data-i18n="navAbout">Chi Siamo</a>
-                <a href="info.html" class="text-white hover:text-brand-400 transition-colors" data-i18n="navQuote">Preventivi</a>
-            </nav>
-
-            <a href="index.html" class="px-4 py-2 rounded-xl bg-dark-surface border border-gray-800 hover:border-brand-500/50 text-xs font-mono text-gray-300 transition-all" data-i18n="backToCatalog">
-                ← Torna al Catalogo
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
+            <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">← Torna alla Home</a>
         </div>
     </header>
 
-    <main class="py-20 px-4 flex-grow flex items-center justify-center">
-        <div class="max-w-xl w-full space-y-6">
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl font-extrabold text-white tracking-tight">Hai un progetto su misura?</h1>
-                <p class="text-xs text-gray-400">Compila il modulo per richiedere un preventivo o informazioni dettagliate.</p>
+    <main class="py-12 px-4 sm:px-6 max-w-4xl mx-auto w-full flex-grow space-y-12">
+        <div class="border-b border-gray-800 pb-6">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Informazioni & Contatti</h1>
+            <p class="text-xs font-mono text-gray-400 mt-1">Hai richieste per stampe 3D personalizzate? Contattaci direttamente.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-4 shadow-xl font-mono text-xs">
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Chi Siamo</h2>
+                <p class="text-gray-400 leading-relaxed">LS3Dmaker nasce dalla passione per la prototipazione rapida e la stampa 3D di precisione. Realizziamo componenti su misura, oggetti di design e accessori funzionali.</p>
+                <div class="pt-4 space-y-2 text-gray-300">
+                    <p>📍 Sede: Bologna, Italia</p>
+                    <p>✉️ Email: info@ls3dmaker.it</p>
+                </div>
             </div>
 
-            <form onsubmit="sendInfoRequest(event)" class="bg-dark-card border border-brand-500/30 p-8 rounded-2xl space-y-4 text-xs shadow-2xl backdrop-blur-md">
-                <div>
-                    <label class="block text-gray-400 mb-1 font-mono">Nome e Cognome *</label>
-                    <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1 font-mono">Email *</label>
-                    <input type="email" id="info-email" required placeholder="mario@example.com" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1 font-mono">Dettagli del Progetto / Link file 3D *</label>
-                    <textarea id="info-message" required rows="5" placeholder="Descrivi dimensioni, quantità o colori di filamento desiderati..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
-                </div>
-                <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg shadow-brand-500/10">Invia Richiesta</button>
-            </form>
+            <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-4 shadow-xl">
+                <h2 class="text-sm font-bold text-white font-mono uppercase tracking-wider">Invia un Messaggio</h2>
+                <form id="contact-form" onsubmit="handleContactSubmit(event)" class="space-y-4 text-xs font-mono">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Nome *</label>
+                        <input type="text" id="contact-name" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Email *</label>
+                        <input type="email" id="contact-email" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Messaggio *</label>
+                        <textarea id="contact-message" required rows="4" placeholder="Descrivi il tuo progetto o richiesta..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Invia Messaggio</button>
+                </form>
+            </div>
         </div>
     </main>
 
-    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <p class="font-bold text-white">LS3DMAKER © 2026</p>
-            <div class="flex gap-6 font-mono">
-                <a href="index.html" class="hover:text-brand-400 transition-colors" data-i18n="navProducts">Prodotti</a>
-                <a href="chisiamo.html" class="hover:text-brand-400 transition-colors" data-i18n="navAbout">Chi Siamo</a>
-            </div>
-        </div>
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
+        LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
 
-    <script src="i18n.js"></script>
+    <script src="mailer.js"></script>
     <script>
-        const EMAILJS_SERVICE_ID = "service_1nyj1gz";
-        const EMAILJS_TEMPLATE_ID = "template_ltm9vpm";
-
-        function sendInfoRequest(e) {
+        function handleContactSubmit(e) {
             e.preventDefault();
-            const name = document.getElementById('info-name').value;
-            const email = document.getElementById('info-email').value;
-            const message = document.getElementById('info-message').value;
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
 
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                customer_name: name,
-                customer_email: email,
-                message_details: message,
-                order_total: "Richiesta Preventivo Personalizzato"
-            }).then(
-                () => { alert("Richiesta inviata con successo!"); location.reload(); },
-                (err) => { console.error("Errore invio:", err); alert("Richiesta registrata."); }
+            if (!name || !email || !message) { alert("Compila tutti i campi."); return; }
+
+            sendContactEmail(
+                { name, email, message },
+                () => {
+                    alert("Messaggio inviato con successo! Ti risponderemo presto.");
+                    document.getElementById('contact-form').reset();
+                },
+                (err) => {
+                    alert("Errore durante l'invio del messaggio. Riprova più tardi.");
+                    console.error(err);
+                }
             );
         }
+        try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
 </html>
