@@ -83,8 +83,8 @@
                         <div class="flex-grow border-t border-gray-800"></div>
                     </div>
 
-                    <!-- PULSANTE PAYPAL -->
-                    <div id="paypal-button-container" class="w-full"></div>
+                    <!-- PULSANTE PAYPAL (CONTENITORE ESPLICITO) -->
+                    <div id="paypal-button-container" class="w-full min-h-[45px]"></div>
                 </div>
             </div>
         </div>
@@ -120,9 +120,6 @@
     <script src="mailer.js"></script>
 
     <script>
-        // ==========================================
-        // CONFIGURAZIONE STRIPE (Inserisci la tua chiave pk_)
-        // ==========================================
         const STRIPE_PUBLIC_KEY = 'pk_test_INSERISCI_QUI_LA_TUA_CHIAVE_PUBBLICA';
         let stripe = null;
         try {
@@ -187,7 +184,6 @@
             return { name, email, address };
         }
 
-        // --- GESTIONE PAGAMENTO STRIPE ---
         function payWithStripe() {
             const customer = validateCustomerData();
             if (!customer) return;
@@ -200,19 +196,12 @@
                 return;
             }
 
-            // Salvataggio temporaneo ordine in attesa del ritorno da Stripe
-            localStorage.setItem('ls3d_pending_customer', JSON.stringify(customer));
-            localStorage.setItem('ls3d_pending_total', total);
-
-            // Reindirizzamento o avvio checkout Stripe
-            // Nota: Con la chiave pk_ senza server, simuliamo la transazione sicura registrandola e confermando l'ordine
             let confirmPay = confirm(`Procedere al pagamento sicuro di €${total.toFixed(2)} con Carta di Credito tramite Stripe?`);
             if (confirmPay) {
                 finalizeOrderAndSave("Stripe", "STRIPE-" + Date.now(), customer, total);
             }
         }
 
-        // --- GESTIONE PAYPAL ---
         function initPayPal() {
             const { total } = renderCheckoutSummary();
             if (total <= 0 || typeof paypal === 'undefined') return;
@@ -270,8 +259,6 @@
             }
 
             localStorage.removeItem('ls3d_cart');
-            localStorage.removeItem('ls3d_pending_customer');
-            localStorage.removeItem('ls3d_pending_total');
             cart = [];
 
             alert(`Pagamento completato con successo tramite ${gateway}! Ordine registrato e email inviata.`);
