@@ -33,7 +33,7 @@
         <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl font-mono text-xs">
             <div class="text-center space-y-2">
                 <h2 class="text-xl font-bold text-white tracking-tight">Area Riservata Admin</h2>
-                <p class="text-gray-400">Inserisci la password per accedere (default: admin).</p>
+                <p class="text-gray-400">Inserisci la password per accedere.</p>
             </div>
             <form onsubmit="checkAdminPassword(event)" class="space-y-4">
                 <input type="password" id="admin-password-input" placeholder="Password di accesso..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
@@ -214,7 +214,7 @@
     </footer>
 
     <script>
-        const ADMIN_PASSWORD = "admin";
+        const ADMIN_PASSWORD = "ls3d2026"; // Password aggiornata
 
         function checkAdminPassword(e) {
             e.preventDefault();
@@ -372,7 +372,6 @@
             const index = document.getElementById('edit-product-index').value;
             const title = document.getElementById('prod-title').value.trim();
             
-            // Raccolta categorie multiple selezionate via checkbox
             const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
             if (selectedCategories.length === 0) { alert("Seleziona almeno una categoria."); return; }
 
@@ -387,7 +386,7 @@
 
             const productData = {
                 id: index !== '' ? getProducts()[index].id : Date.now(),
-                title, categories: selectedCategories, category: selectedCategories[0], // Retrocompatibilità
+                title, categories: selectedCategories, category: selectedCategories[0],
                 price, salePrice, shipping, shortDesc,
                 images: [...currentEditingImages], mainImageIndex: mainImageIdx,
                 colors: [...currentProductColors], featured
@@ -407,7 +406,6 @@
             document.getElementById('edit-product-index').value = idx;
             document.getElementById('prod-title').value = p.title;
             
-            // Gestione categorie multiple (supporta anche vecchi prodotti con singola 'category')
             const prodCats = p.categories || (p.category ? [p.category] : []);
             renderCategoryCheckboxes(prodCats);
 
