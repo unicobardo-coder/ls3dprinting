@@ -115,6 +115,15 @@
             return [];
         }
 
+        // Recupera l'utente attualmente registrato/loggato (salvato nel localStorage durante il checkout o login)
+        function getCurrentUser() {
+            try {
+                const user = localStorage.getItem('ls3d_logged_user');
+                if (user) return JSON.parse(user);
+            } catch (e) {}
+            return null;
+        }
+
         let cart = [];
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
         let currentCategory = 'Tutti';
@@ -193,6 +202,34 @@
             const colors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
             const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
             const reviews = getReviews().filter(r => r.productTitle === p.title);
+            
+            const currentUser = getCurrentUser();
+
+            // Se l'utente è registrato mostra il form, altrimenti un invito a registrarsi/fare il login o un acquisto
+            let reviewFormHtml = '';
+            if (currentUser) {
+                reviewFormHtml = `
+                    <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
+                        <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${currentUser.name}</span></p>
+                        <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none">
+                            <option value="5">5 Stelle - Eccellente</option>
+                            <option value="4">4 Stelle - Molto buono</option>
+                            <option value="3">3 Stelle - Buono</option>
+                            <option value="2">2 Stelle - Sufficiente</option>
+                            <option value="1">1 Stella - Scarsa</option>
+                        </select>
+                        <textarea id="rev-comment" placeholder="Scrivi il tuo commento..." rows="2" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        <button onclick="submitReview('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Invia Recensione</button>
+                    </div>
+                `;
+            } else {
+                reviewFormHtml = `
+                    <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 text-center space-y-2 font-mono">
+                        <p class="text-xs text-gray-400">Devi effettuare un ordine o autenticarti per lasciare una recensione.</p>
+                        <a href="checkout.html" class="inline-block text-xs text-brand-400 hover:underline">Effettua un ordine per registrarti subito →</a>
+                    </div>
+                `;
+            }
 
             content.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -233,19 +270,7 @@
                         `).join('')}
                     </div>
 
-                    <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3">
-                        <p class="text-xs font-bold text-white">Lascia una recensione</p>
-                        <input type="text" id="rev-author" placeholder="Il tuo nome" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none">
-                        <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none">
-                            <option value="5">5 Stelle - Eccellente</option>
-                            <option value="4">4 Stelle - Molto buono</option>
-                            <option value="3">3 Stelle - Buono</option>
-                            <option value="2">2 Stelle - Sufficiente</option>
-                            <option value="1">1 Stella - Scarsa</option>
-                        </select>
-                        <textarea id="rev-comment" placeholder="Scrivi il tuo commento..." rows="2" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none"></textarea>
-                        <button onclick="submitReview('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs cursor-pointer">Invia Recensione</button>
-                    </div>
+                    ${reviewFormHtml}
                 </div>
             `;
             modal.classList.remove('hidden');
@@ -272,16 +297,24 @@
         }
 
         function submitReview(productTitle) {
-            const author = document.getElementById('rev-author').value.trim();
+            const currentUser = getCurrentUser();
+            if (!currentUser) { alert("Devi effettuare l'accesso per recensire."); return; }
+
             const rating = parseInt(document.getElementById('rev-rating').value);
             const comment = document.getElementById('rev-comment').value.trim();
 
-            if (!author || !comment) { alert("Compila tutti i campi."); return; }
+            if (!comment) { alert("Scrivi un commento."); return; }
 
             const reviews = getReviews();
-            reviews.push({ productTitle, author, rating, comment, date: new Date().toLocaleDateString('it-IT') });
+            reviews.push({ 
+                productTitle, 
+                author: currentUser.name, 
+                rating, 
+                comment, 
+                date: new Date().toLocaleDateString('it-IT') 
+            });
             localStorage.setItem('ls3d_reviews', JSON.stringify(reviews));
-            alert("Recensione inviata!");
+            alert("Recensione inviata con successo!");
             openProductModal(getProducts().find(p => p.title === productTitle).id);
         }
 
