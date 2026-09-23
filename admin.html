@@ -46,7 +46,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Amministrazione</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, categorie, foto multiple e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, categorie, colori, foto multiple, fatture e recensioni.</p>
             </div>
         </div>
 
@@ -60,7 +60,7 @@
             <div id="admin-categories-list" class="flex flex-wrap gap-2 pt-2"></div>
         </section>
 
-        <!-- SEZIONE PRODOTTI E FOTO -->
+        <!-- SEZIONE PRODOTTI, FOTO E COLORI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
@@ -91,7 +91,7 @@
                         <input type="number" step="0.01" id="prod-saleprice" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-1">Spedizione Corrieren (€) *</label>
+                        <label class="block text-gray-400 mb-1">Spedizione (€) *</label>
                         <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                 </div>
@@ -101,7 +101,7 @@
                     <textarea id="prod-desc" required rows="2" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- GESTIONE FOTO MULTIPLE (Aggiungi, Elimina, Seleziona Principale) -->
+                <!-- GESTIONE FOTO MULTIPLE -->
                 <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
                     <label class="block text-white font-bold">Gestione Foto (URL Immagini)</label>
                     <div class="flex gap-2">
@@ -111,14 +111,15 @@
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
                 </div>
 
+                <!-- COLORI E VETRINA -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-gray-400 mb-1">Colori disponibili (separati da virgola)</label>
-                        <input type="text" id="prod-colors" placeholder="Nero Opaco, Bianco, Rosso" value="Nero Opaco" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                        <label class="block text-gray-400 mb-1">Colori disponibili (separati da virgola) *</label>
+                        <input type="text" id="prod-colors" placeholder="Nero Opaco, Bianco, Rosso" value="Nero Opaco" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                     <div class="flex items-center gap-3 pt-6">
                         <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
-                        <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza)</label>
+                        <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
                     </div>
                 </div>
 
@@ -129,6 +130,12 @@
                 <h3 class="text-sm font-bold text-white font-mono">Prodotti Esistenti</h3>
                 <div id="admin-products-list" class="space-y-3"></div>
             </div>
+        </section>
+
+        <!-- SEZIONE GESTIONE FATTURE / ORDINI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white font-mono">Richieste Fatture & Ordini Registrati</h2>
+            <div id="admin-invoices-list" class="space-y-3 font-mono text-xs"></div>
         </section>
 
         <!-- SEZIONE GESTIONE RECENSIONI / COMMENTI -->
@@ -199,7 +206,7 @@
                 if (saved) return JSON.parse(saved);
             } catch (e) {}
             return [
-                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], mainImageIndex: 0, colors: ["Nero Opaco"], featured: true }
+                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?w=600"], mainImageIndex: 0, colors: ["Nero Opaco", "Bianco"], featured: true }
             ];
         }
 
@@ -282,7 +289,7 @@
 
             saveProducts(products);
             resetProductForm();
-            alert("Prodotto salvato con successo!");
+            alert("Modifiche salvate con successo!");
         }
 
         function editProduct(idx) {
@@ -338,12 +345,44 @@
                         <img src="${p.images?.[p.mainImageIndex || 0] || ''}" class="w-10 h-10 object-cover rounded-lg">
                         <div>
                             <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
-                            <p class="text-[10px] text-gray-400">Cat: ${p.category || 'Generale'} | €${p.price}</p>
+                            <p class="text-[10px] text-gray-400">Cat: ${p.category || 'Generale'} | Colori: ${(p.colors || []).join(', ')} | €${p.price}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer">Modifica</button>
                         <button onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg cursor-pointer">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- GESTIONE FATTURE & ORDINI ---
+        function getOrders() {
+            try {
+                const saved = localStorage.getItem('ls3d_orders');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
+            return [];
+        }
+
+        function renderAdminInvoices() {
+            const container = document.getElementById('admin-invoices-list');
+            if (!container) return;
+            const orders = getOrders();
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Nessun ordine o richiesta fattura registrata.</p>`;
+                return;
+            }
+            container.innerHTML = orders.map(o => `
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-2">
+                    <div class="flex justify-between items-center font-bold text-white">
+                        <span>Ordine ${o.number} (${o.date})</span>
+                        <span class="text-brand-400">€${o.total.toFixed(2)}</span>
+                    </div>
+                    <p class="text-gray-300">Cliente: ${o.name} (${o.email}) - Spedizione: ${o.address}</p>
+                    <div class="border-t border-gray-800 pt-2 text-[11px] text-gray-400">
+                        <p class="font-bold text-gray-200">Stato Fattura:</p>
+                        ${o.invoice ? `<p class="text-brand-400">Richiesta Fattura — Rag. Soc: ${o.company}, P.IVA/CF:${o.taxId}</p>` : `<p>Nessuna fattura richiesta (Ricevuta standard)</p>`}
                     </div>
                 </div>
             `).join('');
@@ -392,6 +431,7 @@
         renderAdminCategories();
         populateCategoryDropdown();
         renderAdminProducts();
+        renderAdminInvoices();
         renderAdminReviews();
         try { lucide.createIcons(); } catch(e){}
     </script>
