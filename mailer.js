@@ -16,7 +16,7 @@ function sendOrderConfirmationEmail(orderData) {
     };
 
     if (typeof emailjs !== 'undefined') {
-        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", emailParams)
+        emailjs.send("service_1nyj1gz", "template_437dnsk", emailParams)
             .then(function(response) {
                 console.log("Email di conferma inviata con successo!", response.status);
             }, function(error) {
