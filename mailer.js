@@ -2,7 +2,7 @@
 // GESTORE INVIO EMAIL CENTRALIZZATO (mailer.js)
 // ==========================================
 
-// Inizializzazione automatica EmailJS all'inclusione dello script
+// Inizializzazione automatica EmailJS con la Public Key da config.js
 (function() {
     if (typeof LS3D_CONFIG !== 'undefined' && typeof emailjs !== 'undefined') {
         emailjs.init(LS3D_CONFIG.emailjs.publicKey);
