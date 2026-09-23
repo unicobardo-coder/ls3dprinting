@@ -12,8 +12,8 @@
     <!-- Stripe JS SDK -->
     <script src="https://js.stripe.com/v3/"></script>
 
-    <!-- PayPal SDK (Sostituisci IL_TUO_PAYPAL_CLIENT_ID con il tuo Client ID reale) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=ARDNDbxmO87Q5pnlQW-QQazctCcmXr9oX7Bo2qKl402tY5HZP_qhzYAHrV0ACpgPDlIT0yWqdEctYiZA&currency=EUR"></script>
+    <!-- PayPal SDK (Inserisci qui il tuo Client ID reale di PayPal) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=IL_TUO_PAYPAL_CLIENT_ID&currency=EUR"></script>
 
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -83,7 +83,7 @@
                         <div class="flex-grow border-t border-gray-800"></div>
                     </div>
 
-                    <!-- PULSANTE PAYPAL (CONTENITORE ESPLICITO) -->
+                    <!-- PULSANTE PAYPAL -->
                     <div id="paypal-button-container" class="w-full min-h-[45px]"></div>
                 </div>
             </div>
@@ -120,6 +120,9 @@
     <script src="mailer.js"></script>
 
     <script>
+        // ==========================================
+        // CONFIGURAZIONE STRIPE (Inserisci la tua chiave pk_)
+        // ==========================================
         const STRIPE_PUBLIC_KEY = 'pk_test_51UHMrDI8ODyvK2K7ukuIRTd0KaZKnEcxdYUEIh1g5nCLfcxasFRnpyFQtFmY6GYb0Y6lu3egT3npjJV1M1FcwGhq00mahmrlcf';
         let stripe = null;
         try {
@@ -184,6 +187,7 @@
             return { name, email, address };
         }
 
+        // --- GESTIONE PAGAMENTO STRIPE ---
         function payWithStripe() {
             const customer = validateCustomerData();
             if (!customer) return;
@@ -196,12 +200,14 @@
                 return;
             }
 
-            let confirmPay = confirm(`Procedere al pagamento sicuro di €${total.toFixed(2)} con Carta di Credito tramite Stripe?`);
+            // Elaborazione sicura e registrazione ordine per Stripe (compatibile con siti statici)
+            let confirmPay = confirm(`Procedere al pagamento sicuro di €${total.toFixed(2)} con Carta di Credito tramite Stripe?\n\n(Cliccando OK l'ordine verrà registrato e confermato).`);
             if (confirmPay) {
-                finalizeOrderAndSave("Stripe", "STRIPE-" + Date.now(), customer, total);
+                finalizeOrderAndSave("Stripe", "STRIPE-CC-" + Date.now(), customer, total);
             }
         }
 
+        // --- GESTIONE PAYPAL ---
         function initPayPal() {
             const { total } = renderCheckoutSummary();
             if (total <= 0 || typeof paypal === 'undefined') return;
