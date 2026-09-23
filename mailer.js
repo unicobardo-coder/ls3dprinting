@@ -1,28 +1,57 @@
-// --- GESTIONE INVIO EMAIL DI CONFERMA (EMAILJS) ---
+// ==========================================
+// GESTORE INVIO EMAIL CENTRALIZZATO (mailer.js)
+// ==========================================
 
+// Inizializzazione automatica EmailJS all'inclusione dello script
+(function() {
+    if (typeof LS3D_CONFIG !== 'undefined' && typeof emailjs !== 'undefined') {
+        emailjs.init(LS3D_CONFIG.emailjs.publicKey);
+    }
+})();
+
+// 1. Invio email per la Conferma Ordine (usa orderTemplateId)
 function sendOrderConfirmationEmail(orderData) {
-    if (!orderData || !orderData.items) return;
+    if (typeof LS3D_CONFIG === 'undefined') {
+        console.error("File config.js non trovato!");
+        return;
+    }
 
-    const orderSummaryText = orderData.items.map(i => `${i.qty || 1}x ${i.title} (${i.color || 'Standard'}) - €${((Number(i.price) || 0) * (Number(i.qty) || 1)).toFixed(2)}`).join('\n');
-    
-    const emailParams = {
-        to_email: orderData.email,
-        customer_name: orderData.name,
-        customer_address: orderData.address,
+    const templateParams = {
+        order_number: orderData.number,
         order_id: orderData.id,
-        order_total: Number(orderData.total || 0).toFixed(2),
-        order_items: orderSummaryText,
-        payment_gateway: orderData.gateway
+        customer_name: orderData.name,
+        customer_email: orderData.email,
+        customer_address: orderData.address,
+        order_date: orderData.date,
+        payment_gateway: orderData.gateway,
+        order_total: `€${orderData.total.toFixed(2)}`,
+        order_items: orderData.items.map(i => `${i.qty}x ${i.title} (Colore: ${i.color || 'Standard'}) - €${(i.price * i.qty).toFixed(2)}`).join('\n')
     };
 
-    if (typeof emailjs !== 'undefined') {
-        emailjs.send("service_1nyj1gz", "template_437dnsk", emailParams)
-            .then(function(response) {
-                console.log("Email di conferma inviata con successo!", response.status);
-            }, function(error) {
-                console.error("Errore invio email:", error);
-            });
-    } else {
-        console.warn("SDK EmailJS non trovato.");
+    emailjs.send(LS3D_CONFIG.emailjs.serviceId, LS3D_CONFIG.emailjs.orderTemplateId, templateParams)
+        .then(response => console.log('Email ordine inviata con successo!', response.status))
+        .catch(error => console.error('Errore invio email ordine:', error));
+}
+
+// 2. Invio email per i Messaggi di Contatto/Info (usa contactTemplateId)
+function sendContactEmail(contactData, onSuccess, onError) {
+    if (typeof LS3D_CONFIG === 'undefined') {
+        if (typeof onError === 'function') onError("Configurazione mancante");
+        return;
     }
+
+    const templateParams = {
+        from_name: contactData.name,
+        from_email: contactData.email,
+        message: contactData.message,
+        to_name: "LS3Dmaker Admin"
+    };
+
+    emailjs.send(LS3D_CONFIG.emailjs.serviceId, LS3D_CONFIG.emailjs.contactTemplateId, templateParams)
+        .then(response => {
+            if (typeof onSuccess === 'function') onSuccess(response);
+        })
+        .catch(error => {
+            if (typeof onError === 'function') onError(error);
+        });
 }
