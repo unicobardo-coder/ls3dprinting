@@ -317,63 +317,65 @@
         }
 
         function initCatalogStlViewer(stlDataUrl) {
-            const canvas = document.getElementById('catalog-stl-canvas');
-            if (!canvas) return;
-            if (catalogStlRenderer) catalogStlRenderer.dispose();
+            setTimeout(() => {
+                const canvas = document.getElementById('catalog-stl-canvas');
+                if (!canvas) return;
+                if (catalogStlRenderer) catalogStlRenderer.dispose();
 
-            const width = canvas.parentElement.clientWidth || 300;
-            const height = 192;
+                const container = canvas.parentElement;
+                const width = container ? (container.clientWidth || 350) : 350;
+                const height = 192;
 
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x070b14);
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x070b14);
 
-            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-            camera.position.set(0, 0, 150);
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+                camera.position.set(0, 0, 150);
 
-            catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-            catalogStlRenderer.setSize(width, height);
+                catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+                catalogStlRenderer.setSize(width, height);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-            directionalLight.position.set(1, 1, 1).normalize();
-            scene.add(directionalLight);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(1, 1, 1).normalize();
+                scene.add(directionalLight);
 
-            let mesh;
+                let mesh;
 
-            if (stlDataUrl) {
-                const loader = new THREE.STLLoader();
-                loader.load(stlDataUrl, function (geometry) {
-                    geometry.computeVertexNormals();
+                if (stlDataUrl) {
+                    const loader = new THREE.STLLoader();
+                    loader.load(stlDataUrl, function (geometry) {
+                        geometry.computeVertexNormals();
+                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        geometry.center();
+                        scene.add(mesh);
+                    }, undefined, function (error) {
+                        createFallbackMesh();
+                    });
+                } else {
+                    createFallbackMesh();
+                }
+
+                function createFallbackMesh() {
+                    const geometry = new THREE.BoxGeometry(50, 50, 50);
                     const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
                     mesh = new THREE.Mesh(geometry, material);
-                    geometry.center();
                     scene.add(mesh);
-                }, undefined, function (error) {
-                    console.error("Errore caricamento STL, uso forma di esempio:", error);
-                    createFallbackMesh();
-                });
-            } else {
-                // Se non c'è il file binario salvato, mostra una forma 3D stilizzata di anteprima
-                createFallbackMesh();
-            }
-
-            function createFallbackMesh() {
-                const geometry = new THREE.BoxGeometry(50, 50, 50);
-                const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                mesh = new THREE.Mesh(geometry, material);
-                scene.add(mesh);
-            }
-
-            function animate() {
-                requestAnimationFrame(animate);
-                if (mesh) {
-                    mesh.rotation.x += 0.005;
-                    mesh.rotation.y += 0.008;
                 }
-                catalogStlRenderer.render(scene, camera);
-            }
-            animate();
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (mesh) {
+                        mesh.rotation.x += 0.005;
+                        mesh.rotation.y += 0.008;
+                    }
+                    catalogStlRenderer.render(scene, camera);
+                }
+                animate();
+            }, 50);
         }
+            
         function closeProductModal() {
             if (catalogStlRenderer) {
                 catalogStlRenderer.dispose();
