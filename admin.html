@@ -45,35 +45,30 @@
         </div>
     </div>
 
-    <!-- HEADER & MENU MULTIPAGE -->
+    <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85 hidden" id="admin-header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
-                <img src="logo.png" alt="LS3Dmaker Logo" class="h-8 sm:h-10 object-contain" onerror="this.src='logo.svg'">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            <nav class="hidden md:flex items-center gap-2 font-mono text-xs">
-                <a href="admin.html" class="px-3 py-2 bg-brand-500/10 text-brand-400 border border-brand-500/30 rounded-lg">Prodotti</a>
-                <a href="admin-categories.html" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors">Categorie</a>
-                <a href="admin-colors.html" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors">Colori</a>
-                <a href="admin-invoices.html" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors">Fatture & Ordini</a>
-            </nav>
             <div class="flex items-center gap-4">
+                <a href="management.html" class="px-4 py-2 bg-dark-surface hover:bg-gray-800 text-brand-400 rounded-xl text-xs font-mono border border-gray-800 transition-all">⚙️ Gestione (Colori, Categorie, Fatture)</a>
                 <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo</a>
                 <button onclick="logoutAdmin()" class="text-xs font-mono text-red-400 hover:text-red-300 underline cursor-pointer">Esci</button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT: PRODOTTI & RECENSIONI -->
+    <!-- MAIN CONTENT -->
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12 hidden" id="admin-main-content">
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Gestione Prodotti</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Aggiungi, modifica o rimuovi i prodotti del catalogo e modera le recensioni.</p>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti</h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">Aggiungi prodotti, gestisci foto multiple, colori e recensioni.</p>
             </div>
         </div>
 
-        <!-- FORM PRODOTTO -->
+        <!-- PRODOTTI FORM -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
@@ -111,14 +106,14 @@
 
                 <div>
                     <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
-                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione del prodotto..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
-                <!-- FOTO MULTIPLE -->
+                <!-- GESTIONE FOTO MULTIPLE (CORRETTA) -->
                 <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
                     <label class="block text-white font-bold">Gestione Foto (URL Immagini)</label>
                     <div class="flex gap-2">
-                        <input type="text" id="new-image-url" placeholder="Incolla URL immagine..." class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                        <input type="text" id="new-image-url" placeholder="Incolla URL immagine (es. https://...)" class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
                         <button type="button" onclick="addImageUrl()" class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all cursor-pointer">Aggiungi Foto</button>
                     </div>
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
@@ -209,9 +204,9 @@
             const container = document.getElementById('prod-colors-checkboxes');
             if (!container) return;
             container.innerHTML = filamentColors.map(c => `
-                <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-bg p-2 rounded-lg border border-gray-800">
+                <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-card p-2 rounded-lg border border-gray-800">
                     <input type="checkbox" name="product-colors" value="${c.name}" ${selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
-                    <span class="w-3 h-3 rounded-full border border-gray-600" style="background-color: ${c.code};"></span>
+                    <span class="w-3 h-3 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
                     <span class="text-[11px]">${c.name}</span>
                 </label>
             `).join('');
@@ -227,6 +222,7 @@
             renderAdminProducts();
         }
 
+        // FOTO MULTIPLE (FUNZIONANTI)
         function addImageUrl() {
             const input = document.getElementById('new-image-url');
             const url = input.value.trim();
@@ -248,15 +244,15 @@
             const container = document.getElementById('admin-images-preview');
             if (!container) return;
             if (currentEditingImages.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto.</p>`;
+                container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto aggiunta.</p>`;
                 return;
             }
             container.innerHTML = currentEditingImages.map((img, idx) => `
                 <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
-                    <img src="${img}" class="w-full h-20 object-cover rounded-lg">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150?text=Errore+URL'">
                     <div class="flex items-center justify-between w-full text-[10px]">
-                        <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold' : 'text-gray-400'}">Principale</button>
-                        <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400">Elimina</button>
+                        <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold' : 'text-gray-400 hover:text-white'}">Principale</button>
+                        <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300">Elimina</button>
                     </div>
                 </div>
             `).join('');
@@ -271,6 +267,7 @@
             if (selectedCategories.length === 0) { alert("Seleziona almeno una categoria."); return; }
 
             const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(el => el.value);
+            if (selectedColors.length === 0) { alert("Seleziona almeno un colore disponibile."); return; }
 
             const price = parseFloat(document.getElementById('prod-price').value);
             const salePriceInput = document.getElementById('prod-saleprice').value;
@@ -279,14 +276,14 @@
             const shortDesc = document.getElementById('prod-desc').value.trim();
             const featured = document.getElementById('prod-featured').checked;
 
-            if (currentEditingImages.length === 0) { alert("Aggiungi almeno una foto."); return; }
+            if (currentEditingImages.length === 0) { alert("Aggiungi almeno un'immagine prima di salvare."); return; }
 
             const productData = {
                 id: index !== '' ? getProducts()[index].id : Date.now(),
                 title, categories: selectedCategories, category: selectedCategories[0],
                 price, salePrice, shipping, shortDesc,
                 images: [...currentEditingImages], mainImageIndex: mainImageIdx,
-                colors: selectedColors.length > 0 ? selectedColors : ["Standard"], featured
+                colors: selectedColors, featured
             };
 
             const products = getProducts();
@@ -328,7 +325,9 @@
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             renderCategoryCheckboxes();
             renderColorCheckboxes();
-            currentEditingImages = []; mainImageIdx = 0; renderImagesPreview();
+            currentEditingImages = []; 
+            mainImageIdx = 0; 
+            renderImagesPreview();
         }
 
         function deleteProduct(idx) {
@@ -341,7 +340,7 @@
             const container = document.getElementById('admin-products-list');
             if (!container) return;
             const products = getProducts();
-            if (products.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs">Nessun prodotto.</p>`; return; }
+            if (products.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs">Nessun prodotto presente.</p>`; return; }
             container.innerHTML = products.map((p, idx) => {
                 const catsText = (p.categories || [p.category || 'Generale']).join(', ');
                 return `
@@ -350,7 +349,7 @@
                             <img src="${p.images?.[p.mainImageIndex || 0] || ''}" class="w-10 h-10 object-cover rounded-lg">
                             <div>
                                 <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
-                                <p class="text-[10px] text-gray-400">Cat: ${catsText} | Colori: ${(p.colors || []).join(', ')} | €${p.price}</p>
+                                <p class="text-[10px] text-gray-400">Cat: ${catsText} | Colori: ${(p.colors || []).length} | €${p.price}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -362,6 +361,7 @@
             }).join('');
         }
 
+        // RECENSIONI
         function getReviews() {
             try { const s = localStorage.getItem('ls3d_reviews'); if(s) return JSON.parse(s); } catch(e){}
             return [];
