@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
+    
     <!-- Configurazione Globale -->
     <script src="config.js"></script>
 
@@ -28,6 +28,7 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
+    <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
@@ -40,15 +41,16 @@
         </div>
     </header>
 
+    <!-- CONTENUTO ADMIN -->
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12">
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Amministrazione</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, categorie, foto e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, categorie, foto multiple e recensioni.</p>
             </div>
         </div>
 
-        <!-- GESTIONE CATEGORIE -->
+        <!-- SEZIONE CATEGORIE -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <h2 class="text-lg font-bold text-white font-mono">Gestione Categorie</h2>
             <div class="flex gap-3">
@@ -58,7 +60,7 @@
             <div id="admin-categories-list" class="flex flex-wrap gap-2 pt-2"></div>
         </section>
 
-        <!-- GESTIONE PRODOTTI E FOTO -->
+        <!-- SEZIONE PRODOTTI E FOTO -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
@@ -67,6 +69,7 @@
 
             <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-mono">
                 <input type="hidden" id="edit-product-index" value="">
+                
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-400 mb-1">Titolo Prodotto *</label>
@@ -88,7 +91,7 @@
                         <input type="number" step="0.01" id="prod-saleprice" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-1">Spedizione (€) *</label>
+                        <label class="block text-gray-400 mb-1">Spedizione Corrieren (€) *</label>
                         <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                     </div>
                 </div>
@@ -98,7 +101,7 @@
                     <textarea id="prod-desc" required rows="2" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- GESTIONE FOTO MULTIPLE -->
+                <!-- GESTIONE FOTO MULTIPLE (Aggiungi, Elimina, Seleziona Principale) -->
                 <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
                     <label class="block text-white font-bold">Gestione Foto (URL Immagini)</label>
                     <div class="flex gap-2">
@@ -108,9 +111,15 @@
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
                 </div>
 
-                <div>
-                    <label class="block text-gray-400 mb-1">Colori disponibili (separati da virgola)</label>
-                    <input type="text" id="prod-colors" placeholder="Nero Opaco, Bianco, Rosso" value="Nero Opaco" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Colori disponibili (separati da virgola)</label>
+                        <input type="text" id="prod-colors" placeholder="Nero Opaco, Bianco, Rosso" value="Nero Opaco" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div class="flex items-center gap-3 pt-6">
+                        <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
+                        <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza)</label>
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
@@ -122,7 +131,7 @@
             </div>
         </section>
 
-        <!-- GESTIONE RECENSIONI -->
+        <!-- SEZIONE GESTIONE RECENSIONI / COMMENTI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <h2 class="text-lg font-bold text-white font-mono">Gestione Recensioni / Commenti</h2>
             <div id="admin-reviews-list" class="space-y-3 font-mono text-xs"></div>
@@ -156,7 +165,11 @@
             const val = input.value.trim();
             if (!val) return;
             const cats = getCategories();
-            if (!cats.includes(val)) { cats.push(val); saveCategories(cats); input.value = ''; }
+            if (!cats.includes(val)) {
+                cats.push(val);
+                saveCategories(cats);
+                input.value = '';
+            }
         }
 
         function deleteCategory(cat) {
@@ -186,7 +199,7 @@
                 if (saved) return JSON.parse(saved);
             } catch (e) {}
             return [
-                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], mainImageIndex: 0, colors: ["Nero Opaco"] }
+                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], mainImageIndex: 0, colors: ["Nero Opaco"], featured: true }
             ];
         }
 
@@ -210,7 +223,10 @@
             renderImagesPreview();
         }
 
-        function setMainImage(idx) { mainImageIdx = idx; renderImagesPreview(); }
+        function setMainImage(idx) {
+            mainImageIdx = idx;
+            renderImagesPreview();
+        }
 
         function renderImagesPreview() {
             const container = document.getElementById('admin-images-preview');
@@ -241,23 +257,32 @@
             const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
             const shortDesc = document.getElementById('prod-desc').value.trim();
             const colors = document.getElementById('prod-colors').value.split(',').map(c => c.trim()).filter(Boolean);
+            const featured = document.getElementById('prod-featured').checked;
 
-            if (currentEditingImages.length === 0) { alert("Aggiungi almeno un'immagine."); return; }
+            if (currentEditingImages.length === 0) {
+                alert("Aggiungi almeno un'immagine per il prodotto.");
+                return;
+            }
 
             const productData = {
                 id: index !== '' ? getProducts()[index].id : Date.now(),
                 title, category, price, salePrice, shipping, shortDesc,
                 images: [...currentEditingImages],
                 mainImageIndex: mainImageIdx,
-                colors: colors.length > 0 ? colors : ["Standard"]
+                colors: colors.length > 0 ? colors : ["Standard"],
+                featured
             };
 
             const products = getProducts();
-            if (index !== '') products[index] = productData;
-            else products.push(productData);
+            if (index !== '') {
+                products[index] = productData;
+            } else {
+                products.push(productData);
+            }
 
             saveProducts(products);
             resetProductForm();
+            alert("Prodotto salvato con successo!");
         }
 
         function editProduct(idx) {
@@ -270,6 +295,7 @@
             document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
             document.getElementById('prod-desc').value = p.shortDesc || p.desc || '';
             document.getElementById('prod-colors').value = (p.colors || []).join(', ');
+            document.getElementById('prod-featured').checked = p.featured || false;
             
             currentEditingImages = [...(p.images || [])];
             mainImageIdx = p.mainImageIndex || 0;
@@ -302,13 +328,16 @@
             const container = document.getElementById('admin-products-list');
             if (!container) return;
             const products = getProducts();
-            if (products.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs font-mono">Nessun prodotto.</p>`; return; }
+            if (products.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-xs font-mono">Nessun prodotto presente.</p>`;
+                return;
+            }
             container.innerHTML = products.map((p, idx) => `
                 <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
                     <div class="flex items-center gap-3">
                         <img src="${p.images?.[p.mainImageIndex || 0] || ''}" class="w-10 h-10 object-cover rounded-lg">
                         <div>
-                            <p class="font-bold text-white">${p.title}</p>
+                            <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
                             <p class="text-[10px] text-gray-400">Cat: ${p.category || 'Generale'} | €${p.price}</p>
                         </div>
                     </div>
@@ -320,23 +349,34 @@
             `).join('');
         }
 
+        // --- GESTIONE RECENSIONI / COMMENTI ---
         function getReviews() {
-            try { const saved = localStorage.getItem('ls3d_reviews'); if (saved) return JSON.parse(saved); } catch (e) {}
+            try {
+                const saved = localStorage.getItem('ls3d_reviews');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
             return [];
+        }
+
+        function saveReviews(revs) {
+            localStorage.setItem('ls3d_reviews', JSON.stringify(revs));
+            renderAdminReviews();
         }
 
         function deleteReview(idx) {
             const revs = getReviews();
             revs.splice(idx, 1);
-            localStorage.setItem('ls3d_reviews', JSON.stringify(revs));
-            renderAdminReviews();
+            saveReviews(revs);
         }
 
         function renderAdminReviews() {
             const container = document.getElementById('admin-reviews-list');
             if (!container) return;
             const revs = getReviews();
-            if (revs.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessuna recensione.</p>`; return; }
+            if (revs.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Nessuna recensione presente.</p>`;
+                return;
+            }
             container.innerHTML = revs.map((r, idx) => `
                 <div class="flex justify-between items-start bg-dark-bg p-4 rounded-xl border border-gray-800">
                     <div>
