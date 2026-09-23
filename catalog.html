@@ -51,10 +51,8 @@
             </div>
         </div>
 
-        <!-- BARRA FILTRO CATEGORIE -->
-        <div id="category-filters" class="flex flex-wrap gap-2 font-mono text-xs">
-            <!-- I bottoni delle categorie verranno iniettati qui dinamicamente -->
-        </div>
+        <!-- BARRA FILTRO CATEGORIE (Allineata all'Admin) -->
+        <div id="category-filters" class="flex flex-wrap gap-2 font-mono text-xs"></div>
 
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
@@ -92,6 +90,18 @@
     </footer>
 
     <script>
+        function getCategories() {
+            try {
+                const saved = localStorage.getItem('ls3d_categories');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) { console.error(e); }
+            // Categorie predefinite di fallback coerenti con l'Admin
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
+        }
+
         function getProducts() {
             try {
                 const saved = localStorage.getItem('ls3d_products');
@@ -107,12 +117,12 @@
         
         let currentCategory = 'Tutti';
 
-        function renderCategories(products) {
+        function renderCategories() {
             const container = document.getElementById('category-filters');
             if (!container) return;
 
-            // Estrae tutte le categorie uniche dai prodotti (fallback su "Generale" se non specificata)
-            const categories = ['Tutti', ...new Set(products.map(p => p.category ? p.category.trim() : 'Generale'))];
+            // Prende le categorie ufficiali configurate nell'Admin + l'opzione "Tutti"
+            const categories = ['Tutti', ...getCategories()];
 
             container.innerHTML = categories.map(cat => {
                 const isActive = currentCategory === cat;
@@ -121,7 +131,7 @@
                     : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white';
                 
                 return `
-                    <button onclick="filterByCategory('${cat}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${activeClass}">
+                    <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${activeClass}">
                         ${cat}
                     </button>
                 `;
@@ -138,12 +148,12 @@
             if (!grid) return;
 
             const products = getProducts();
-            renderCategories(products);
+            renderCategories();
 
-            // Filtra i prodotti in base alla categoria selezionata
+            // Filtra i prodotti in base alla categoria selezionata nell'Admin
             const filteredProducts = currentCategory === 'Tutti' 
                 ? products 
-                : products.filter(p => (p.category ? p.category.trim() : 'Generale') === currentCategory);
+                : products.filter(p => (p.category ? p.category.trim() : '') === currentCategory);
 
             if (filteredProducts.length === 0) {
                 grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto disponibile in questa categoria.</p>`;
