@@ -7,7 +7,6 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Three.js e STLLoader per l'anteprima 3D del file STL -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
 
@@ -68,7 +67,7 @@
         <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci prodotti, caricamento foto multiple da PC, file STL reali e recensioni.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Carica immagini e file STL direttamente dal tuo computer.</p>
             </div>
         </div>
 
@@ -118,37 +117,23 @@
                     <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
                 </div>
 
-                <!-- GESTIONE FOTO MULTIPLE (DA PC E URL CON SCELTA PRINCIPALE ED ELIMINAZIONE) -->
+                <!-- GESTIONE FOTO DA PC (CON COMPRESSIONE AUTOMATICA) -->
                 <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
-                    <label class="block text-white font-bold">Gestione Foto Multiple Prodotto</label>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-gray-400 mb-1 text-[11px]">Carica Foto dal PC (anche multiple):</label>
-                            <input type="file" id="prod-image-file" accept="image/*" multiple onchange="handleImageFileUpload(event)" class="w-full text-xs text-gray-400 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 text-[11px]">Oppure Incolla URL Immagine:</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="new-image-url" placeholder="https://..." class="flex-grow bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none text-xs">
-                                <button type="button" onclick="addImageUrl()" class="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl text-xs cursor-pointer">Aggiungi</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Griglia di Anteprima Immagini -->
+                    <label class="block text-white font-bold">Immagini Prodotto (Carica dal PC)</label>
+                    <input type="file" id="prod-file-input" accept="image/*" multiple onchange="handleImageFiles(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
+                    <!-- Griglia anteprima con scelta Principale ed Elimina -->
                     <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
                 </div>
 
-                <!-- CARICAMENTO E ANTEPRIMA FILE 3D STL -->
+                <!-- CARICAMENTO FILE 3D STL -->
                 <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
                     <label class="block text-white font-bold">Modello 3D (.STL)</label>
                     <input type="file" id="prod-stl-input" accept=".stl" onchange="handleStlUpload(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
                     <input type="hidden" id="prod-stl-name" value="">
+                    <input type="hidden" id="prod-stl-data" value="">
                     
-                    <div id="stl-viewer-container" class="w-full h-56 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center justify-center mt-3">
-                        <canvas id="stl-canvas" class="w-full h-full rounded-xl"></canvas>
-                        <span class="absolute bottom-2 right-2 text-[10px] bg-black/70 px-2 py-1 rounded text-brand-400 font-mono">Anteprima 3D Modello STL</span>
+                    <div id="stl-viewer-container" class="w-full h-40 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center justify-center mt-3">
+                        <span id="stl-file-label" class="text-xs font-mono text-brand-400 font-bold">Nessun file caricato</span>
                         <button type="button" onclick="removeStlFile()" class="absolute top-2 right-2 px-2.5 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer">Rimuovi STL</button>
                     </div>
                 </div>
@@ -258,29 +243,43 @@
             renderAdminProducts();
         }
 
-        // --- GESTIONE FOTO DA PC E URL ---
-        function handleImageFileUpload(event) {
+        // --- CARICAMENTO FOTO DA PC CON COMPRESSIONE AUTOMATICA ---
+        function handleImageFiles(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    currentEditingImages.push(e.target.result);
-                    renderImagesPreview();
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 800;
+
+                        if (width > height && width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        } else if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        currentEditingImages.push(compressedDataUrl);
+                        renderImagesPreview();
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });
             event.target.value = '';
-        }
-
-        function addImageUrl() {
-            const input = document.getElementById('new-image-url');
-            const url = input.value.trim();
-            if (!url) { alert("Inserisci un URL valido."); return; }
-            currentEditingImages.push(url);
-            input.value = '';
-            renderImagesPreview();
         }
 
         function removeImageUrl(idx) {
@@ -300,12 +299,12 @@
             const container = document.getElementById('admin-images-preview');
             if (!container) return;
             if (currentEditingImages.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto aggiunta.</p>`;
+                container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto caricata dal PC.</p>`;
                 return;
             }
             container.innerHTML = currentEditingImages.map((img, idx) => `
                 <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500 ring-2 ring-brand-500/50' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
-                    <img src="${img}" class="w-full h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150?text=Anteprima'">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg">
                     <div class="flex items-center justify-between w-full text-[10px] pt-1">
                         <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold underline' : 'text-gray-400 hover:text-white'} cursor-pointer">Principale</button>
                         <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300 font-bold cursor-pointer">Elimina</button>
@@ -314,7 +313,7 @@
             `).join('');
         }
 
-        // --- GESTIONE FILE STL & ANTEPRIMA 3D REALE ---
+        // --- GESTIONE FILE STL ---
         function handleStlUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -324,8 +323,9 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentStlBase64 = e.target.result;
+                document.getElementById('prod-stl-data').value = currentStlBase64;
+                document.getElementById('stl-file-label').innerText = "File STL caricato: " + file.name;
                 document.getElementById('stl-viewer-container').classList.remove('hidden');
-                renderStlPreviewFromData(currentStlBase64);
             };
             reader.readAsDataURL(file);
         }
@@ -335,49 +335,8 @@
             currentStlFileName = '';
             document.getElementById('prod-stl-input').value = '';
             document.getElementById('prod-stl-name').value = '';
+            document.getElementById('prod-stl-data').value = '';
             document.getElementById('stl-viewer-container').classList.add('hidden');
-        }
-
-        let stlRenderer = null;
-        function renderStlPreviewFromData(dataUrl) {
-            const container = document.getElementById('stl-viewer-container');
-            const canvas = document.getElementById('stl-canvas');
-            if (stlRenderer) { stlRenderer.dispose(); }
-
-            const width = container.clientWidth || 400;
-            const height = 220;
-
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0d1322);
-
-            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-            camera.position.set(0, 0, 150);
-
-            stlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-            stlRenderer.setSize(width, height);
-
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-            directionalLight.position.set(1, 1, 1).normalize();
-            scene.add(directionalLight);
-
-            const loader = new THREE.STLLoader();
-            loader.load(dataUrl, function (geometry) {
-                geometry.computeVertexNormals();
-                const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                const mesh = new THREE.Mesh(geometry, material);
-                geometry.center();
-                scene.add(mesh);
-
-                function animate() {
-                    requestAnimationFrame(animate);
-                    mesh.rotation.z += 0.008;
-                    stlRenderer.render(scene, camera);
-                }
-                animate();
-            }, undefined, function (error) {
-                console.error("Errore caricamento STL nell'admin:", error);
-            });
         }
 
         function saveProduct(e) {
@@ -399,7 +358,7 @@
             const longDesc = document.getElementById('prod-longdesc').value.trim();
             const featured = document.getElementById('prod-featured').checked;
 
-            if (currentEditingImages.length === 0) { alert("Aggiungi almeno un'immagine prima di salvare."); return; }
+            if (currentEditingImages.length === 0) { alert("Carica almeno un'immagine dal PC prima di salvare."); return; }
 
             const productData = {
                 id: index !== '' ? getProducts()[index].id : Date.now(),
@@ -428,7 +387,7 @@
                 resetProductForm();
                 alert("Prodotto salvato con successo!");
             } catch (err) {
-                alert("Errore di salvataggio: le immagini o il file STL potrebbero essere troppo pesanti per la memoria del browser.");
+                alert("Spazio di archiviazione pieno nel browser. Riduci il numero di foto caricate.");
                 console.error(err);
             }
         }
@@ -455,11 +414,10 @@
             currentStlFileName = p.stlFileName || '';
             currentStlBase64 = p.stlData || '';
             document.getElementById('prod-stl-name').value = currentStlFileName;
+            document.getElementById('prod-stl-data').value = currentStlBase64;
             
-            if (currentStlBase64) {
-                document.getElementById('stl-viewer-container').classList.remove('hidden');
-                renderStlPreviewFromData(currentStlBase64);
-            } else if (currentStlFileName) {
+            if (currentStlFileName) {
+                document.getElementById('stl-file-label').innerText = "File STL associato: " + currentStlFileName;
                 document.getElementById('stl-viewer-container').classList.remove('hidden');
             } else {
                 document.getElementById('stl-viewer-container').classList.add('hidden');
@@ -515,7 +473,6 @@
             }).join('');
         }
 
-        // RECENSIONI
         function getReviews() {
             try { const s = localStorage.getItem('ls3d_reviews'); if(s) return JSON.parse(s); } catch(e){}
             return [];
