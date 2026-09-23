@@ -9,6 +9,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
+    <!-- Configurazione Globale -->
+    <script src="config.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -25,13 +28,11 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- HEADER / NAV -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            
             <div class="flex items-center gap-4">
                 <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Home</a>
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
@@ -42,7 +43,6 @@
         </div>
     </header>
 
-    <!-- CONTENUTO PRINCIPALE CATALOGO -->
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-800 pb-6">
             <div>
@@ -51,9 +51,7 @@
             </div>
         </div>
 
-        <!-- BARRA FILTRO CATEGORIE -->
         <div id="category-filters" class="flex flex-wrap gap-2 font-mono text-xs"></div>
-
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
@@ -65,14 +63,10 @@
                     <h2 class="text-base font-bold text-white flex items-center gap-2 font-mono">
                         <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i> Il tuo Carrello
                     </h2>
-                    <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white cursor-pointer">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
+                    <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-
                 <div id="cart-items-container" class="space-y-3 font-mono text-xs max-h-[50vh] overflow-y-auto pr-1"></div>
             </div>
-
             <div class="border-t border-gray-800 pt-4 space-y-4">
                 <div class="flex justify-between items-center font-bold text-sm">
                     <span>Totale (incl. spedizione):</span>
@@ -85,6 +79,11 @@
         </div>
     </div>
 
+    <!-- MODALE DETTAGLIO PRODOTTO & RECENSIONI -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
+    </div>
+
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
         LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
@@ -93,11 +92,8 @@
         function getCategories() {
             try {
                 const saved = localStorage.getItem('ls3d_categories');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                }
-            } catch (e) { console.error(e); }
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
             return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
 
@@ -105,35 +101,33 @@
             try {
                 const saved = localStorage.getItem('ls3d_products');
                 if (saved) return JSON.parse(saved);
-            } catch (e) { console.error(e); }
+            } catch (e) {}
             return [
-                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], colors: ["Nero Opaco"] },
+                { id: 1, title: "Supporto Cuffie Premium", category: "Accessori", price: 24.99, salePrice: 19.99, shipping: 5.00, shortDesc: "Supporto ergonomico.", images: ["https://images.unsplash.com/photo-1584679109597-c651b16c62db?auto=format&fit=crop&q=80&w=600"], mainImageIndex: 0, colors: ["Nero Opaco"] },
             ];
+        }
+
+        function getReviews() {
+            try {
+                const saved = localStorage.getItem('ls3d_reviews');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
+            return [];
         }
 
         let cart = [];
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
-        
         let currentCategory = 'Tutti';
 
         function renderCategories() {
             const container = document.getElementById('category-filters');
             if (!container) return;
-
             const categories = ['Tutti', ...getCategories()];
-
-            container.innerHTML = categories.map(cat => {
-                const isActive = currentCategory === cat;
-                const activeClass = isActive 
-                    ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' 
-                    : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white';
-                
-                return `
-                    <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${activeClass}">
-                        ${cat}
-                    </button>
-                `;
-            }).join('');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${currentCategory === cat ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white'}">
+                    ${cat}
+                </button>
+            `).join('');
         }
 
         function filterByCategory(category) {
@@ -144,103 +138,158 @@
         function renderCatalog() {
             const grid = document.getElementById('products-grid');
             if (!grid) return;
-
             const products = getProducts();
             renderCategories();
 
-            // Filtro robusto: confronta le categorie pulendo spazi e ignorando le maiuscole/minuscole
             const filteredProducts = currentCategory === 'Tutti' 
                 ? products 
-                : products.filter(p => {
-                    const prodCat = (p.category || p.cat || '').trim().toLowerCase();
-                    const targetCat = currentCategory.trim().toLowerCase();
-                    return prodCat === targetCat;
-                });
+                : products.filter(p => (p.category || '').trim().toLowerCase() === currentCategory.trim().toLowerCase());
 
             if (filteredProducts.length === 0) {
                 grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto disponibile in questa categoria.</p>`;
                 return;
             }
 
-            grid.innerHTML = filteredProducts.map((p, idx) => {
-                const colors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
-                const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
-                
+            grid.innerHTML = filteredProducts.map(p => {
+                const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
                 const listPrice = Number(p.price) || 0;
-                const salePrice = p.salePrice ? Number(p.salePrice) : null;
+                const salePrice = p.salePrice !== null && p.salePrice !== undefined ? Number(p.salePrice) : null;
                 const finalPrice = salePrice !== null ? salePrice : listPrice;
-                const shippingCost = Number(p.shipping !== undefined ? p.shipping : 5.00);
 
                 let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${finalPrice.toFixed(2)}</span>`;
                 if (salePrice !== null && salePrice < listPrice) {
-                    priceHtml = `
-                        <div class="flex items-center gap-2">
-                            <span class="font-mono font-bold text-brand-400 text-sm">€${salePrice.toFixed(2)}</span>
-                            <span class="font-mono text-gray-500 text-xs line-through">€${listPrice.toFixed(2)}</span>
-                        </div>
-                    `;
+                    priceHtml = `<div class="flex items-center gap-2"><span class="font-mono font-bold text-brand-400 text-sm">€${salePrice.toFixed(2)}</span><span class="font-mono text-gray-500 text-xs line-through">€${listPrice.toFixed(2)}</span></div>`;
                 }
-
-                const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
 
                 return `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all">
-                        <div>
+                        <div onclick="openProductModal(${p.id})" class="cursor-pointer">
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
                                 <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
                             </div>
-                            <div class="p-5 space-y-3">
+                            <div class="p-5 space-y-2">
                                 <h3 class="font-bold text-white text-base">${p.title}</h3>
-                                <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${p.shortDesc || p.desc || 'Prodotto 3D di alta qualità.'}</p>
-                                <p class="text-[11px] font-mono text-gray-500">Spedizione: €${shippingCost.toFixed(2)}</p>
-                                
-                                <div class="space-y-1 pt-2 font-mono text-[11px]">
-                                    <label class="text-gray-400">Colore:</label>
-                                    <select id="color-${idx}" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2 text-white focus:border-brand-500 focus:outline-none">
-                                        ${colorOptions}
-                                    </select>
-                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${p.shortDesc || p.desc || ''}</p>
                             </div>
                         </div>
-
                         <div class="p-5 pt-0 flex items-center justify-between border-t border-gray-800/60 mt-4">
                             <div>${priceHtml}</div>
-                            <button onclick="addToCart('${p.title.replace(/'/g, "\\'")}', ${finalPrice}, ${shippingCost}, 'color-${idx}')" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer">
-                                <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi
-                            </button>
+                            <button onclick="openProductModal(${p.id})" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs font-mono cursor-pointer">Dettagli</button>
                         </div>
                     </div>
                 `;
             }).join('');
-
             try { lucide.createIcons(); } catch(e){}
         }
 
-        function addToCart(title, price, shipping, colorSelectId) {
-            const colorSelect = document.getElementById(colorSelectId);
-            const selectedColor = colorSelect ? colorSelect.value : 'Standard';
+        function openProductModal(productId) {
+            const p = getProducts().find(prod => prod.id === productId);
+            if (!p) return;
 
+            const modal = document.getElementById('product-modal');
+            const content = document.getElementById('product-modal-content');
+            const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
+            const colors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
+            const colorOptions = colors.map(c => `<option value="${c}">${c}</option>`).join('');
+            const reviews = getReviews().filter(r => r.productTitle === p.title);
+
+            content.innerHTML = `
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <h2 class="text-lg font-bold text-white font-mono">${p.title}</h2>
+                    <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <img id="main-modal-img" src="${images[p.mainImageIndex || 0]}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
+                        <div class="flex gap-2 overflow-x-auto pb-2">
+                            ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
+                        </div>
+                    </div>
+                    <div class="space-y-4 font-mono text-xs">
+                        <p class="text-gray-300 leading-relaxed">${p.shortDesc || p.desc || ''}</p>
+                        <p class="text-brand-400 font-bold text-base">€${(p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price).toFixed(2)}</p>
+                        <p class="text-gray-500">Spedizione: €${(p.shipping !== undefined ? p.shipping : 5.00).toFixed(2)}</p>
+                        
+                        <div class="space-y-1 pt-2">
+                            <label class="text-gray-400">Colore:</label>
+                            <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2 text-white focus:border-brand-500 focus:outline-none">${colorOptions}</select>
+                        </div>
+                        <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${p.shipping !== undefined ? p.shipping : 5.00})" class="w-full py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
+                    <h3 class="text-sm font-bold text-white">Recensioni dei Clienti</h3>
+                    <div class="space-y-3 max-h-40 overflow-y-auto">
+                        ${reviews.length === 0 ? '<p class="text-gray-500 text-xs">Ancora nessuna recensione.</p>' : reviews.map(r => `
+                            <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
+                                <div class="flex justify-between text-gray-400 text-[10px]">
+                                    <span class="font-bold text-white">${r.author}</span>
+                                    <span class="text-brand-400">${r.rating}/5 ★</span>
+                                </div>
+                                <p class="mt-1 text-gray-300">${r.comment}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3">
+                        <p class="text-xs font-bold text-white">Lascia una recensione</p>
+                        <input type="text" id="rev-author" placeholder="Il tuo nome" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none">
+                        <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none">
+                            <option value="5">5 Stelle - Eccellente</option>
+                            <option value="4">4 Stelle - Molto buono</option>
+                            <option value="3">3 Stelle - Buono</option>
+                            <option value="2">2 Stelle - Sufficiente</option>
+                            <option value="1">1 Stella - Scarsa</option>
+                        </select>
+                        <textarea id="rev-comment" placeholder="Scrivi il tuo commento..." rows="2" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        <button onclick="submitReview('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs cursor-pointer">Invia Recensione</button>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            try { lucide.createIcons(); } catch(e){}
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function addModalToCart(title, price, shipping) {
+            const colorSelect = document.getElementById('modal-color');
+            const selectedColor = colorSelect ? colorSelect.value : 'Standard';
             const existingIndex = cart.findIndex(i => i.title === title && i.color === selectedColor);
             if (existingIndex > -1) {
                 cart[existingIndex].qty += 1;
             } else {
                 cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
             }
-
             saveCart();
             updateCartUI();
+            closeProductModal();
             toggleCartModal();
+        }
+
+        function submitReview(productTitle) {
+            const author = document.getElementById('rev-author').value.trim();
+            const rating = parseInt(document.getElementById('rev-rating').value);
+            const comment = document.getElementById('rev-comment').value.trim();
+
+            if (!author || !comment) { alert("Compila tutti i campi."); return; }
+
+            const reviews = getReviews();
+            reviews.push({ productTitle, author, rating, comment, date: new Date().toLocaleDateString('it-IT') });
+            localStorage.setItem('ls3d_reviews', JSON.stringify(reviews));
+            alert("Recensione inviata!");
+            openProductModal(getProducts().find(p => p.title === productTitle).id);
         }
 
         function updateCartUI() {
             const counter = document.getElementById('cart-counter');
             const container = document.getElementById('cart-items-container');
             const totalModal = document.getElementById('cart-modal-total');
-
-            let totalQty = 0;
-            let productsPrice = 0;
-            let maxShipping = 0;
+            let totalQty = 0, productsPrice = 0, maxShipping = 0;
 
             if (cart.length === 0) {
                 if (container) container.innerHTML = `<p class="text-gray-500 text-center py-6">Il carrello è vuoto.</p>`;
@@ -254,30 +303,24 @@
                     totalQty += item.qty;
                     const itemTotal = item.price * item.qty;
                     productsPrice += itemTotal;
-                    if ((item.shipping || 0) > maxShipping) {
-                        maxShipping = item.shipping;
-                    }
+                    if ((item.shipping || 0) > maxShipping) maxShipping = item.shipping;
 
                     return `
                         <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                             <div>
                                 <p class="font-bold text-white">${item.qty}x ${item.title}</p>
-                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${item.color}</span> | Sped: €${(item.shipping || 5).toFixed(2)}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${item.color}</span></p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-bold text-brand-400">€${itemTotal.toFixed(2)}</span>
-                                <button onclick="removeFromCard(${index})" class="text-red-400 hover:text-red-300 cursor-pointer">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
+                                <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
-
-            const grandTotal = productsPrice + maxShipping;
             if (counter) counter.innerText = totalQty;
-            if (totalModal) totalModal.innerText = `€${grandTotal.toFixed(2)}`;
+            if (totalModal) totalModal.innerText = `€${(productsPrice + maxShipping).toFixed(2)}`;
             try { lucide.createIcons(); } catch(e){}
         }
 
@@ -287,22 +330,10 @@
             updateCartUI();
         }
 
-        function saveCart() {
-            try {
-                localStorage.setItem('ls3d_cart', JSON.stringify(cart));
-            } catch (e) { console.error(e); }
-        }
-
-        function toggleCartModal() {
-            const modal = document.getElementById('cart-modal');
-            if (modal) modal.classList.toggle('hidden');
-        }
-
+        function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
+        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
         function goToCheckout() {
-            if (cart.length === 0) {
-                alert("Il carrello è vuoto. Aggiungi almeno un prodotto.");
-                return;
-            }
+            if (cart.length === 0) { alert("Il carrello è vuoto."); return; }
             window.location.href = "checkout.html";
         }
 
