@@ -33,13 +33,21 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
+    <!-- HEADER COMPLETO -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            <div class="flex items-center gap-4 font-mono text-xs">
+            <div class="flex items-center gap-4 sm:gap-6 font-mono text-xs">
+                <a href="chisiamo.html" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Chi Siamo</a>
                 <a href="catalog.html" class="text-gray-400 hover:text-white transition-colors">Catalogo 3D</a>
+                <select class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
+                    <option value="it">IT</option>
+                    <option value="en">EN</option>
+                </select>
+                <a href="login.html" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Accedi / Registrati</a>
+                <a href="admin.html" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -242,7 +250,7 @@
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
 
-                        <!-- Visualizzatore STL con fallback animato -->
+                        <!-- Visualizzatore STL -->
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
                                 <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${cleanStlFilename(p.stlFileName)})</p>
@@ -325,7 +333,6 @@
                         geometry.center();
                         scene.add(mesh);
                     }, undefined, function (error) {
-                        console.error("Errore caricamento STL, uso fallback:", error);
                         createFallbackMesh();
                     });
                 } else {
@@ -350,6 +357,7 @@
                 animate();
             }, 50);
         }
+
         function closeProductModal() {
             if (catalogStlRenderer) {
                 catalogStlRenderer.dispose();
