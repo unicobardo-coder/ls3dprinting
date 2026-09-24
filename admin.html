@@ -269,10 +269,10 @@
                 longDesc,
                 images: [...currentEditingImages], 
                 mainImageIndex: mainImageIdx,
-                colors: selectedColors, // SALVA I COLORI SCELTI
+                colors: selectedColors, 
                 featured,
                 stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : ''),
-                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '')
+                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '') // SALVA I DATI STL
             };
 
             const products = getProducts();
@@ -463,6 +463,7 @@
             renderImagesPreview();
 
             currentStlFileName = p.stlFileName || '';
+            currentStlBase64 = p.stlData || '';
             document.getElementById('prod-stl-name').value = currentStlFileName;
             if (currentStlFileName) {
                 document.getElementById('stl-file-label').innerText = "File STL: " + currentStlFileName;
