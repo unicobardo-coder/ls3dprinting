@@ -194,12 +194,10 @@
             location.reload();
         }
 
-        if (localStorage.getItem('ls3d_admin_auth') === 'true') {
-            revealAdminPanel();
-        }
-
         let currentEditingImages = [];
         let mainImageIdx = 0;
+        let currentStlBase64 = '';
+        let currentStlFileName = '';
 
         function getCategories() {
             try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
@@ -364,8 +362,6 @@
         }
 
         // --- GESTIONE STL ---
-        let currentStlBase64 = '';
-        let currentStlFileName = '';
 
         function handleStlUpload(event) {
             const file = event.target.files[0];
@@ -559,6 +555,19 @@
             renderAdminReviews();
             renderImagesPreview();
             try { lucide.createIcons(); } catch(e){}
+        }
+
+        // Fallback se config.js non definisce saveProducts
+        if (typeof window.saveProducts !== 'function') {
+            window.saveProducts = function (products) {
+                localStorage.setItem('ls3d_products', JSON.stringify(products));
+                renderAdminProducts();
+            };
+        }
+
+        // Auto-login: DEVE stare in fondo, dopo tutte le dichiarazioni
+        if (localStorage.getItem('ls3d_admin_auth') === 'true') {
+            revealAdminPanel();
         }
     </script>
 </body>
