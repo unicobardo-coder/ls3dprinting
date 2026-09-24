@@ -200,7 +200,6 @@
 
         let currentEditingImages = [];
         let mainImageIdx = 0;
-        let currentStlFileName = '';
 
         function getCategories() {
             try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
@@ -371,6 +370,9 @@
         function handleStlUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            if (file.size > 1.5 * 1024 * 1024) {
+                alert("Attenzione: questo STL pesa " + (file.size/1048576).toFixed(1) + " MB. Il salvataggio nel browser (localStorage, ~5 MB totali) probabilmente fallirà. Usa un file più leggero o salva gli STL come file sul server.");
+            }
             currentStlFileName = file.name;
             document.getElementById('prod-stl-name').value = file.name;
 
@@ -426,7 +428,8 @@
                 mainImageIndex: mainImageIdx,
                 colors: selectedColors, 
                 featured,
-                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : '')
+                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : ''),
+                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '')
             };
 
             const products = getProducts();
