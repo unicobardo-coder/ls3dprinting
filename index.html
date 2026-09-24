@@ -325,6 +325,7 @@
                         geometry.center();
                         scene.add(mesh);
                     }, undefined, function (error) {
+                        console.error("Errore caricamento STL, uso fallback:", error);
                         createFallbackMesh();
                     });
                 } else {
@@ -349,7 +350,6 @@
                 animate();
             }, 50);
         }
-
         function closeProductModal() {
             if (catalogStlRenderer) {
                 catalogStlRenderer.dispose();
