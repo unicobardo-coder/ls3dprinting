@@ -216,7 +216,7 @@
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
             
-            // Gestione colori con pallini associati da filamentColors
+            // Gestione colori sincronizzata con filamentColors
             const availableColors = (typeof filamentColors !== 'undefined') ? filamentColors : [
                 { name: "Nero Opaco", code: "#111827" },
                 { name: "Bianco Perla", code: "#f3f4f6" },
@@ -253,8 +253,6 @@
                 </div>
             `;
 
-            const displayStlName = cleanStlFilename(p.stlFileName);
-
             content.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                     <h2 class="text-lg font-bold text-white font-mono">${p.title}</h2>
@@ -267,13 +265,13 @@
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
 
-                        <!-- Visualizzatore STL Reale se presente -->
+                        <!-- Visualizzatore STL con fallback anti-schermo nero -->
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
-                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${displayStlName})</p>
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${p.stlFileName})</p>
                                 <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
                                     <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
-                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Reale</span>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
                                 </div>
                             </div>
                         ` : ''}
@@ -311,7 +309,7 @@
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
 
-            if (p.stlFileName && p.stlData) {
+            if (p.stlFileName) {
                 initCatalogStlViewer(p.stlData);
             }
         }
@@ -322,8 +320,7 @@
                 if (!canvas) return;
                 if (catalogStlRenderer) catalogStlRenderer.dispose();
 
-                const container = canvas.parentElement;
-                const width = container ? (container.clientWidth || 350) : 350;
+                const width = canvas.parentElement.clientWidth || 300;
                 const height = 192;
 
                 const scene = new THREE.Scene();
@@ -375,7 +372,6 @@
                 animate();
             }, 50);
         }
-            
         function closeProductModal() {
             if (catalogStlRenderer) {
                 catalogStlRenderer.dispose();
