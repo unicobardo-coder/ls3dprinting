@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannello Admin - Prodotti | LS3Dmaker</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="config.js"></script>
+    <script src="colors_2.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        brand: { 500: '#10b981', 400: '#34d399', 600: '#059669' },
+                        dark: { bg: '#070b14', card: '#0d1322', surface: '#131c31' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+
+    <!-- LOGIN MODALE ADMIN -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl font-mono text-xs">
+            <div class="text-center space-y-2">
+                <h2 class="text-xl font-bold text-white tracking-tight">Area Riservata Admin</h2>
+                <p class="text-gray-400">Inserisci la password per accedere.</p>
+            </div>
+            <form onsubmit="checkAdminPassword(event)" class="space-y-4">
+                <input type="password" id="admin-password-input" placeholder="Password di accesso..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Accedi</button>
+            </form>
+            <div class="text-center">
+                <a href="index.html" class="text-gray-500 hover:text-gray-300 underline">← Torna al sito</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85 hidden" id="admin-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="management.html" class="px-4 py-2 bg-dark-surface hover:bg-gray-800 text-brand-400 rounded-xl text-xs font-mono border border-gray-800 transition-all">⚙️ Gestione (Colori, Categorie, Fatture)</a>
+                <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo</a>
+                <button onclick="logoutAdmin()" class="text-xs font-mono text-red-400 hover:text-red-300 underline cursor-pointer">Esci</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12 hidden" id="admin-main-content">
+        <div class="border-b border-gray-800 pb-6 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">Carica immagini dal PC e gestisci i prodotti in sicurezza.</p>
+            </div>
+        </div>
+
+        <!-- PRODOTTI FORM -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
+                <button type="button" onclick="resetProductForm()" id="cancel-edit-btn" class="hidden text-xs text-gray-400 hover:text-white font-mono underline cursor-pointer">Annulla Modifica</button>
+            </div>
+
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-mono">
+                <input type="hidden" id="edit-product-index" value="">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Titolo Prodotto *</label>
+                        <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Categorie Multiple *</label>
+                        <div id="prod-categories-checkboxes" class="bg-dark-bg border border-gray-700/80 rounded-xl p-3 max-h-36 overflow-y-auto space-y-2"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Prezzo Listino (€) *</label>
+                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Prezzo Scontato (€)</label>
+                        <input type="number" step="0.01" id="prod-saleprice" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Spedizione (€) *</label>
+                        <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
+                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Descrizione Lunga / Dettagliata *</label>
+                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                </div>
+
+                <!-- GESTIONE FOTO DA PC CON COMPRESSIONE SICURA -->
+                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Immagini Prodotto (Carica dal PC)</label>
+                    <input type="file" id="prod-file-input" accept="image/*" multiple onchange="handleImageFiles(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
+                    <!-- Griglia anteprima -->
+                    <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
+                </div>
+
+                <!-- CARICAMENTO FILE 3D STL -->
+                <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Modello 3D (.STL)</label>
+                    <input type="file" id="prod-stl-input" accept=".stl" onchange="handleStlUpload(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
+                    <input type="hidden" id="prod-stl-name" value="">
+                    
+                    <div id="stl-viewer-container" class="w-full h-12 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center px-4 mt-3">
+                        <span id="stl-file-label" class="text-xs font-mono text-brand-400 font-bold">Nessun file caricato</span>
+                        <button type="button" onclick="removeStlFile()" class="absolute right-3 px-2.5 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer">Rimuovi STL</button>
+                    </div>
+                </div>
+
+                <!-- SELEZIONE COLORI -->
+                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Colori Disponibili per questo Prodotto</label>
+                    <div id="prod-colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2"></div>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
+                    <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
+            </form>
+
+            <div class="pt-8 border-t border-gray-800 space-y-4">
+                <h3 class="text-sm font-bold text-white font-mono">Prodotti Esistenti</h3>
+                <div id="admin-products-list" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- RECENSIONI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white font-mono">Gestione Recensioni / Commenti</h2>
+            <div id="admin-reviews-list" class="space-y-3 font-mono text-xs"></div>
+        </section>
+    </main>
+
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
+        LS3DMAKER © 2026 - Admin Panel
+    </footer>
+
+    <script>
+        const ADMIN_PASSWORD = "ls3d2026";
+
+        function checkAdminPassword(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-password-input').value;
+            if (pass === ADMIN_PASSWORD) {
+                localStorage.setItem('ls3d_admin_auth', 'true');
+                revealAdminPanel();
+            } else {
+                alert("Password errata!");
+            }
+        }
+
+        function revealAdminPanel() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('admin-header').classList.remove('hidden');
+            document.getElementById('admin-main-content').classList.remove('hidden');
+            initAdminDashboard();
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('ls3d_admin_auth');
+            location.reload();
+        }
+
+        if (localStorage.getItem('ls3d_admin_auth') === 'true') {
+            revealAdminPanel();
+        }
+
+        let currentEditingImages = [];
+        let mainImageIdx = 0;
+        let currentStlFileName = '';
+
+        function getCategories() {
+            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
+        }
+
+        function renderCategoryCheckboxes(selectedCategories = []) {
+            const container = document.getElementById('prod-categories-checkboxes');
+            if (!container) return;
+            const cats = getCategories();
+            container.innerHTML = cats.map(c => `
+                <label class="flex items-center gap-2 text-white cursor-pointer">
+                    <input type="checkbox" name="product-categories" value="${c}" ${selectedCategories.includes(c) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
+                    <span>${c}</span>
+                </label>
+            `).join('');
+        }
+
+        function renderColorCheckboxes(selectedColors = []) {
+            const container = document.getElementById('prod-colors-checkboxes');
+            if (!container) return;
+            container.innerHTML = filamentColors.map(c => `
+                <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-card p-2 rounded-lg border border-gray-800">
+                    <input type="checkbox" name="product-colors" value="${c.name}" ${selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
+                    <span class="w-3 h-3 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
+                    <span class="text-[11px]">${c.name}</span>
+                </label>
+            `).join('');
+        }
+
+        function getProducts() {
+            try { const s = localStorage.getItem('ls3d_products'); if (s) return JSON.parse(s); } catch (e) {}
+            return [];
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const index = document.getElementById('edit-product-index').value;
+            const title = document.getElementById('prod-title').value.trim();
+            
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
+            if (selectedCategories.length === 0) { alert("Seleziona almeno una categoria."); return; }
+
+            const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(el => el.value);
+            if (selectedColors.length === 0) { alert("Seleziona almeno un colore disponibile."); return; }
+
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
+            const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
+            const shortDesc = document.getElementById('prod-desc').value.trim();
+            const longDesc = document.getElementById('prod-longdesc').value.trim();
+            const featured = document.getElementById('prod-featured').checked;
+
+            if (currentEditingImages.length === 0) { alert("Carica almeno un'immagine dal PC prima di salvare."); return; }
+
+            const productData = {
+                id: index !== '' ? getProducts()[index].id : Date.now(),
+                title, 
+                categories: selectedCategories, 
+                category: selectedCategories[0],
+                price, 
+                salePrice, 
+                shipping, 
+                shortDesc,
+                longDesc,
+                images: [...currentEditingImages], 
+                mainImageIndex: mainImageIdx,
+                colors: selectedColors, 
+                featured,
+                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : ''),
+                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '') // SALVA I DATI STL
+            };
+
+            const products = getProducts();
+            if (index !== '') products[index] = productData;
+            else products.push(productData);
+
+            try {
+                localStorage.setItem('ls3d_products', JSON.stringify(products));
+                resetProductForm();
+                renderAdminProducts();
+                alert("Prodotto salvato con successo!");
+            } catch (err) {
+                alert("Memoria LocalStorage esaurita. Riduci il numero di foto.");
+                console.error(err);
+            }
+        }
+
+        // --- CARICAMENTO FOTO DA PC CON COMPRESSIONE SICURA ---
+        function handleImageFiles(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 600; // Ottimizzato per evitare limiti di memoria
+
+                        if (width > height && width > maxDim) {
+                            height = Math.round(height * (maxDim / width));
+                            width = maxDim;
+                        } else if (height > maxDim) {
+                            width = Math.round(width * (maxDim / height));
+                            height = maxDim;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                        currentEditingImages.push(compressedDataUrl);
+                        renderImagesPreview();
+                    };
+                    img.onerror = function() {
+                        currentEditingImages.push(e.target.result);
+                        renderImagesPreview();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function removeImageUrl(idx) {
+            currentEditingImages.splice(idx, 1);
+            if (mainImageIdx >= currentEditingImages.length) {
+                mainImageIdx = Math.max(0, currentEditingImages.length - 1);
+            }
+            renderImagesPreview();
+        }
+
+        function setMainImage(idx) {
+            mainImageIdx = idx;
+            renderImagesPreview();
+        }
+
+        function renderImagesPreview() {
+            const container = document.getElementById('admin-images-preview');
+            if (!container) return;
+            if (currentEditingImages.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto caricata dal PC.</p>`;
+                return;
+            }
+            container.innerHTML = currentEditingImages.map((img, idx) => `
+                <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500 ring-2 ring-brand-500/50' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg">
+                    <div class="flex items-center justify-between w-full text-[10px] pt-1">
+                        <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold underline' : 'text-gray-400 hover:text-white'} cursor-pointer">Principale</button>
+                        <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300 font-bold cursor-pointer">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- GESTIONE STL ---
+        let currentStlBase64 = '';
+        let currentStlFileName = '';
+
+        function handleStlUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            currentStlFileName = file.name;
+            document.getElementById('prod-stl-name').value = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentStlBase64 = e.target.result; // Salva i dati binari/base64 del file STL
+                document.getElementById('stl-file-label').innerText = "File STL: " + file.name;
+                document.getElementById('stl-viewer-container').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeStlFile() {
+            currentStlBase64 = '';
+            currentStlFileName = '';
+            document.getElementById('prod-stl-input').value = '';
+            document.getElementById('prod-stl-name').value = '';
+            document.getElementById('stl-viewer-container').classList.add('hidden');
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const index = document.getElementById('edit-product-index').value;
+            const title = document.getElementById('prod-title').value.trim();
+            
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
+            if (selectedCategories.length === 0) { alert("Seleziona almeno una categoria."); return; }
+
+            const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(el => el.value);
+            if (selectedColors.length === 0) { alert("Seleziona almeno un colore disponibile."); return; }
+
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
+            const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
+            const shortDesc = document.getElementById('prod-desc').value.trim();
+            const longDesc = document.getElementById('prod-longdesc').value.trim();
+            const featured = document.getElementById('prod-featured').checked;
+
+            if (currentEditingImages.length === 0) { alert("Carica almeno un'immagine dal PC prima di salvare."); return; }
+
+            const productData = {
+                id: index !== '' ? getProducts()[index].id : Date.now(),
+                title, 
+                categories: selectedCategories, 
+                category: selectedCategories[0],
+                price, 
+                salePrice, 
+                shipping, 
+                shortDesc,
+                longDesc,
+                images: [...currentEditingImages], 
+                mainImageIndex: mainImageIdx,
+                colors: selectedColors, 
+                featured,
+                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : '')
+            };
+
+            const products = getProducts();
+            if (index !== '') products[index] = productData;
+            else products.push(productData);
+
+            try {
+                saveProducts(products);
+                resetProductForm();
+                alert("Prodotto salvato con successo!");
+            } catch (err) {
+                alert("Memoria LocalStorage esaurita. Riduci il numero di foto.");
+                console.error(err);
+            }
+        }
+
+        function editProduct(idx) {
+            const p = getProducts()[idx];
+            document.getElementById('edit-product-index').value = idx;
+            document.getElementById('prod-title').value = p.title;
+            
+            renderCategoryCheckboxes(p.categories || [p.category || '']);
+            renderColorCheckboxes(p.colors || []);
+
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
+            document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
+            document.getElementById('prod-desc').value = p.shortDesc || '';
+            document.getElementById('prod-longdesc').value = p.longDesc || '';
+            document.getElementById('prod-featured').checked = p.featured || false;
+            
+            currentEditingImages = [...(p.images || [])];
+            mainImageIdx = p.mainImageIndex || 0;
+            renderImagesPreview();
+
+            currentStlFileName = p.stlFileName || '';
+            currentStlBase64 = p.stlData || '';
+            document.getElementById('prod-stl-name').value = currentStlFileName;
+            if (currentStlFileName) {
+                document.getElementById('stl-file-label').innerText = "File STL: " + currentStlFileName;
+                document.getElementById('stl-viewer-container').classList.remove('hidden');
+            } else {
+                document.getElementById('stl-viewer-container').classList.add('hidden');
+            }
+
+            document.getElementById('product-form-title').innerText = "Modifica Prodotto";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetProductForm() {
+            document.getElementById('product-form').reset();
+            document.getElementById('edit-product-index').value = '';
+            document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            renderCategoryCheckboxes();
+            renderColorCheckboxes();
+            currentEditingImages = []; 
+            mainImageIdx = 0; 
+            renderImagesPreview();
+            removeStlFile();
+        }
+
+        function deleteProduct(idx) {
+            if (confirm("Vuoi eliminare questo prodotto?")) {
+                const products = getProducts(); products.splice(idx, 1); saveProducts(products);
+            }
+        }
+
+        function renderAdminProducts() {
+            const container = document.getElementById('admin-products-list');
+            if (!container) return;
+            const products = getProducts();
+            if (products.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs">Nessun prodotto presente.</p>`; return; }
+            container.innerHTML = products.map((p, idx) => {
+                const catsText = (p.categories || [p.category || 'Generale']).join(', ');
+                const mainImg = p.images?.[p.mainImageIndex || 0] || '';
+                return `
+                    <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
+                        <div class="flex items-center gap-3">
+                            <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150'">
+                            <div>
+                                <p class="font-bold text-white">${p.title} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
+                                <p class="text-[10px] text-gray-400">Cat: ${catsText} | Foto: ${(p.images || []).length} | €${p.price}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="editProduct(${idx})" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg cursor-pointer">Modifica</button>
+                            <button type="button" onclick="deleteProduct(${idx})" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getReviews() {
+            try { const s = localStorage.getItem('ls3d_reviews'); if(s) return JSON.parse(s); } catch(e){}
+            return [];
+        }
+
+        function deleteReview(idx) {
+            const revs = getReviews(); revs.splice(idx, 1);
+            localStorage.setItem('ls3d_reviews', JSON.stringify(revs));
+            renderAdminReviews();
+        }
+
+        function renderAdminReviews() {
+            const container = document.getElementById('admin-reviews-list');
+            if (!container) return;
+            const revs = getReviews();
+            if (revs.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessuna recensione.</p>`; return; }
+            container.innerHTML = revs.map((r, idx) => `
+                <div class="flex justify-between items-start bg-dark-bg p-4 rounded-xl border border-gray-800">
+                    <div>
+                        <p class="font-bold text-white">${r.author} <span class="text-brand-400">(${r.rating}/5 ★)</span> su ${r.productTitle}</p>
+                        <p class="text-gray-400 mt-1">${r.comment}</p>
+                    </div>
+                    <button type="button" onclick="deleteReview(${idx})" class="text-red-400 cursor-pointer">Elimina</button>
+                </div>
+            `).join('');
+        }
+
+        function initAdminDashboard() {
+            renderCategoryCheckboxes();
+            renderColorCheckboxes();
+            renderAdminProducts();
+            renderAdminReviews();
+            renderImagesPreview();
+            try { lucide.createIcons(); } catch(e){}
+        }
+    </script>
+</body>
+</html>
