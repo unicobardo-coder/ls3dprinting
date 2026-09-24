@@ -236,9 +236,58 @@
             return [];
         }
 
-        function saveProducts(prods) {
-            localStorage.setItem('ls3d_products', JSON.stringify(prods));
-            renderAdminProducts();
+        function saveProduct(e) {
+            e.preventDefault();
+            const index = document.getElementById('edit-product-index').value;
+            const title = document.getElementById('prod-title').value.trim();
+            
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
+            if (selectedCategories.length === 0) { alert("Seleziona almeno una categoria."); return; }
+
+            const selectedColors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(el => el.value);
+            if (selectedColors.length === 0) { alert("Seleziona almeno un colore disponibile."); return; }
+
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const salePrice = salePriceInput ? parseFloat(salePriceInput) : null;
+            const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
+            const shortDesc = document.getElementById('prod-desc').value.trim();
+            const longDesc = document.getElementById('prod-longdesc').value.trim();
+            const featured = document.getElementById('prod-featured').checked;
+
+            if (currentEditingImages.length === 0) { alert("Carica almeno un'immagine dal PC prima di salvare."); return; }
+
+            const productData = {
+                id: index !== '' ? getProducts()[index].id : Date.now(),
+                title, 
+                categories: selectedCategories, 
+                category: selectedCategories[0],
+                price, 
+                salePrice, 
+                shipping, 
+                shortDesc,
+                longDesc,
+                images: [...currentEditingImages], 
+                mainImageIndex: mainImageIdx,
+                colors: selectedColors, // SALVA I COLORI SCELTI
+                featured,
+                stlFileName: currentStlFileName || (index !== '' ? getProducts()[index].stlFileName : ''),
+                stlData: currentStlBase64 || (index !== '' ? getProducts()[index].stlData : '')
+            };
+
+            const products = getProducts();
+            if (index !== '') products[index] = productData;
+            else products.push(productData);
+
+            try {
+                localStorage.setItem('ls3d_products', JSON.stringify(products));
+                resetProductForm();
+                renderAdminProducts();
+                alert("Prodotto salvato con successo!");
+            } catch (err) {
+                alert("Memoria LocalStorage esaurita. Riduci il numero di foto.");
+                console.error(err);
+            }
         }
 
         // --- CARICAMENTO FOTO DA PC CON COMPRESSIONE SICURA ---
