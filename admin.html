@@ -365,16 +365,26 @@
         }
 
         // --- GESTIONE STL ---
+        let currentStlBase64 = '';
+        let currentStlFileName = '';
+
         function handleStlUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             currentStlFileName = file.name;
             document.getElementById('prod-stl-name').value = file.name;
-            document.getElementById('stl-file-label').innerText = "File STL: " + file.name;
-            document.getElementById('stl-viewer-container').classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentStlBase64 = e.target.result; // Salva i dati binari/base64 del file STL
+                document.getElementById('stl-file-label').innerText = "File STL: " + file.name;
+                document.getElementById('stl-viewer-container').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
         }
 
         function removeStlFile() {
+            currentStlBase64 = '';
             currentStlFileName = '';
             document.getElementById('prod-stl-input').value = '';
             document.getElementById('prod-stl-name').value = '';
