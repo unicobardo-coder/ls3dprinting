@@ -16,6 +16,8 @@
     <!-- Configurazioni e Colori Globali -->
     <script src="config.js"></script>
     <script src="colors_2.js"></script>
+    <!-- Gestione Traduzioni Centralizzata (i18n) -->
+    <script src="i18n.js"></script>
 
     <script>
         tailwind.config = {
@@ -40,14 +42,21 @@
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             <div class="flex items-center gap-4 sm:gap-6 font-mono text-xs">
-                <a href="chisiamo.html" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Chi Siamo</a>
-                <a href="catalog.html" class="text-gray-400 hover:text-white transition-colors">Catalogo 3D</a>
-                <select class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
+                <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Chi Siamo</a>
+                <a href="catalog.html" id="nav-catalogo" class="text-gray-400 hover:text-white transition-colors">Catalogo 3D</a>
+                
+                <!-- SELETTORE LINGUE (IT, EN, FR, ES, DE) -->
+                <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
                     <option value="it">IT</option>
                     <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
                 </select>
-                <a href="login.html" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Accedi / Registrati</a>
-                <a href="admin.html" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
+
+                <a href="login.html" id="nav-accedi" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Accedi / Registrati</a>
+                <a href="admin.html" id="nav-admin" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
+                
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -59,10 +68,10 @@
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-16">
         <!-- HERO SECTION -->
         <div class="text-center space-y-4 py-8">
-            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampa 3D di Alta Precisione</h1>
-            <p class="text-xs sm:text-sm font-mono text-gray-400 max-w-2xl mx-auto">Realizziamo i tuoi progetti con materiali avanzati e finiture curate nei minimi dettagli.</p>
+            <h1 id="hero-title" class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampa 3D di Alta Precisione</h1>
+            <p id="hero-subtitle" class="text-xs sm:text-sm font-mono text-gray-400 max-w-2xl mx-auto">Realizziamo i tuoi progetti con materiali avanzati e finiture curate nei minimi dettagli.</p>
             <div class="pt-4">
-                <a href="catalog.html" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg inline-flex items-center gap-2">
+                <a href="catalog.html" id="hero-cta" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg inline-flex items-center gap-2">
                     Esplora il Catalogo <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -72,10 +81,10 @@
         <div class="space-y-6">
             <div class="border-b border-gray-800 pb-4 flex justify-between items-end">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight font-mono">Prodotti in Vetrina</h2>
-                    <p class="text-xs font-mono text-gray-400">Clicca su un prodotto per visualizzarne i dettagli e l'anteprima 3D.</p>
+                    <h2 id="vetrina-title" class="text-xl sm:text-2xl font-bold text-white tracking-tight font-mono">Prodotti in Vetrina</h2>
+                    <p id="vetrina-desc" class="text-xs font-mono text-gray-400">Clicca su un prodotto per visualizzarne i dettagli e l'anteprima 3D.</p>
                 </div>
-                <a href="catalog.html" class="text-xs font-mono text-brand-400 hover:underline">Vedi tutti →</a>
+                <a href="catalog.html" id="vetrina-all" class="text-xs font-mono text-brand-400 hover:underline">Vedi tutti →</a>
             </div>
             <div id="featured-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
@@ -86,7 +95,7 @@
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
             <div class="space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h2 class="text-base font-bold text-white flex items-center gap-2 font-mono">
+                    <h2 id="cart-title" class="text-base font-bold text-white flex items-center gap-2 font-mono">
                         <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i> Il tuo Carrello
                     </h2>
                     <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -95,10 +104,10 @@
             </div>
             <div class="border-t border-gray-800 pt-4 space-y-4">
                 <div class="flex justify-between items-center font-bold text-sm">
-                    <span>Totale (incl. spedizione):</span>
+                    <span id="cart-total-label">Totale (incl. spedizione):</span>
                     <span id="cart-modal-total" class="text-brand-400">€0.00</span>
                 </div>
-                <button onclick="goToCheckout()" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                <button onclick="goToCheckout()" id="cart-checkout-btn" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                     Procedi al Checkout Sicuro <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -111,7 +120,7 @@
     </div>
 
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
-        LS3DMAKER © 2026 - Tutti i diritti riservati
+        <span id="footer-copy">LS3DMAKER © 2026 - Tutti i diritti riservati</span>
     </footer>
 
     <script>
@@ -201,7 +210,6 @@
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
             
-            // Gestione colori con pallini associati da filamentColors
             const availableColors = (typeof filamentColors !== 'undefined') ? filamentColors : [
                 { name: "Nero Opaco", code: "#111827" },
                 { name: "Bianco Perla", code: "#f3f4f6" },
@@ -211,8 +219,6 @@
             
             const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
             const colorOptions = productColors.map(colorName => {
-                const found = availableColors.find(c => c.name.toLowerCase() === colorName.toLowerCase());
-                const hex = found ? found.code : '#10b981';
                 return `<option value="${colorName}">● ${colorName}</option>`;
             }).join('');
 
@@ -250,7 +256,6 @@
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
 
-                        <!-- Visualizzatore STL -->
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
                                 <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${cleanStlFilename(p.stlFileName)})</p>
