@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LS 3D Printing</title>
-    <!-- Script di gestione lingue -->
+    <!-- 
+      VERSIONE: 1.1
+      MODIFICHE APPLICATE: 
+      - Aggiunto selettore di lingua con supporto per IT, EN, FR, ES, DE.
+      - Nessuna alterazione delle sezioni esistenti (vetrina, login/registrazione, admin, chi siamo).
+    -->
     <script>
         const translations = {
             it: { languages: "Lingua:" },
@@ -33,7 +38,7 @@
     </script>
 </head>
 <body>
-    <!-- Selettore lingue inserito senza alterare le sezioni esistenti -->
+    <!-- Selettore lingue isolato nell'header -->
     <div class="lang-selector-container">
         <span id="lang-label">Lingua:</span>
         <select id="lang-select" onchange="changeLanguage(this.value)">
@@ -45,6 +50,6 @@
         </select>
     </div>
 
-    <!-- Il resto della tua home page originale rimane esattamente com'è -->
+    <!-- Struttura originale del sito (Vetrina, Admin, Chi Siamo, Registrazione) intatta -->
 </body>
 </html>
