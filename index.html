@@ -38,12 +38,13 @@
     <!-- HEADER COMPLETO -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <!-- Logo originale protetto -->
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             
-            <!-- VOCI DI NAVIGAZIONE PRINCIPALI (Chi Siamo, Catalogo, Area Utenti, Admin) -->
-            <div class="flex items-center gap-3 sm:gap-5 font-mono text-xs">
+            <!-- VOCI DI NAVIGAZIONE DESKTOP -->
+            <div class="hidden md:flex items-center gap-5 font-mono text-xs">
                 <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-300 hover:text-white transition-colors">Chi Siamo</a>
                 <a href="catalog.html" id="nav-catalogo" class="text-gray-300 hover:text-white transition-colors">Catalogo 3D</a>
                 <a href="login.html" id="nav-accedi" class="text-gray-300 hover:text-white transition-colors">Accedi / Registrati</a>
@@ -58,12 +59,40 @@
                 </select>
 
                 <a href="admin.html" id="nav-admin" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
-                
+            </div>
+
+            <!-- CARRELLO & MENU MOBILE TOGGLE -->
+            <div class="flex items-center gap-3">
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </button>
+                
+                <!-- Pulsante Hamburger Mobile -->
+                <button onclick="toggleMobileMenu()" class="md:hidden bg-dark-surface border border-gray-800 p-3 rounded-xl text-gray-300 hover:text-white cursor-pointer">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
             </div>
+        </div>
+
+        <!-- SOTTOMENÙ MOBILE (A scomparsa) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-card border-b border-gray-800 px-6 py-4 space-y-4 font-mono text-xs shadow-2xl">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                <span class="text-gray-400">Seleziona Lingua:</span>
+                <select id="lang-selector-mobile" onchange="changeLanguage(this.value); syncLangSelects(this.value);" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
+                    <option value="it">IT</option>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
+                </select>
+            </div>
+            <nav class="flex flex-col space-y-3">
+                <a href="chisiamo.html" class="text-gray-300 hover:text-white transition-colors py-1">Chi Siamo</a>
+                <a href="catalog.html" class="text-gray-300 hover:text-white transition-colors py-1">Catalogo 3D</a>
+                <a href="login.html" class="text-gray-300 hover:text-white transition-colors py-1">Accedi / Registrati</a>
+                <a href="admin.html" class="text-brand-400 font-bold hover:text-brand-300 transition-colors py-1">Admin Panel</a>
+            </nav>
         </div>
     </header>
 
@@ -126,6 +155,18 @@
     </footer>
 
     <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function syncLangSelects(lang) {
+            const desktopSelect = document.getElementById('lang-selector');
+            const mobileSelect = document.getElementById('lang-selector-mobile');
+            if (desktopSelect) desktopSelect.value = lang;
+            if (mobileSelect) mobileSelect.value = lang;
+        }
+
         function getProducts() {
             try {
                 const saved = localStorage.getItem('ls3d_products');
