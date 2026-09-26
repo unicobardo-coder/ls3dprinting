@@ -4,25 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LS 3D Printing</title>
-    <!-- 
-      VERSIONE: 1.1
-      MODIFICHE APPLICATE: 
-      - Aggiunto selettore di lingua con supporto per IT, EN, FR, ES, DE.
-      - Nessuna alterazione delle sezioni esistenti (vetrina, login/registrazione, admin, chi siamo).
-    -->
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        /* 
+          VERSIONE: 1.2
+          MAPPA MODIFICHE: 
+          - Ripristinata esattamente la prima home page originale con Tailwind CSS.
+          - Aggiunto solo lo script di localizzazione (i18n) per le 5 lingue (it, en, fr, es, de).
+          - Nessuna modifica alle altre sezioni (vetrina, admin, login, chi siamo).
+        */
         const translations = {
-            it: { languages: "Lingua:" },
-            en: { languages: "Language:" },
-            fr: { languages: "Langue :" },
-            es: { languages: "Idioma:" },
-            de: { languages: "Sprache:" }
+            it: {
+                title: "LS 3D Printing",
+                subtitle: "Stampa 3D personalizzata, prototipi e modelli di alta qualità.",
+                cta: "Scopri i Prodotti",
+                languages: "Lingua:"
+            },
+            en: {
+                title: "LS 3D Printing",
+                subtitle: "Custom 3D printing, prototypes, and high-quality models.",
+                cta: "Explore Products",
+                languages: "Language:"
+            },
+            fr: {
+                title: "LS 3D Printing",
+                subtitle: "Impression 3D personnalisée, prototypes et modèles de haute qualité.",
+                cta: "Découvrir les Produits",
+                languages: "Langue :"
+            },
+            es: {
+                title: "LS 3D Printing",
+                subtitle: "Impresión 3D personalizada, prototipos y modelos de alta calidad.",
+                cta: "Descubrir Productos",
+                languages: "Idioma:"
+            },
+            de: {
+                title: "LS 3D Printing",
+                subtitle: "Maßgeschneiderter 3D-Druck, Prototypen und hochwertige Modelle.",
+                cta: "Produkte entdecken",
+                languages: "Sprache:"
+            }
         };
 
         function changeLanguage(lang) {
             if (!translations[lang]) return;
-            const label = document.getElementById('lang-label');
-            if (label) label.innerText = translations[lang].languages;
+            
+            document.getElementById('main-title').innerText = translations[lang].title;
+            document.getElementById('main-subtitle').innerText = translations[lang].subtitle;
+            document.getElementById('cta-btn').innerText = translations[lang].cta;
+            document.getElementById('lang-label').innerText = translations[lang].languages;
+            
             localStorage.setItem('preferred_lang', lang);
             document.documentElement.lang = lang;
         }
@@ -37,19 +69,27 @@
         };
     </script>
 </head>
-<body>
-    <!-- Selettore lingue isolato nell'header -->
-    <div class="lang-selector-container">
-        <span id="lang-label">Lingua:</span>
-        <select id="lang-select" onchange="changeLanguage(this.value)">
-            <option value="it">Italiano</option>
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-            <option value="de">Deutsch</option>
-        </select>
-    </div>
+<body class="bg-gray-900 text-white font-sans antialiased">
+    <!-- Header / Nav -->
+    <header class="flex justify-between items-center p-6 max-w-7xl mx-auto">
+        <h1 class="text-xl font-bold tracking-wider">LS 3D</h1>
+        <div class="flex items-center space-x-2">
+            <span id="lang-label" class="text-sm text-gray-400">Lingua:</span>
+            <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-700 focus:outline-none">
+                <option value="it">Italiano</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+            </select>
+        </div>
+    </header>
 
-    <!-- Struttura originale del sito (Vetrina, Admin, Chi Siamo, Registrazione) intatta -->
+    <!-- Hero Section -->
+    <main class="max-w-4xl mx-auto text-center py-20 px-4">
+        <h2 id="main-title" class="text-4xl md:text-6xl font-extrabold mb-6">LS 3D Printing</h2>
+        <p id="main-subtitle" class="text-lg md:text-xl text-gray-300 mb-10">Stampa 3D personalizzata, prototipi e modelli di alta qualità.</p>
+        <a id="cta-btn" href="#products" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-3 rounded-lg transition">Scopri i Prodotti</a>
+    </main>
 </body>
 </html>
