@@ -1,121 +1,128 @@
-const translations = {
+// i18n.js - Gestione multilingua centralizzata per LS3DMAKER (IT, EN, FR, ES, DE)
+const i18nTranslations = {
     it: {
-        navProducts: "Prodotti & Catalogo",
-        navAbout: "Chi Siamo",
-        navQuote: "Preventivi",
-        navAdmin: "Admin",
-        cartTitle: "Carrello",
-        cartTotal: "Totale Carrello:",
-        continueShopping: "Continua Shopping",
-        checkoutBtn: "Vai al Checkout →",
-        heroBadge: "Soluzioni di Stampa 3D & Prototipazione",
-        heroTitle1: "Trasforma le tue idee in",
-        heroTitle2: "Stampe 3D",
-        catalogTitle: "Cataloghi & Modelli",
-        
-        // Chi Siamo (Italiano)
-        aboutTitle: "Chi è LS3DMAKER",
-        aboutSubtitle: "Artigianato digitale, prototipazione rapida e passione per la stampa 3D a Bologna.",
-        aboutText1: "Siamo un laboratorio di manifattura digitale e prototipazione 3D con sede a Bologna. Trasformiamo idee, progetti e concept geometrici in oggetti reali, funzionali e di altissimo design.",
-        aboutText2: "Utilizziamo stampanti di ultima generazione e una vasta gamma di filamenti tecnici e decorativi per garantire precisione millimetrica e finiture impeccabili, sia per singoli pezzi unici che per piccole serie."
+        nav_chisiamo: "Chi Siamo",
+        nav_catalogo: "Catalogo 3D",
+        nav_accedi: "Accedi / Registrati",
+        nav_admin: "Admin",
+        hero_title: "Stampa 3D di Alta Precisione",
+        hero_subtitle: "Realizziamo i tuoi progetti con materiali avanzati e finiture curate nei minimi dettagli.",
+        hero_cta: "Esplora il Catalogo",
+        vetrina_title: "Prodotti in Vetrina",
+        vetrina_desc: "Clicca su un prodotto per visualizzarne i dettagli e l'anteprima 3D.",
+        vetrina_all: "Vedi tutti →",
+        cart_title: "Il tuo Carrello",
+        cart_total: "Totale (incl. spedizione):",
+        cart_checkout: "Procedi al Checkout Sicuro",
+        empty_cart: "Il carrello è vuoto.",
+        footer_copy: "LS3DMAKER © 2026 - Tutti i diritti riservati"
     },
     en: {
-        navProducts: "Products & Catalog",
-        navAbout: "About Us",
-        navQuote: "Quotes",
-        navAdmin: "Admin",
-        cartTitle: "Cart",
-        cartTotal: "Cart Total:",
-        continueShopping: "Continue Shopping",
-        checkoutBtn: "Proceed to Checkout →",
-        heroBadge: "3D Printing & Prototyping Solutions",
-        heroTitle1: "Turn your ideas into",
-        heroTitle2: "3D Prints",
-        catalogTitle: "Catalogs & Models",
-        
-        // Chi Siamo (Inglese)
-        aboutTitle: "About LS3DMAKER",
-        aboutSubtitle: "Digital craftsmanship, rapid prototyping, and a passion for 3D printing in Bologna.",
-        aboutText1: "We are a digital manufacturing and 3D prototyping laboratory based in Bologna. We transform ideas, designs, and geometric concepts into real, functional, and high-design objects.",
-        aboutText2: "We use state-of-the-art printers and a wide range of technical and decorative filaments to ensure millimeter precision and impeccable finishes, for both single unique pieces and small series."
+        nav_chisiamo: "About Us",
+        nav_catalogo: "3D Catalog",
+        nav_accedi: "Sign In / Register",
+        nav_admin: "Admin",
+        hero_title: "High-Precision 3D Printing",
+        hero_subtitle: "We bring your projects to life with advanced materials and meticulous finishes.",
+        hero_cta: "Explore Catalog",
+        vetrina_title: "Featured Products",
+        vetrina_desc: "Click on a product to view details and 3D preview.",
+        vetrina_all: "View all →",
+        cart_title: "Your Cart",
+        cart_total: "Total (incl. shipping):",
+        cart_checkout: "Proceed to Secure Checkout",
+        empty_cart: "Your cart is empty.",
+        footer_copy: "LS3DMAKER © 2026 - All rights reserved"
     },
     fr: {
-        navProducts: "Produits & Catalogue",
-        navAbout: "À Propos",
-        navQuote: "Devis",
-        navAdmin: "Admin",
-        cartTitle: "Panier",
-        cartTotal: "Total du panier:",
-        continueShopping: "Continuer les achats",
-        checkoutBtn: "Passer à la caisse →",
-        heroBadge: "Solutions d'Impression 3D & Prototypage",
-        heroTitle1: "Transformez vos idées en",
-        heroTitle2: "Impressions 3D",
-        catalogTitle: "Catalogues & Modèles",
-        
-        // Chi Siamo (Francese)
-        aboutTitle: "À propos de LS3DMAKER",
-        aboutSubtitle: "Artisanat numérique, prototypage rapide et passion pour l'impression 3D à Bologne.",
-        aboutText1: "Nous sommes un laboratoire de fabrication numérique et de prototypage 3D basé à Bologne. Nous transformons des idées, des conceptions et des concepts géométriques en objets réels, fonctionnels et haut de gamme.",
-        aboutText2: "Nous utilisons des imprimantes de pointe et une large gamme de filaments techniques et décoratifs pour garantir une précision millimétrique et des finitions impeccables."
+        nav_chisiamo: "À propos",
+        nav_catalogo: "Catalogue 3D",
+        nav_accedi: "Connexion / S'inscrire",
+        nav_admin: "Admin",
+        hero_title: "Impression 3D de Haute Précision",
+        hero_subtitle: "Nous donnons vie à vos projets avec des matériaux avancés et des finitions soignées.",
+        hero_cta: "Explorer le Catalogue",
+        vetrina_title: "Produits en Vedette",
+        vetrina_desc: "Cliquez sur un produit pour voir les détails et l'aperçu 3D.",
+        vetrina_all: "Voir tout →",
+        cart_title: "Votre Panier",
+        cart_total: "Total (frais de port incl.):",
+        cart_checkout: "Procéder au Paiement Sécurisé",
+        empty_cart: "Votre panier est vide.",
+        footer_copy: "LS3DMAKER © 2026 - Tous droits réservés"
     },
     es: {
-        navProducts: "Productos & Catálogo",
-        navAbout: "Quiénes Somos",
-        navQuote: "Presupuestos",
-        navAdmin: "Admin",
-        cartTitle: "Carrito",
-        cartTotal: "Total del Carrito:",
-        continueShopping: "Continuar Comprando",
-        checkoutBtn: "Ir al Pago →",
-        heroBadge: "Soluciones de Impresión 3D & Prototipado",
-        heroTitle1: "Transforma tus ideas en",
-        heroTitle2: "Impresiones 3D",
-        catalogTitle: "Catálogos & Modelos",
-        
-        // Chi Siamo (Spagnolo)
-        aboutTitle: "Quiénes Somos - LS3DMAKER",
-        aboutSubtitle: "Artesanía digital, creación rápida de prototipos y pasión por la impresión 3D en Bolonia.",
-        aboutText1: "Somos un laboratorio de fabricación digital y prototipado 3D con sede en Bolonia. Transformamos ideas, diseños y conceptos geométricos en objetos reales, funcionales y de gran diseño.",
-        aboutText2: "Utilizamos impresoras de última generación y una amplia gama de filamentos técnicos y decorativos para garantizar una precisión milimétrica y unos acabados impecables."
+        nav_chisiamo: "Quiénes Somos",
+        nav_catalogo: "Catálogo 3D",
+        nav_accedi: "Iniciar Sesión / Registrarse",
+        nav_admin: "Admin",
+        hero_title: "Impresión 3D de Alta Precisión",
+        hero_subtitle: "Hacemos realidad tus proyectos con materiales avanzados y acabados minuciosos.",
+        hero_cta: "Explorar Catálogo",
+        vetrina_title: "Productos Destacados",
+        vetrina_desc: "Haz clic en un producto para ver los detalles y la vista previa 3D.",
+        vetrina_all: "Ver todos →",
+        cart_title: "Tu Carrito",
+        cart_total: "Total (envío incl.):",
+        cart_checkout: "Proceder al Pago Seguro",
+        empty_cart: "El carrito está vacío.",
+        footer_copy: "LS3DMAKER © 2026 - Todos los derechos reservados"
     },
     de: {
-        navProducts: "Produkte & Katalog",
-        navAbout: "Über Uns",
-        navQuote: "Angebote",
-        navAdmin: "Admin",
-        cartTitle: "Warenkorb",
-        cartTotal: "Warenkorb-Gesamt:",
-        continueShopping: "Einkauf fortsetzen",
-        checkoutBtn: "Zur Kasse →",
-        heroBadge: "3D-Druck & Prototyping Lösungen",
-        heroTitle1: "Verwandeln Sie Ihre Ideen in",
-        heroTitle2: "3D-Drucke",
-        catalogTitle: "Kataloge & Modelle",
-        
-        // Chi Siamo (Tedesco)
-        aboutTitle: "Über LS3DMAKER",
-        aboutSubtitle: "Digitale Handwerkskunst, Rapid Prototyping und Leidenschaft für den 3D-Druck in Bologna.",
-        aboutText1: "Wir sind ein Labor für digitale Fertigung und 3D-Prototyping mit Sitz in Bologna. Wir verwandeln Ideen, Designs und geometrische Konzepte in reale, funktionale und formschöne Objekte.",
-        aboutText2: "Wir nutzen modernste Drucker und eine breite Palette technischer und dekorativer Filamente, um millimetergenaue Präzision und makellose Oberflächen zu gewährleisten."
+        nav_chisiamo: "Über uns",
+        nav_catalogo: "3D-Katalog",
+        nav_accedi: "Anmelden / Registrieren",
+        nav_admin: "Admin",
+        hero_title: "Hochpräziser 3D-Druck",
+        hero_subtitle: "Wir verwirklichen Ihre Projekte mit fortschrittlichen Materialien und sorgfältigen Oberflächen.",
+        hero_cta: "Katalog erkunden",
+        vetrina_title: "Empfohlene Produkte",
+        vetrina_desc: "Klicken Sie auf ein Produkt, um Details und 3D-Vorschau anzuzeigen.",
+        vetrina_all: "Alle anzeigen →",
+        cart_title: "Ihr Warenkorb",
+        cart_total: "Gesamt (inkl. Versand):",
+        cart_checkout: "Weiter zur sicheren Kasse",
+        empty_cart: "Ihr Warenkorb ist leer.",
+        footer_copy: "LS3DMAKER © 2026 - Alle Rechte vorbehalten"
     }
 };
 
-// Funzione di cambio lingua aggiornata per includere anche il Tedesco (de)
-function setLanguage(lang) {
-    localStorage.setItem('ls3d_lang', lang);
-    const elements = document.querySelectorAll('[data-i18n]');
-    elements.forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-            el.innerText = translations[lang][key];
-        }
-    });
-    const select = document.getElementById('lang-select');
-    if (select) select.value = lang;
+function changeLanguage(lang) {
+    if (!i18nTranslations[lang]) return;
+    const t = i18nTranslations[lang];
+
+    // Mappatura dinamica degli elementi della pagina
+    const elements = {
+        'nav-chisiamo': t.nav_chisiamo,
+        'nav-catalogo': t.nav_catalogo,
+        'nav-accedi': t.nav_accedi,
+        'nav-admin': t.nav_admin,
+        'hero-title': t.hero_title,
+        'hero-subtitle': t.hero_subtitle,
+        'hero-cta': t.hero_cta,
+        'vetrina-title': t.vetrina_title,
+        'vetrina-desc': t.vetrina_desc,
+        'vetrina-all': t.vetrina_all,
+        'cart-title': t.cart_title,
+        'cart-total-label': t.cart_total,
+        'cart-checkout-btn': t.cart_checkout,
+        'footer-copy': t.footer_copy
+    };
+
+    for (const [id, text] of Object.entries(elements)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+    }
+
+    localStorage.setItem('preferred_lang', lang);
+    document.documentElement.lang = lang;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const savedLang = localStorage.getItem('ls3d_lang') || 'it';
-    setLanguage(savedLang);
+window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('preferred_lang') || 'it';
+    const selectElement = document.getElementById('lang-selector');
+    if (selectElement) {
+        selectElement.value = savedLang;
+    }
+    changeLanguage(savedLang);
 });
