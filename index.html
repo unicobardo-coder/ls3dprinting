@@ -41,9 +41,12 @@
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            <div class="flex items-center gap-4 sm:gap-6 font-mono text-xs">
-                <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Chi Siamo</a>
-                <a href="catalog.html" id="nav-catalogo" class="text-gray-400 hover:text-white transition-colors">Catalogo 3D</a>
+            
+            <!-- VOCI DI NAVIGAZIONE PRINCIPALI (Chi Siamo, Catalogo, Area Utenti, Admin) -->
+            <div class="flex items-center gap-3 sm:gap-5 font-mono text-xs">
+                <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-300 hover:text-white transition-colors">Chi Siamo</a>
+                <a href="catalog.html" id="nav-catalogo" class="text-gray-300 hover:text-white transition-colors">Catalogo 3D</a>
+                <a href="login.html" id="nav-accedi" class="text-gray-300 hover:text-white transition-colors">Accedi / Registrati</a>
                 
                 <!-- SELETTORE LINGUE (IT, EN, FR, ES, DE) -->
                 <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
@@ -54,7 +57,6 @@
                     <option value="de">DE</option>
                 </select>
 
-                <a href="login.html" id="nav-accedi" class="text-gray-400 hover:text-white transition-colors hidden sm:inline-block">Accedi / Registrati</a>
                 <a href="admin.html" id="nav-admin" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
                 
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
