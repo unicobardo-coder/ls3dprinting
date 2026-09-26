@@ -9,34 +9,36 @@
     <!-- Configurazione centralizzata delle lingue -->
     <script src="i18n.js"></script>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased">
+<body class="bg-gray-900 text-white font-sans min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-black">
     
-    <!-- HEADER / NAV -->
-    <header class="flex justify-between items-center p-6 max-w-7xl mx-auto border-b border-gray-800">
-        <!-- Logo -->
-        <div class="flex items-center space-x-3">
-            <img src="logo.png" alt="LS 3D Printing Logo" class="h-10 w-auto">
-            <span class="text-xl font-bold tracking-wider">LS 3D</span>
-        </div>
+    <!-- HEADER COMPLETO (Ripreso dal commit) -->
+    <header class="sticky top-0 z-40 bg-gray-900/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            
+            <!-- Logo e Link Home -->
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
 
-        <!-- Navigazione interna -->
-        <nav class="hidden md:flex space-x-6 text-sm text-gray-300">
-            <a href="#vetrina" class="hover:text-white transition">Vetrina</a>
-            <a href="#chi-siamo" class="hover:text-white transition">Chi Siamo</a>
-            <a href="#utenti" class="hover:text-white transition">Area Utenti</a>
-            <a href="#admin" class="hover:text-white transition">Admin</a>
-        </nav>
+            <!-- Navigazione rapida -->
+            <nav class="hidden md:flex items-center gap-6 text-sm text-gray-300 font-mono">
+                <a href="#vetrina" class="hover:text-white transition">Vetrina</a>
+                <a href="#chi-siamo" class="hover:text-white transition">Chi Siamo</a>
+                <a href="#utenti" class="hover:text-white transition">Area Utenti</a>
+                <a href="#admin" class="hover:text-amber-500 transition">Admin</a>
+            </nav>
 
-        <!-- Selettore Lingue -->
-        <div class="flex items-center space-x-2">
-            <span id="lang-label" class="text-sm text-gray-400">Lingua:</span>
-            <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-700 focus:outline-none">
-                <option value="it">Italiano</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-            </select>
+            <!-- Selettore Lingue -->
+            <div class="flex items-center gap-2 sm:gap-4 font-mono text-xs">
+                <span id="lang-label" class="text-gray-400">Lingua:</span>
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-700 focus:outline-none">
+                    <option value="it">Italiano</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                    <option value="de">Deutsch</option>
+                </select>
+            </div>
         </div>
     </header>
 
@@ -48,40 +50,39 @@
     </main>
 
     <!-- SEZIONE VETRINA -->
-    <section id="vetrina" class="py-16 max-w-7xl mx-auto px-6 border-t border-gray-800">
+    <section id="vetrina" class="py-16 max-w-7xl mx-auto px-6 border-t border-gray-800 w-full">
         <h3 class="text-2xl font-bold mb-8 text-center">Vetrina Prodotti</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <div class="h-48 bg-gray-700 rounded mb-4 flex items-center justify-center text-gray-500">Anteprima Prodotto 1</div>
+                <div class="h-48 bg-gray-700 rounded mb-4 flex items-center justify-center text-gray-500">Prodotto 1</div>
                 <h4 class="font-bold text-lg mb-2">Modello personalizzato 3D</h4>
-                <p class="text-sm text-gray-400 mb-4">Prototipi di alta precisione stampati in FDM.</p>
+                <p class="text-sm text-gray-400 mb-4">Prototipi di alta precisione.</p>
             </div>
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <div class="h-48 bg-gray-700 rounded mb-4 flex items-center justify-center text-gray-500">Anteprima Prodotto 2</div>
+                <div class="h-48 bg-gray-700 rounded mb-4 flex items-center justify-center text-gray-500">Prodotto 2</div>
                 <h4 class="font-bold text-lg mb-2">Componenti Meccanici</h4>
-                <p class="text-sm text-gray-400 mb-4">Componenti robusti su misura per ogni esigenza.</p>
+                <p class="text-sm text-gray-400 mb-4">Componenti robusti su misura.</p>
             </div>
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <div class="h-48 bg-gray-700 rounded mb-4 flex items-center justify-center text-gray-500">Anteprima Prodotto 3</div>
+                <div class="h-48 bg-gray-700 rounded mb-4 flex items-center justify-center text-gray-500">Prodotto 3</div>
                 <h4 class="font-bold text-lg mb-2">Gadget & Design</h4>
-                <p class="text-sm text-gray-400 mb-4">Oggettistica di design e gadget unici.</p>
+                <p class="text-sm text-gray-400 mb-4">Oggettistica di design unica.</p>
             </div>
         </div>
     </section>
 
     <!-- SEZIONE CHI SIAMO -->
-    <section id="chi-siamo" class="py-16 max-w-4xl mx-auto px-6 border-t border-gray-800 text-center">
+    <section id="chi-siamo" class="py-16 max-w-4xl mx-auto px-6 border-t border-gray-800 text-center w-full">
         <h3 class="text-2xl font-bold mb-6">Chi Siamo</h3>
         <p class="text-gray-300 leading-relaxed">
-            LS 3D Printing nasce dalla passione per la manifattura additiva e l'ingegneria di precisione. Realizziamo prototipi funzionali e prodotti finiti di alta qualità grazie a tecnologie di stampa 3D avanzate e un rigoroso controllo di qualità.
+            LS 3D Printing nasce dalla passione per la manifattura additiva e l'ingegneria di precisione.
         </p>
     </section>
 
-    <!-- SEZIONE UTENTI (REGISTRAZIONE / LOGIN) -->
-    <section id="utenti" class="py-16 max-w-md mx-auto px-6 border-t border-gray-800">
+    <!-- SEZIONE UTENTI -->
+    <section id="utenti" class="py-16 max-w-md mx-auto px-6 border-t border-gray-800 w-full">
         <h3 class="text-2xl font-bold mb-6 text-center">Area Utenti</h3>
         <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 space-y-4">
-            <h4 class="font-semibold text-center">Accedi o Registrati</h4>
             <input type="email" placeholder="Email" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none">
             <input type="password" placeholder="Password" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none">
             <button class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 rounded transition">Entra</button>
@@ -89,16 +90,16 @@
     </section>
 
     <!-- SEZIONE ADMIN -->
-    <section id="admin" class="py-16 max-w-4xl mx-auto px-6 border-t border-gray-800">
+    <section id="admin" class="py-16 max-w-4xl mx-auto px-6 border-t border-gray-800 w-full">
         <h3 class="text-2xl font-bold mb-6 text-center text-amber-500">Pannello Admin</h3>
         <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
-            <p class="text-sm text-gray-400 mb-4">Area riservata alla gestione degli ordini, dei prodotti in vetrina e dei contenuti del sito.</p>
+            <p class="text-sm text-gray-400 mb-4">Area riservata alla gestione.</p>
             <button class="bg-amber-600 hover:bg-amber-500 text-white font-medium px-4 py-2 rounded text-sm transition">Accesso Admin</button>
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="text-center py-8 text-sm text-gray-500 border-t border-gray-800">
+    <footer class="text-center py-8 text-sm text-gray-500 border-t border-gray-800 w-full">
         &copy; 2026 LS 3D Printing. Tutti i diritti riservati.
     </footer>
 
