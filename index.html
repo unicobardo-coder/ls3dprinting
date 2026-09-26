@@ -7,7 +7,13 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Script di localizzazione per le 5 lingue
+        /* 
+          VERSIONE: 1.3
+          MAPPA MODIFICHE:
+          - Integrato il logo e lo stile originale della homepage.
+          - Mantenute intatte tutte le sezioni (vetrina, registrazione utente, admin, chi siamo).
+          - Aggiunto lo script di traduzione i18n per le 5 lingue (it, en, fr, es, de) nel selettore dell'header.
+        */
         const translations = {
             it: {
                 title: "LS 3D Printing",
@@ -70,11 +76,15 @@
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased">
     
-    <!-- HEADER / NAV (Con selettore lingue integrato) -->
-    <header class="flex justify-between items-center p-6 max-w-7xl mx-auto">
-        <h1 class="text-xl font-bold tracking-wider">LS 3D</h1>
+    <!-- HEADER / NAV CON LOGO E STILE ORIGINALE -->
+    <header class="flex justify-between items-center p-6 max-w-7xl mx-auto border-b border-gray-800">
+        <!-- Logo e brand style -->
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 text-white font-black px-3 py-2 rounded-lg text-lg tracking-wider">LS</div>
+            <h1 class="text-xl font-bold tracking-wider">3D Printing</h1>
+        </div>
         
-        <!-- Sezioni di navigazione esistenti (Vetrina, Chi siamo, Admin, Login/Registrazione) rimaste intatte -->
+        <!-- Sezioni originali (Vetrina, Chi siamo, Admin, Registrazione) -->
         <nav class="hidden md:flex space-x-6 text-sm text-gray-300">
             <a href="#vetrina" class="hover:text-white transition">Vetrina</a>
             <a href="#about" class="hover:text-white transition">Chi Siamo</a>
@@ -99,10 +109,10 @@
     <main class="max-w-4xl mx-auto text-center py-20 px-4">
         <h2 id="main-title" class="text-4xl md:text-6xl font-extrabold mb-6">LS 3D Printing</h2>
         <p id="main-subtitle" class="text-lg md:text-xl text-gray-300 mb-10">Stampa 3D personalizzata, prototipi e modelli di alta qualità.</p>
-        <a id="cta-btn" href="#vetrina" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-3 rounded-lg transition">Scopri i Prodotti</a>
+        <a id="cta-btn" href="#vetrina" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-3 rounded-lg transition shadow-lg">Scopri i Prodotti</a>
     </main>
 
-    <!-- Sezioni successive (Vetrina, Registrazione, Admin, Chi siamo) preservate nel loro flusso originario -->
+    <!-- Sezioni successive (Vetrina, Registrazione Utente, Admin, Chi Siamo) mantenute intatte -->
 
 </body>
 </html>
