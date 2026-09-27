@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin - Prodotti | LS3Dmaker</title>
+    <title>Pannello Admin - LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -32,6 +32,7 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
+    <!-- LOGIN MODALE ADMIN -->
     <div id="auth-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl font-mono text-xs">
             <div class="text-center space-y-2">
@@ -49,30 +50,32 @@
         </div>
     </div>
 
+    <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85 hidden" id="admin-header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             <div class="flex items-center gap-4">
-                <a href="management.html" class="px-4 py-2 bg-dark-surface hover:bg-gray-800 text-brand-400 rounded-xl text-xs font-mono border border-gray-800 transition-all">⚙️ Gestione (Colori, Categorie)</a>
                 <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo</a>
                 <button onclick="logoutAdmin()" class="text-xs font-mono text-red-400 hover:text-red-300 underline cursor-pointer">Esci</button>
             </div>
         </div>
     </header>
 
+    <!-- MAIN CONTENT -->
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12 hidden" id="admin-main-content">
         <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo Prodotti & Modelli 3D</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Controllo totale e sincronizzazione in tempo reale con Supabase.</p>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di prodotti, utenti registrati e fatture.</p>
             </div>
             <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
             </button>
         </div>
 
+        <!-- SEZIONE PRODOTTI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
@@ -139,9 +142,15 @@
                     <div id="prod-colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2"></div>
                 </div>
 
-                <div class="flex items-center gap-3 pt-2">
-                    <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
-                    <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
+                        <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="prod-combined-shipping" class="w-5 h-5 accent-brand-500 rounded cursor-pointer" checked>
+                        <label for="prod-combined-shipping" class="text-white font-bold cursor-pointer">Abilita Spedizione Combinata (+€2.00 su articoli extra)</label>
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
@@ -156,11 +165,67 @@
             </div>
         </section>
 
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
-            <h2 class="text-lg font-bold text-white font-mono">Gestione Recensioni / Commenti</h2>
-            <div id="admin-reviews-list" class="space-y-3 font-mono text-xs"></div>
+        <!-- SEZIONE UTENTI REGISTRATI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Controllo Utenti Registrati</h2>
+            <div id="admin-users-list" class="space-y-3"></div>
+        </section>
+
+        <!-- SEZIONE FATTURE E ORDINI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Ordini & Fatture</h2>
+            <div id="admin-orders-list" class="space-y-3"></div>
+        </section>
+
+        <!-- SEZIONE RECENSIONI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Recensioni / Commenti</h2>
+            <div id="admin-reviews-list" class="space-y-3"></div>
         </section>
     </main>
+
+    <!-- MODALE ANTEPRIMA FATTURA -->
+    <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 font-sans">
+        <div class="bg-white text-gray-900 w-full max-w-2xl rounded-2xl p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start border-b pb-4">
+                <div>
+                    <h3 class="text-xl font-extrabold" id="inv-modal-number">Fattura N. 2026/01</h3>
+                    <p class="text-xs text-gray-500" id="inv-modal-date">Data: 27/09/2026</p>
+                </div>
+                <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-gray-700 font-bold text-lg cursor-pointer">✕</button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                    <p class="font-bold text-gray-700">Cedente:</p>
+                    <p>LS3DMAKER di Luigi Schiavello</p>
+                    <p>Bologna, Italia</p>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-700">Cliente:</p>
+                    <p id="inv-modal-client">-</p>
+                    <p id="inv-modal-email" class="text-gray-500">-</p>
+                    <p id="inv-modal-address" class="text-gray-500">-</p>
+                </div>
+            </div>
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b text-gray-500 text-left">
+                        <th class="py-2">Prodotto</th>
+                        <th class="py-2 text-center">Qt.</th>
+                        <th class="py-2 text-right">Totale</th>
+                    </tr>
+                </thead>
+                <tbody id="inv-modal-items"></tbody>
+            </table>
+            <div class="flex justify-between items-center border-t pt-4 font-bold text-sm">
+                <span>Totale Documento:</span>
+                <span id="inv-modal-total" class="text-emerald-600">€0.00</span>
+            </div>
+            <div class="text-center pt-2">
+                <button onclick="closeInvoiceModal()" class="px-6 py-2 bg-gray-900 text-white rounded-xl text-xs font-mono cursor-pointer">Chiudi Anteprima</button>
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
         LS3DMAKER © 2026 - Admin Panel
@@ -176,7 +241,8 @@
                 price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
                 shipping: Number(r.shipping), shortDesc: r.short_desc, longDesc: r.long_desc,
                 images: r.images || [], mainImageIndex: r.main_image_index || 0, colors: r.colors || [],
-                featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url };
+                featured: r.featured, combinedShipping: r.combined_shipping !== false,
+                stlFileName: r.stl_file_name, stlUrl: r.stl_url };
         }
         function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
 
@@ -197,8 +263,10 @@
                 await fetchAll();
                 renderCategoryCheckboxes();
                 renderAdminProducts();
+                renderAdminUsers();
+                renderAdminOrders();
                 renderAdminReviews();
-                alert("Sincronizzazione completata: dati aggiornati da Supabase!");
+                alert("Sincronizzazione completata con successo!");
             } catch (e) {
                 console.error(e);
                 alert("Errore di sincronizzazione: " + e.message);
@@ -227,8 +295,7 @@
 
         let currentEditingImages = [];
         let mainImageIdx = 0;
-        let currentStlFile = null, currentStlUrl = '';
-        let currentStlFileName = '';
+        let currentStlFile = null, currentStlUrl = '', currentStlFileName = '';
 
         function getBaseCategories() {
             try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
@@ -376,6 +443,7 @@
                     short_desc: document.getElementById('prod-desc').value.trim(),
                     long_desc: document.getElementById('prod-longdesc').value.trim(),
                     featured: document.getElementById('prod-featured').checked,
+                    combined_shipping: document.getElementById('prod-combined-shipping').checked,
                     stl_file_name: stlUrl ? currentStlFileName : '', stl_url: stlUrl || ''
                 };
                 
@@ -408,6 +476,7 @@
             document.getElementById('prod-desc').value = p.shortDesc || '';
             document.getElementById('prod-longdesc').value = p.longDesc || '';
             document.getElementById('prod-featured').checked = p.featured || false;
+            document.getElementById('prod-combined-shipping').checked = p.combinedShipping !== false;
             currentEditingImages = [...(p.images || [])];
             mainImageIdx = p.mainImageIndex || 0;
             renderImagesPreview();
@@ -469,7 +538,7 @@
                             <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150'">
                             <div>
                                 <p class="font-bold text-white">${esc(p.title)} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
-                                <p class="text-[10px] text-gray-400">Cat: ${esc(catsText)} | Prezzo: €${p.price} | Foto: ${(p.images || []).length}</p>
+                                <p class="text-[10px] text-gray-400">Cat: ${esc(catsText)} | Prezzo: €${p.price} | Sped. Comb.: ${p.combinedShipping !== false ? 'Sì' : 'No'}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -479,6 +548,134 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        // --- GESTIONE UTENTI REGISTRATI ---
+        function renderAdminUsers() {
+            const container = document.getElementById('admin-users-list');
+            if (!container) return;
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch (e) {}
+
+            if (users.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Nessun utente registrato nel browser.</p>`;
+                return;
+            }
+
+            container.innerHTML = users.map((u, idx) => `
+                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                    <div>
+                        <p class="font-bold text-white">${esc(u.username || u.name)}</p>
+                        <p class="text-[10px] text-gray-400">Email: ${esc(u.email)}</p>
+                    </div>
+                    <button type="button" onclick="deleteUser(${idx})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina Utente</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteUser(idx) {
+            if (!confirm("Vuoi eliminare questo utente registrato?")) return;
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch (e) {}
+            users.splice(idx, 1);
+            localStorage.setItem('ls3d_users', JSON.stringify(users));
+            renderAdminUsers();
+        }
+
+        // --- GESTIONE FATTURE E ORDINI ---
+        function renderAdminOrders() {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+            const container = document.getElementById('admin-orders-list');
+            if (!container) return;
+            
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Nessun ordine o fattura registrata.</p>`;
+                return;
+            }
+            
+            container.innerHTML = orders.map((o, idx) => `
+                <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
+                    <div class="flex justify-between text-white font-bold">
+                        <span>Fattura n. ${esc(o.number)} (${esc(o.id)})</span>
+                        <span class="text-brand-400">€${Number(o.total || 0).toFixed(2)}</span>
+                    </div>
+                    <p class="text-gray-400">Cliente: ${esc(o.name)} (${esc(o.email)}) - Pagamento: <strong class="text-white">${esc(o.gateway)}</strong></p>
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
+                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg cursor-pointer">📥 XML AdE</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewInvoiceModal(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) {}
+            const o = orders[idx];
+            if (!o) return;
+
+            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
+            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
+            document.getElementById('inv-modal-client').innerText = o.name;
+            document.getElementById('inv-modal-email').innerText = o.email;
+            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
+            document.getElementById('inv-modal-total').innerText = `€${Number(o.total || 0).toFixed(2)}`;
+
+            const itemsContainer = document.getElementById('inv-modal-items');
+            itemsContainer.innerHTML = (o.items || []).map(item => `
+                <tr class="border-b border-gray-100">
+                    <td class="py-2">
+                        <p class="font-bold">${esc(item.title)}</p>
+                        <p class="text-[10px] text-gray-500">Colore: ${esc(item.color || 'Standard')}</p>
+                    </td>
+                    <td class="py-2 text-center">${item.quantity || item.qty || 1}</td>
+                    <td class="py-2 text-right font-mono">€${(((Number(item.price) || 0) * (Number(item.quantity || item.qty) || 1))).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoice-modal').classList.add('hidden');
+        }
+
+        function downloadXmlAdmin(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) {}
+            const o = orders[idx];
+            if (!o) return;
+
+            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<FatturaElettronica versione="FPR12">
+    <FatturaElettronicaHeader>
+        <DatiTrasmissione>
+            <IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdTrasmittente>
+            <ProgressivoInvio>${o.id}</ProgressivoInvio>
+            <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+        </DatiTrasmissione>
+        <CedentePrestatore>
+            <DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3Dmaker</Denominazione></Anagrafica></DatiAnagrafici>
+        </CedentePrestatore>
+        <CessionarioCommittente>
+            <DatiAnagrafici><Anagrafica><Denominazione>${esc(o.name)}</Denominazione></Anagrafica></DatiAnagrafici>
+        </CessionarioCommittente>
+    </FatturaElettronicaHeader>
+    <FatturaElettronicaBody>
+        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${o.date}</Data><Numero>${o.number}</Numero><ImportoTotaleDocumento>${o.total.toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
+    </FatturaElettronicaBody>
+</FatturaElettronica>`;
+
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Fattura_${o.number.replace('/', '_')}.xml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function getReviews() { return reviewsCache; }
@@ -494,23 +691,25 @@
             const container = document.getElementById('admin-reviews-list');
             if (!container) return;
             const revs = getReviews();
-            if (revs.length === 0) { container.innerHTML = `<p class="text-gray-500 text-xs">Nessuna recensione.</p>`; return; }
+            if (revs.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessuna recensione.</p>`; return; }
             container.innerHTML = revs.map((r) => `
                 <div class="flex justify-between items-start bg-dark-bg p-4 rounded-xl border border-gray-800">
                     <div>
                         <p class="font-bold text-white">${esc(r.author)} <span class="text-brand-400">(${r.rating}/5 ★)</span> su ${esc(r.productTitle)}</p>
                         <p class="text-gray-400 mt-1">${esc(r.comment)}</p>
                     </div>
-                    <button type="button" onclick="deleteReview(${r.id})" class="text-red-400 hover:text-red-300 cursor-pointer text-xs font-mono">Elimina</button>
+                    <button type="button" onclick="deleteReview(${r.id})" class="text-red-400 hover:text-red-300 cursor-pointer">Elimina</button>
                 </div>
             `).join('');
         }
 
         async function initAdminDashboard() {
-            try { await fetchAll(); } catch (e) { console.error(e); alert("Errore nel caricamento dei dati: " + e.message); }
+            try { await fetchAll(); } catch (e) { console.error(e); alert("Errore nel caricamento: " + e.message); }
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             renderAdminProducts();
+            renderAdminUsers();
+            renderAdminOrders();
             renderAdminReviews();
             renderImagesPreview();
             try { lucide.createIcons(); } catch(e){}
