@@ -7,16 +7,14 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Three.js e STLLoader per l'anteprima 3D -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Configurazioni e Colori Globali -->
     <script src="config.js"></script>
     <script src="colors_2.js"></script>
-    <!-- Gestione Traduzioni Centralizzata (i18n) -->
     <script src="i18n.js"></script>
 
     <script>
@@ -35,21 +33,17 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- HEADER COMPLETO -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
-            <!-- Logo originale protetto -->
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             
-            <!-- VOCI DI NAVIGAZIONE DESKTOP -->
             <div class="hidden md:flex items-center gap-5 font-mono text-xs">
                 <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-300 hover:text-white transition-colors">Chi Siamo</a>
                 <a href="catalog.html" id="nav-catalogo" class="text-gray-300 hover:text-white transition-colors">Catalogo 3D</a>
                 <a href="login.html" id="nav-accedi" class="text-gray-300 hover:text-white transition-colors">Accedi / Registrati</a>
                 
-                <!-- SELETTORE LINGUE (IT, EN, FR, ES, DE) -->
                 <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
                     <option value="it">IT</option>
                     <option value="en">EN</option>
@@ -61,25 +55,21 @@
                 <a href="admin.html" id="nav-admin" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
             </div>
 
-            <!-- CARRELLO & MENU MOBILE TOGGLE -->
             <div class="flex items-center gap-3">
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </button>
-                
-                <!-- Pulsante Hamburger Mobile -->
                 <button onclick="toggleMobileMenu()" class="md:hidden bg-dark-surface border border-gray-800 p-3 rounded-xl text-gray-300 hover:text-white cursor-pointer">
                     <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
 
-        <!-- SOTTOMENÙ MOBILE (A scomparsa) -->
         <div id="mobile-menu" class="hidden md:hidden bg-dark-card border-b border-gray-800 px-6 py-4 space-y-4 font-mono text-xs shadow-2xl">
             <div class="flex items-center justify-between pb-2 border-b border-gray-800">
                 <span class="text-gray-400">Seleziona Lingua:</span>
-                <select id="lang-selector-mobile" onchange="changeLanguage(this.value); syncLangSelects(this.value);" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
+                <select id="lang-selector-mobile" onchange="changeLanguage(this.value);" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
                     <option value="it">IT</option>
                     <option value="en">EN</option>
                     <option value="fr">FR</option>
@@ -97,7 +87,6 @@
     </header>
 
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-16">
-        <!-- HERO SECTION -->
         <div class="text-center space-y-4 py-8">
             <h1 id="hero-title" class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampa 3D di Alta Precisione</h1>
             <p id="hero-subtitle" class="text-xs sm:text-sm font-mono text-gray-400 max-w-2xl mx-auto">Realizziamo i tuoi progetti con materiali avanzati e finiture curate nei minimi dettagli.</p>
@@ -108,7 +97,6 @@
             </div>
         </div>
 
-        <!-- VETRINA PRODOTTI IN EVIDENZA -->
         <div class="space-y-6">
             <div class="border-b border-gray-800 pb-4 flex justify-between items-end">
                 <div>
@@ -121,7 +109,6 @@
         </div>
     </main>
 
-    <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex justify-end">
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
             <div class="space-y-6">
@@ -145,7 +132,6 @@
         </div>
     </div>
 
-    <!-- MODALE DETTAGLIO PRODOTTO & RECENSIONI -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
     </div>
@@ -155,33 +141,31 @@
     </footer>
 
     <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
+        const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
+        let productsCache = [], reviewsCache = [];
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        function mapProduct(r) {
+            return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
+                price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
+                shipping: Number(r.shipping), shortDesc: r.short_desc, longDesc: r.long_desc,
+                images: r.images || [], mainImageIndex: r.main_image_index || 0, colors: r.colors || [],
+                featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url };
+        }
+        function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
+
+        async function fetchAll() {
+            const [p, r] = await Promise.all([
+                lsSb.from('products').select('*').order('created_at', { ascending: false }),
+                lsSb.from('reviews').select('*').order('created_at', { ascending: false })
+            ]);
+            if (p.error) throw p.error;
+            productsCache = (p.data || []).map(mapProduct);
+            reviewsCache = (r.data || []).map(mapReview);
         }
 
-        function syncLangSelects(lang) {
-            const desktopSelect = document.getElementById('lang-selector');
-            const mobileSelect = document.getElementById('lang-selector-mobile');
-            if (desktopSelect) desktopSelect.value = lang;
-            if (mobileSelect) mobileSelect.value = lang;
-        }
-
-        function getProducts() {
-            try {
-                const saved = localStorage.getItem('ls3d_products');
-                if (saved) return JSON.parse(saved);
-            } catch (e) {}
-            return [];
-        }
-
-        function getReviews() {
-            try {
-                const saved = localStorage.getItem('ls3d_reviews');
-                if (saved) return JSON.parse(saved);
-            } catch (e) {}
-            return [];
-        }
+        function getProducts() { return productsCache; }
+        function getReviews() { return reviewsCache; }
 
         function getCurrentUser() {
             try {
@@ -189,12 +173,6 @@
                 if (user) return JSON.parse(user);
             } catch (e) {}
             return null;
-        }
-
-        function cleanStlFilename(filename) {
-            if (!filename) return '';
-            if (filename.length > 25) return "Modello 3D (.stl)";
-            return filename;
         }
 
         let cart = [];
@@ -205,7 +183,9 @@
             const grid = document.getElementById('featured-products-grid');
             if (!grid) return;
             const products = getProducts();
-            const featuredProducts = products.filter(p => p.featured);
+            
+            // Vetrina rigorosa basata sul flag featured impostato nell'admin
+            const featuredProducts = products.filter(p => p.featured === true);
             const displayList = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 3);
 
             if (displayList.length === 0) {
@@ -227,13 +207,13 @@
                 return `
                     <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all cursor-pointer" onclick="openProductModal(${p.id})">
                         <div class="h-48 overflow-hidden bg-dark-bg relative">
-                            <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
                             ${p.stlFileName ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
                         </div>
                         <div class="p-5 space-y-2">
-                            <h3 class="font-bold text-white text-base">${p.title}</h3>
-                            <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${p.shortDesc || ''}</p>
+                            <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${esc(p.shortDesc || '')}</p>
                         </div>
                         <div class="p-5 pt-0 flex items-center justify-between border-t border-gray-800/60 mt-4">
                             <div>${priceHtml}</div>
@@ -253,24 +233,15 @@
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
             
-            const availableColors = (typeof filamentColors !== 'undefined') ? filamentColors : [
-                { name: "Nero Opaco", code: "#111827" },
-                { name: "Bianco Perla", code: "#f3f4f6" },
-                { name: "Grigio Techno", code: "#6b7280" },
-                { name: "Verde Brand", code: "#10b981" }
-            ];
-            
             const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
-            const colorOptions = productColors.map(colorName => {
-                return `<option value="${colorName}">● ${colorName}</option>`;
-            }).join('');
+            const colorOptions = productColors.map(colorName => `<option value="${esc(colorName)}">● ${esc(colorName)}</option>`).join('');
 
             const reviews = getReviews().filter(r => r.productTitle === p.title);
             const currentUser = getCurrentUser();
 
             let reviewFormHtml = currentUser ? `
                 <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
-                    <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${currentUser.name}</span></p>
+                    <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${esc(currentUser.name || currentUser.username)}</span></p>
                     <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none">
                         <option value="5">5 Stelle - Eccellente</option>
                         <option value="4">4 Stelle - Molto buono</option>
@@ -283,13 +254,13 @@
                 </div>
             ` : `
                 <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 text-center space-y-2 font-mono">
-                    <p class="text-xs text-gray-400">Effettua un ordine per poter lasciare recensioni.</p>
+                    <p class="text-xs text-gray-400">Effettua l'accesso per poter lasciare recensioni.</p>
                 </div>
             `;
 
             content.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h2 class="text-lg font-bold text-white font-mono">${p.title}</h2>
+                    <h2 class="text-lg font-bold text-white font-mono">${esc(p.title)}</h2>
                     <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -298,10 +269,9 @@
                         <div class="flex gap-2 overflow-x-auto pb-2">
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
-
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
-                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${cleanStlFilename(p.stlFileName)})</p>
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
                                 <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
                                     <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
                                     <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
@@ -309,12 +279,10 @@
                             </div>
                         ` : ''}
                     </div>
-
                     <div class="space-y-4 font-mono text-xs">
-                        <p class="text-gray-300 leading-relaxed">${p.longDesc || p.shortDesc || ''}</p>
+                        <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
                         <p class="text-brand-400 font-bold text-base">€${(p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price).toFixed(2)}</p>
                         <p class="text-gray-500">Spedizione: €${(p.shipping !== undefined ? p.shipping : 5.00).toFixed(2)}</p>
-                        
                         <div class="space-y-1 pt-2">
                             <label class="text-gray-400">Colore Filamento:</label>
                             <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none">${colorOptions}</select>
@@ -322,17 +290,16 @@
                         <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${p.shipping !== undefined ? p.shipping : 5.00})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                     </div>
                 </div>
-
                 <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
                     <h3 class="text-sm font-bold text-white">Recensioni dei Clienti</h3>
                     <div class="space-y-3 max-h-40 overflow-y-auto">
                         ${reviews.length === 0 ? '<p class="text-gray-500 text-xs">Ancora nessuna recensione.</p>' : reviews.map(r => `
                             <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
                                 <div class="flex justify-between text-gray-400 text-[10px]">
-                                    <span class="font-bold text-white">${r.author}</span>
+                                    <span class="font-bold text-white">${esc(r.author)}</span>
                                     <span class="text-brand-400">${r.rating}/5 ★</span>
                                 </div>
-                                <p class="mt-1 text-gray-300">${r.comment}</p>
+                                <p class="mt-1 text-gray-300">${esc(r.comment)}</p>
                             </div>
                         `).join('')}
                     </div>
@@ -341,10 +308,7 @@
             `;
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
-
-            if (p.stlFileName) {
-                initCatalogStlViewer(p.stlData);
-            }
+            if (p.stlFileName && p.stlUrl) initCatalogStlViewer(p.stlUrl);
         }
 
         function initCatalogStlViewer(stlDataUrl) {
@@ -352,65 +316,47 @@
                 const canvas = document.getElementById('catalog-stl-canvas');
                 if (!canvas) return;
                 if (catalogStlRenderer) catalogStlRenderer.dispose();
-
                 const width = canvas.parentElement.clientWidth || 300;
                 const height = 192;
-
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x070b14);
-
-                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
                 camera.position.set(0, 0, 150);
-
                 catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
                 catalogStlRenderer.setSize(width, height);
-
                 scene.add(new THREE.AmbientLight(0xffffff, 0.7));
                 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
                 directionalLight.position.set(1, 1, 1).normalize();
                 scene.add(directionalLight);
-
                 let mesh;
-
-                if (stlDataUrl) {
-                    const loader = new THREE.STLLoader();
-                    loader.load(stlDataUrl, function (geometry) {
-                        geometry.computeVertexNormals();
-                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                        mesh = new THREE.Mesh(geometry, material);
-                        geometry.center();
-                        scene.add(mesh);
-                    }, undefined, function (error) {
-                        createFallbackMesh();
-                    });
-                } else {
-                    createFallbackMesh();
-                }
-
-                function createFallbackMesh() {
+                const loader = new THREE.STLLoader();
+                loader.load(stlDataUrl, function (geometry) {
+                    geometry.computeVertexNormals();
+                    geometry.center();
+                    geometry.computeBoundingSphere();
+                    const r = geometry.boundingSphere.radius || 1;
+                    const scale = 40 / r;
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.scale.setScalar(scale);
+                    scene.add(mesh);
+                }, undefined, function () {
                     const geometry = new THREE.BoxGeometry(50, 50, 50);
                     const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
                     mesh = new THREE.Mesh(geometry, material);
                     scene.add(mesh);
-                }
-
+                });
                 function animate() {
                     requestAnimationFrame(animate);
-                    if (mesh) {
-                        mesh.rotation.x += 0.005;
-                        mesh.rotation.y += 0.008;
-                    }
-                    catalogStlRenderer.render(scene, camera);
+                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
+                    if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
                 }
                 animate();
             }, 50);
         }
 
         function closeProductModal() {
-            if (catalogStlRenderer) {
-                catalogStlRenderer.dispose();
-                catalogStlRenderer = null;
-            }
+            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
             document.getElementById('product-modal').classList.add('hidden');
         }
 
@@ -418,37 +364,28 @@
             const colorSelect = document.getElementById('modal-color');
             const selectedColor = colorSelect ? colorSelect.value : 'Standard';
             const existingIndex = cart.findIndex(i => i.title === title && i.color === selectedColor);
-            if (existingIndex > -1) {
-                cart[existingIndex].qty += 1;
-            } else {
-                cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
-            }
+            if (existingIndex > -1) cart[existingIndex].qty += 1;
+            else cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
             saveCart();
             updateCartUI();
             closeProductModal();
             toggleCartModal();
         }
 
-        function submitReview(productTitle) {
+        async function submitReview(productTitle) {
             const currentUser = getCurrentUser();
-            if (!currentUser) { alert("Devi effettuare l'accesso per recensire."); return; }
-
+            if (!currentUser) { alert("Devi effettuare l'accesso."); return; }
             const rating = parseInt(document.getElementById('rev-rating').value);
             const comment = document.getElementById('rev-comment').value.trim();
-
             if (!comment) { alert("Scrivi un commento."); return; }
-
-            const reviews = getReviews();
-            reviews.push({ 
-                productTitle, 
-                author: currentUser.name, 
-                rating, 
-                comment, 
-                date: new Date().toLocaleDateString('it-IT') 
-            });
-            localStorage.setItem('ls3d_reviews', JSON.stringify(reviews));
+            const p = productsCache.find(x => x.title === productTitle);
+            if (!p) return;
+            const row = { product_id: p.id, product_title: productTitle, author: String(currentUser.name || currentUser.username).slice(0, 60), rating, comment: comment.slice(0, 1000) };
+            const { data, error } = await lsSb.from('reviews').insert(row).select().single();
+            if (error) { alert("Errore nell'invio della recensione."); return; }
+            reviewsCache.unshift(mapReview(data));
             alert("Recensione inviata con successo!");
-            openProductModal(getProducts().find(p => p.title === productTitle).id);
+            openProductModal(p.id);
         }
 
         function updateCartUI() {
@@ -456,26 +393,23 @@
             const container = document.getElementById('cart-items-container');
             const totalModal = document.getElementById('cart-modal-total');
             let totalQty = 0, productsPrice = 0, maxShipping = 0;
-
             if (cart.length === 0) {
                 if (container) container.innerHTML = `<p class="text-gray-500 text-center py-6">Il carrello è vuoto.</p>`;
                 if (totalModal) totalModal.innerText = "€0.00";
                 if (counter) counter.innerText = "0";
                 return;
             }
-
             if (container) {
                 container.innerHTML = cart.map((item, index) => {
                     totalQty += item.qty;
                     const itemTotal = item.price * item.qty;
                     productsPrice += itemTotal;
                     if ((item.shipping || 0) > maxShipping) maxShipping = item.shipping;
-
                     return `
                         <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                             <div>
-                                <p class="font-bold text-white">${item.qty}x ${item.title}</p>
-                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${item.color}</span></p>
+                                <p class="font-bold text-white">${item.qty}x ${esc(item.title)}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${esc(item.color)}</span></p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-bold text-brand-400">€${itemTotal.toFixed(2)}</span>
@@ -490,21 +424,18 @@
             try { lucide.createIcons(); } catch(e){}
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            saveCart();
-            updateCartUI();
-        }
-
+        function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
         function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
-        function goToCheckout() {
-            if (cart.length === 0) { alert("Il carrello è vuoto."); return; }
-            window.location.href = "checkout.html";
-        }
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+        function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
 
-        renderFeaturedProducts();
-        updateCartUI();
+        async function init() {
+            try { await fetchAll(); } catch(e) { console.error(e); }
+            renderFeaturedProducts();
+            updateCartUI();
+        }
+        init();
     </script>
 </body>
 </html>
