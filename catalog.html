@@ -7,15 +7,12 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Three.js e STLLoader per visualizzare i file STL reali nel catalogo -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Configurazioni e Colori Globali -->
     <script src="config.js"></script>
     <script src="colors_2.js"></script>
 
@@ -62,7 +59,6 @@
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex justify-end">
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
             <div class="space-y-6">
@@ -86,7 +82,6 @@
         </div>
     </div>
 
-    <!-- MODALE DETTAGLIO PRODOTTO & RECENSIONI -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
     </div>
@@ -99,6 +94,7 @@
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
         let productsCache = [], reviewsCache = [];
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
         function mapProduct(r) {
             return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
                 price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
@@ -107,17 +103,31 @@
                 featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url };
         }
         function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
+
         async function fetchAll() {
             const [p, r] = await Promise.all([
                 lsSb.from('products').select('*').order('created_at', { ascending: false }),
                 lsSb.from('reviews').select('*').order('created_at', { ascending: false })
             ]);
             if (p.error) throw p.error;
-            productsCache = p.data.map(mapProduct);
+            productsCache = (p.data || []).map(mapProduct);
             reviewsCache = (r.data || []).map(mapReview);
         }
 
-        function getCategories() { const s = new Set(); productsCache.forEach(p => (p.categories || []).forEach(x => s.add(x))); return [...s]; }
+        // Categorie unificate e sincronizzate
+        function getBaseCategories() {
+            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
+        }
+        function getCategories() {
+            const s = new Set(getBaseCategories());
+            productsCache.forEach(p => {
+                if (Array.isArray(p.categories)) p.categories.forEach(x => { if(x) s.add(x.trim()); });
+                else if (p.category) s.add(p.category.trim());
+            });
+            return [...s];
+        }
+
         function getProducts() { return productsCache; }
         function getReviews() { return reviewsCache; }
 
@@ -127,15 +137,6 @@
                 if (user) return JSON.parse(user);
             } catch (e) {}
             return null;
-        }
-
-        // Funzione per ripulire nomi di file STL troppo lunghi
-        function cleanStlFilename(filename) {
-            if (!filename) return '';
-            if (filename.length > 25) {
-                return "Modello 3D (.stl)";
-            }
-            return filename;
         }
 
         let cart = [];
@@ -149,15 +150,12 @@
             const categories = ['Tutti', ...getCategories()];
             container.innerHTML = categories.map(cat => `
                 <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${currentCategory === cat ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white'}">
-                    ${cat}
+                    ${esc(cat)}
                 </button>
             `).join('');
         }
 
-        function filterByCategory(category) {
-            currentCategory = category;
-            renderCatalog();
-        }
+        function filterByCategory(category) { currentCategory = category; renderCatalog(); }
 
         function renderCatalog() {
             const grid = document.getElementById('products-grid');
@@ -192,13 +190,13 @@
                     <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all">
                         <div onclick="openProductModal(${p.id})" class="cursor-pointer">
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
-                                <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
                                 ${p.stlFileName ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
                             </div>
                             <div class="p-5 space-y-2">
-                                <h3 class="font-bold text-white text-base">${p.title}</h3>
-                                <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${p.shortDesc || ''}</p>
+                                <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${esc(p.shortDesc || '')}</p>
                             </div>
                         </div>
                         <div class="p-5 pt-0 flex items-center justify-between border-t border-gray-800/60 mt-4">
@@ -214,32 +212,19 @@
         function openProductModal(productId) {
             const p = getProducts().find(prod => prod.id === productId);
             if (!p) return;
-
             const modal = document.getElementById('product-modal');
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
             
-            // Gestione colori sincronizzata con filamentColors
-            const availableColors = (typeof filamentColors !== 'undefined') ? filamentColors : [
-                { name: "Nero Opaco", code: "#111827" },
-                { name: "Bianco Perla", code: "#f3f4f6" },
-                { name: "Grigio Techno", code: "#6b7280" },
-                { name: "Verde Brand", code: "#10b981" }
-            ];
-            
             const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
-            const colorOptions = productColors.map(colorName => {
-                const found = availableColors.find(c => c.name.toLowerCase() === colorName.toLowerCase());
-                const hex = found ? found.code : '#10b981';
-                return `<option value="${colorName}">● ${colorName}</option>`;
-            }).join('');
+            const colorOptions = productColors.map(colorName => `<option value="${esc(colorName)}">● ${esc(colorName)}</option>`).join('');
 
             const reviews = getReviews().filter(r => r.productTitle === p.title);
             const currentUser = getCurrentUser();
 
             let reviewFormHtml = currentUser ? `
                 <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
-                    <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${currentUser.name}</span></p>
+                    <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${esc(currentUser.name || currentUser.username)}</span></p>
                     <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none">
                         <option value="5">5 Stelle - Eccellente</option>
                         <option value="4">4 Stelle - Molto buono</option>
@@ -252,13 +237,13 @@
                 </div>
             ` : `
                 <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 text-center space-y-2 font-mono">
-                    <p class="text-xs text-gray-400">Effettua un ordine per poter lasciare recensioni.</p>
+                    <p class="text-xs text-gray-400">Effettua l'accesso per poter lasciare recensioni.</p>
                 </div>
             `;
 
             content.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h2 class="text-lg font-bold text-white font-mono">${p.title}</h2>
+                    <h2 class="text-lg font-bold text-white font-mono">${esc(p.title)}</h2>
                     <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -267,11 +252,9 @@
                         <div class="flex gap-2 overflow-x-auto pb-2">
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
-
-                        <!-- Visualizzatore STL con fallback anti-schermo nero -->
                         ${p.stlFileName ? `
                             <div class="space-y-1 pt-2">
-                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile (${p.stlFileName})</p>
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
                                 <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
                                     <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
                                     <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
@@ -279,12 +262,10 @@
                             </div>
                         ` : ''}
                     </div>
-
                     <div class="space-y-4 font-mono text-xs">
-                        <p class="text-gray-300 leading-relaxed">${p.longDesc || p.shortDesc || ''}</p>
+                        <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
                         <p class="text-brand-400 font-bold text-base">€${(p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price).toFixed(2)}</p>
                         <p class="text-gray-500">Spedizione: €${(p.shipping !== undefined ? p.shipping : 5.00).toFixed(2)}</p>
-                        
                         <div class="space-y-1 pt-2">
                             <label class="text-gray-400">Colore Filamento:</label>
                             <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none">${colorOptions}</select>
@@ -292,7 +273,6 @@
                         <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${p.shipping !== undefined ? p.shipping : 5.00})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                     </div>
                 </div>
-
                 <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
                     <h3 class="text-sm font-bold text-white">Recensioni dei Clienti</h3>
                     <div class="space-y-3 max-h-40 overflow-y-auto">
@@ -311,10 +291,7 @@
             `;
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
-
-            if (p.stlFileName) {
-                initCatalogStlViewer(p.stlUrl);
-            }
+            if (p.stlFileName && p.stlUrl) initCatalogStlViewer(p.stlUrl);
         }
 
         function initCatalogStlViewer(stlDataUrl) {
@@ -322,81 +299,47 @@
                 const canvas = document.getElementById('catalog-stl-canvas');
                 if (!canvas) return;
                 if (catalogStlRenderer) catalogStlRenderer.dispose();
-
                 const width = canvas.parentElement.clientWidth || 300;
                 const height = 192;
-
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x070b14);
-
                 const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
                 camera.position.set(0, 0, 150);
-
                 catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
                 catalogStlRenderer.setSize(width, height);
-
                 scene.add(new THREE.AmbientLight(0xffffff, 0.7));
                 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
                 directionalLight.position.set(1, 1, 1).normalize();
                 scene.add(directionalLight);
-
                 let mesh;
-
-                function showMessage(text) {
-                    const p = canvas.parentElement;
-                    if (p.querySelector('.stl-msg')) return;
-                    const d = document.createElement('div');
-                    d.className = 'stl-msg absolute bottom-2 left-2 right-2 text-center text-[10px] font-mono text-amber-400 bg-black/60 rounded px-2 py-1';
-                    d.textContent = text;
-                    p.style.position = 'relative';
-                    p.appendChild(d);
-                }
-
-                function createFallbackMesh(reason) {
-                    console.warn('STL non caricato:', reason);
-                    showMessage('Anteprima non disponibile: ' + reason);
+                const loader = new THREE.STLLoader();
+                loader.load(stlDataUrl, function (geometry) {
+                    geometry.computeVertexNormals();
+                    geometry.center();
+                    geometry.computeBoundingSphere();
+                    const r = geometry.boundingSphere.radius || 1;
+                    const scale = 40 / r;
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.scale.setScalar(scale);
+                    scene.add(mesh);
+                }, undefined, function () {
                     const geometry = new THREE.BoxGeometry(50, 50, 50);
                     const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
                     mesh = new THREE.Mesh(geometry, material);
                     scene.add(mesh);
-                }
-
-                if (stlDataUrl) {
-                    const loader = new THREE.STLLoader();
-                    loader.load(stlDataUrl, function (geometry) {
-                        geometry.computeVertexNormals();
-                        geometry.center();
-                        // Auto-scala: il modello occupa sempre ~80 unità, qualunque sia la sua dimensione
-                        geometry.computeBoundingSphere();
-                        const r = geometry.boundingSphere.radius || 1;
-                        const scale = 40 / r;
-                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                        mesh = new THREE.Mesh(geometry, material);
-                        mesh.scale.setScalar(scale);
-                        scene.add(mesh);
-                    }, undefined, function (error) {
-                        createFallbackMesh('file STL non leggibile');
-                    });
-                } else {
-                    createFallbackMesh('nessun file STL salvato per questo prodotto');
-                }
-
+                });
                 function animate() {
                     requestAnimationFrame(animate);
-                    if (mesh) {
-                        mesh.rotation.x += 0.005;
-                        mesh.rotation.y += 0.008;
-                    }
+                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
                     if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
                 }
                 animate();
             }, 50);
         }
+
         function closeProductModal() {
-            if (catalogStlRenderer) {
-                catalogStlRenderer.dispose();
-                catalogStlRenderer = null;
-            }
+            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
             document.getElementById('product-modal').classList.add('hidden');
         }
 
@@ -404,11 +347,8 @@
             const colorSelect = document.getElementById('modal-color');
             const selectedColor = colorSelect ? colorSelect.value : 'Standard';
             const existingIndex = cart.findIndex(i => i.title === title && i.color === selectedColor);
-            if (existingIndex > -1) {
-                cart[existingIndex].qty += 1;
-            } else {
-                cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
-            }
+            if (existingIndex > -1) cart[existingIndex].qty += 1;
+            else cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
             saveCart();
             updateCartUI();
             closeProductModal();
@@ -417,15 +357,15 @@
 
         async function submitReview(productTitle) {
             const currentUser = getCurrentUser();
-            if (!currentUser) { alert("Devi effettuare l'accesso per recensire."); return; }
+            if (!currentUser) { alert("Devi effettuare l'accesso."); return; }
             const rating = parseInt(document.getElementById('rev-rating').value);
             const comment = document.getElementById('rev-comment').value.trim();
             if (!comment) { alert("Scrivi un commento."); return; }
             const p = productsCache.find(x => x.title === productTitle);
             if (!p) return;
-            const row = { product_id: p.id, product_title: productTitle, author: String(currentUser.name).slice(0, 60), rating, comment: comment.slice(0, 1000) };
+            const row = { product_id: p.id, product_title: productTitle, author: String(currentUser.name || currentUser.username).slice(0, 60), rating, comment: comment.slice(0, 1000) };
             const { data, error } = await lsSb.from('reviews').insert(row).select().single();
-            if (error) { console.error(error); alert("Errore nell'invio della recensione."); return; }
+            if (error) { alert("Errore nell'invio della recensione."); return; }
             reviewsCache.unshift(mapReview(data));
             alert("Recensione inviata con successo!");
             openProductModal(p.id);
@@ -436,26 +376,23 @@
             const container = document.getElementById('cart-items-container');
             const totalModal = document.getElementById('cart-modal-total');
             let totalQty = 0, productsPrice = 0, maxShipping = 0;
-
             if (cart.length === 0) {
                 if (container) container.innerHTML = `<p class="text-gray-500 text-center py-6">Il carrello è vuoto.</p>`;
                 if (totalModal) totalModal.innerText = "€0.00";
                 if (counter) counter.innerText = "0";
                 return;
             }
-
             if (container) {
                 container.innerHTML = cart.map((item, index) => {
                     totalQty += item.qty;
                     const itemTotal = item.price * item.qty;
                     productsPrice += itemTotal;
                     if ((item.shipping || 0) > maxShipping) maxShipping = item.shipping;
-
                     return `
                         <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                             <div>
-                                <p class="font-bold text-white">${item.qty}x ${item.title}</p>
-                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${item.color}</span></p>
+                                <p class="font-bold text-white">${item.qty}x ${esc(item.title)}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${esc(item.color)}</span></p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-bold text-brand-400">€${itemTotal.toFixed(2)}</span>
@@ -470,25 +407,16 @@
             try { lucide.createIcons(); } catch(e){}
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            saveCart();
-            updateCartUI();
-        }
-
+        function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
         function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
-        function goToCheckout() {
-            if (cart.length === 0) { alert("Il carrello è vuoto."); return; }
-            window.location.href = "checkout.html";
-        }
+        function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
 
         async function loadData() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '<p class="col-span-full text-center text-gray-500 font-mono py-12">Caricamento prodotti...</p>';
-            try { await fetchAll(); }
-            catch (e) { console.error(e); grid.innerHTML = '<p class="col-span-full text-center text-red-400 font-mono py-12">Impossibile caricare il catalogo. Riprova più tardi.</p>'; return; }
-            renderCatalog();
+            try { await fetchAll(); renderCatalog(); }
+            catch (e) { console.error(e); grid.innerHTML = '<p class="col-span-full text-center text-red-400 font-mono py-12">Impossibile caricare il catalogo. Riprova più tardi.</p>'; }
         }
         updateCartUI();
         loadData();
