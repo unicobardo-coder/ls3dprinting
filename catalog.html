@@ -87,9 +87,9 @@
         </div>
     </div>
 
-    <!-- MODALE PRODOTTO & RICHIEDI INFO -->
+    <!-- MODALE PRODOTTO & VIEWER 3D -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
+        <div class="bg-dark-card border border-gray-800 w-full max-w-4xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
     </div>
 
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
@@ -178,7 +178,7 @@
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
                                 <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
-                                ${p.stlFileName ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
+                                ${p.stlUrl ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
                             </div>
                             <div class="p-5 space-y-2">
                                 <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
@@ -239,11 +239,22 @@
                     <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
-                        <img id="main-modal-img" src="${images[p.mainImageIndex || 0]}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
-                        <div class="flex gap-2 overflow-x-auto pb-2">
-                            ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <img id="main-modal-img" src="${images[p.mainImageIndex || 0]}" class="w-full h-56 object-cover rounded-xl border border-gray-800">
+                            <div class="flex gap-2 overflow-x-auto pb-2">
+                                ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-14 h-14 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
+                            </div>
                         </div>
+                        ${p.stlUrl ? `
+                            <div class="space-y-2 border border-gray-800 p-3 rounded-xl bg-dark-bg font-mono">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-brand-400 font-bold">Anteprima Modello 3D (.STL)</span>
+                                    <a href="${p.stlUrl}" download="${esc(p.stlFileName || 'modello.stl')}" class="text-[10px] text-gray-300 hover:text-white underline">📥 Scarica STL</a>
+                                </div>
+                                <div id="catalog-stl-viewer" class="w-full h-40 bg-dark-card rounded-lg border border-gray-800 relative overflow-hidden"></div>
+                            </div>
+                        ` : ''}
                     </div>
                     <div class="space-y-4 font-mono text-xs">
                         <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
@@ -280,6 +291,57 @@
             `;
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
+
+            if (p.stlUrl) {
+                setTimeout(() => initCatalogStlViewer(p.stlUrl), 100);
+            }
+        }
+
+        function initCatalogStlViewer(url) {
+            const container = document.getElementById('catalog-stl-viewer');
+            if (!container || !url) return;
+            container.innerHTML = '';
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0d1322);
+
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 150);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            dirLight.position.set(1, 2, 3).normalize();
+            scene.add(dirLight);
+
+            const loader = new THREE.STLLoader();
+            loader.load(url, function (geometry) {
+                geometry.computeVertexNormals();
+                const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                const mesh = new THREE.Mesh(geometry, material);
+
+                geometry.center();
+                geometry.computeBoundingSphere();
+                const radius = geometry.boundingSphere.radius;
+                camera.position.z = radius * 3.5;
+
+                scene.add(mesh);
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    mesh.rotation.z += 0.005;
+                    mesh.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+                animate();
+            }, undefined, function (error) {
+                console.error('Errore caricamento STL nel catalogo:', error);
+            });
         }
 
         function openInquiryModal(productTitle) {
