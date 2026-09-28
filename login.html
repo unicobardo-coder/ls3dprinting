@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Clienti | LS3Dmaker</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="config.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        brand: { 500: '#10b981', 400: '#34d399', 600: '#059669' },
+                        dark: { bg: '#070b14', card: '#0d1322', surface: '#131c31' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+
+    <!-- HEADER SEMPLICE -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
+            <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Torna alla Home
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="py-16 px-4 sm:px-6 max-w-md mx-auto w-full flex-grow flex items-center">
+        <div class="bg-dark-card border border-gray-800 w-full rounded-2xl p-8 space-y-6 shadow-2xl font-mono">
+            
+            <!-- SELETTORE TAB (Accedi / Registrati) -->
+            <div class="flex border-b border-gray-800 text-xs font-bold pb-4">
+                <button onclick="switchTab('login')" id="tab-login" class="flex-1 pb-2 text-center text-brand-400 border-b-2 border-brand-500 cursor-pointer transition-colors">Accedi</button>
+                <button onclick="switchTab('register')" id="tab-register" class="flex-1 pb-2 text-center text-gray-400 hover:text-white cursor-pointer transition-colors">Registrati</button>
+            </div>
+
+            <!-- FORM LOGIN -->
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+                <div class="space-y-1">
+                    <label class="text-gray-400">Email</label>
+                    <input type="email" id="login-email" required placeholder="tuamail@esempio.it" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-gray-400">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer mt-2">
+                    Accedi all'Area Clienti
+                </button>
+            </form>
+
+            <!-- FORM REGISTRAZIONE -->
+            <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 text-xs hidden">
+                <div class="space-y-1">
+                    <label class="text-gray-400">Nome e Cognome o Username</label>
+                    <input type="text" id="reg-name" required placeholder="Mario Rossi" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-gray-400">Email</label>
+                    <input type="email" id="reg-email" required placeholder="tuamail@esempio.it" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-gray-400">Password</label>
+                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer mt-2">
+                    Crea Account
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
+        LS3DMAKER © 2026 - Tutti i diritti riservati
+    </footer>
+
+    <script>
+        const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
+
+        function switchTab(tab) {
+            const btnLogin = document.getElementById('tab-login');
+            const btnRegister = document.getElementById('tab-register');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+
+            if (tab === 'login') {
+                btnLogin.className = "flex-1 pb-2 text-center text-brand-400 border-b-2 border-brand-500 cursor-pointer transition-colors";
+                btnRegister.className = "flex-1 pb-2 text-center text-gray-400 hover:text-white cursor-pointer transition-colors";
+                formLogin.classList.remove('hidden');
+                formRegister.classList.add('hidden');
+            } else {
+                btnRegister.className = "flex-1 pb-2 text-center text-brand-400 border-b-2 border-brand-500 cursor-pointer transition-colors";
+                btnLogin.className = "flex-1 pb-2 text-center text-gray-400 hover:text-white cursor-pointer transition-colors";
+                formRegister.classList.remove('hidden');
+                formLogin.classList.add('hidden');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            // Tentativo di login tramite Supabase o fallback su localStorage
+            let loggedUser = null;
+            try {
+                const { data, error } = await lsSb.auth.signInWithPassword({ email, password });
+                if (!error && data.user) {
+                    loggedUser = { id: data.user.id, email: data.user.email, username: data.user.user_metadata?.name || email.split('@')[0] };
+                }
+            } catch(err) {}
+
+            if (!loggedUser) {
+                // Controllo su utenti registrati in locale (localStorage)
+                let users = [];
+                try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch(err) {}
+                const found = users.find(u => u.email === email && u.password === password);
+                if (found) {
+                    loggedUser = { id: found.id || Date.now(), email: found.email, username: found.username || found.name };
+                }
+            }
+
+            if (loggedUser) {
+                localStorage.setItem('ls3d_logged_user', JSON.stringify(loggedUser));
+                alert("Accesso effettuato con successo!");
+                window.location.href = "index.html";
+            } else {
+                alert("Credenziali non valide o utente non registrato.");
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            let registered = false;
+            try {
+                const { data, error } = await lsSb.auth.signUp({ email, password, options: { data: { name } } });
+                if (!error) registered = true;
+            } catch(err) {}
+
+            // Salvataggio di sicurezza anche nel localStorage per la gestione locale dell'admin
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch(err) {}
+            if (users.some(u => u.email === email)) {
+                alert("Questa email è già registrata.");
+                return;
+            }
+
+            const newUser = { id: Date.now(), name, username: name, email, password };
+            users.push(newUser);
+            localStorage.setItem('ls3d_users', JSON.stringify(users));
+
+            localStorage.setItem('ls3d_logged_user', JSON.stringify(newUser));
+            alert("Registrazione completata con successo!");
+            window.location.href = "index.html";
+        }
+
+        try { lucide.createIcons(); } catch(e){}
+    </script>
+</body>
+</html>
