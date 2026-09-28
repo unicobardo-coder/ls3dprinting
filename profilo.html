@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il mio Profilo | LS3Dmaker</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        brand: { 500: '#10b981', 400: '#34d399', 600: '#059669' },
+                        dark: { bg: '#070b14', card: '#0d1322', surface: '#131c31' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
+            </a>
+            <div class="flex items-center gap-4 font-mono text-xs">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="catalog.html" class="text-gray-300 hover:text-white transition-colors">Catalogo</a>
+                <button onclick="logoutUser()" class="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition-colors cursor-pointer">Esci</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENUTO PROFILO -->
+    <main class="py-12 px-4 sm:px-6 max-w-4xl mx-auto w-full flex-grow space-y-8 font-mono">
+        <div class="border-b border-gray-800 pb-6">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Area Personale</h1>
+            <p class="text-xs text-gray-400 mt-1">Benvenuto nel tuo pannello cliente LS3Dmaker.</p>
+        </div>
+
+        <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white">I tuoi Dati</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-1">
+                    <span class="text-gray-400">Nome / Username:</span>
+                    <p id="profile-name" class="font-bold text-white text-sm">-</p>
+                </div>
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-1">
+                    <span class="text-gray-400">Email di Accesso:</span>
+                    <p id="profile-email" class="font-bold text-white text-sm">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white">I tuoi Ordini Recenti</h2>
+            <div id="profile-orders-list" class="space-y-3 text-xs">
+                <p class="text-gray-500">Nessun ordine effettuato al momento.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
+        LS3DMAKER © 2026 - Tutti i diritti riservati
+    </footer>
+
+    <script>
+        function loadUserProfile() {
+            let user = null;
+            try { user = JSON.parse(localStorage.getItem('ls3d_logged_user')); } catch(e) {}
+            
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('profile-name').innerText = user.name || user.username || 'Cliente';
+            document.getElementById('profile-email').innerText = user.email || '-';
+
+            // Caricamento ordini salvati per questo utente
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch(e) {}
+            const userOrders = orders.filter(o => o.email === user.email);
+            
+            const ordersContainer = document.getElementById('profile-orders-list');
+            if (userOrders.length > 0) {
+                ordersContainer.innerHTML = userOrders.map(o => `
+                    <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-white">Ordine n. ${esc(o.number)}</p>
+                            <p class="text-[10px] text-gray-400">Data: ${esc(o.date || 'Recente')} - Pagamento: ${esc(o.gateway)}</p>
+                        </div>
+                        <span class="text-brand-400 font-bold">€${Number(o.total || 0).toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('ls3d_logged_user');
+            window.location.href = 'index.html';
+        }
+
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        loadUserProfile();
+        try { lucide.createIcons(); } catch(e){}
+    </script>
+</body>
+</html>
