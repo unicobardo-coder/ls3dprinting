@@ -268,9 +268,9 @@
                         ${(p.stlFileName || p.stlUrl) ? `
                             <div class="space-y-1 pt-2">
                                 <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
-                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
-                                    <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl touch-none"></canvas>
-                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
+                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center overflow-hidden">
+                                    <canvas id="catalog-stl-canvas" style="width: 100%; height: 100%; display: block;" class="touch-none"></canvas>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono pointer-events-none">Anteprima 3D Interattiva</span>
                                 </div>
                             </div>
                         ` : ''}
@@ -313,47 +313,59 @@
         }
 
         function initCatalogStlViewer(stlDataUrl) {
-            setTimeout(() => {
-                const canvas = document.getElementById('catalog-stl-canvas');
-                if (!canvas) return;
-                if (catalogStlRenderer) catalogStlRenderer.dispose();
-                const width = canvas.parentElement.clientWidth || 300;
-                const height = 192;
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x070b14);
-                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
-                camera.position.set(0, 0, 150);
-                catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
-                catalogStlRenderer.setSize(width, height);
-                scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-                directionalLight.position.set(1, 1, 1).normalize();
-                scene.add(directionalLight);
-                let mesh;
-                const loader = new THREE.STLLoader();
-                loader.load(stlDataUrl, function (geometry) {
-                    geometry.computeVertexNormals();
-                    geometry.center();
-                    geometry.computeBoundingSphere();
-                    const r = geometry.boundingSphere.radius || 1;
-                    const scale = 40 / r;
-                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                    mesh = new THREE.Mesh(geometry, material);
-                    mesh.scale.setScalar(scale);
-                    scene.add(mesh);
-                }, undefined, function () {
-                    const geometry = new THREE.BoxGeometry(50, 50, 50);
-                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                    mesh = new THREE.Mesh(geometry, material);
-                    scene.add(mesh);
-                });
-                function animate() {
-                    requestAnimationFrame(animate);
-                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
-                    if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
-                }
-                animate();
-            }, 100);
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const canvas = document.getElementById('catalog-stl-canvas');
+                    if (!canvas) return;
+                    if (catalogStlRenderer) {
+                        catalogStlRenderer.dispose();
+                        catalogStlRenderer = null;
+                    }
+                    const parent = canvas.parentElement;
+                    const width = parent ? (parent.clientWidth || parent.getBoundingClientRect().width || 300) : 300;
+                    const height = 192;
+
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0x070b14);
+
+                    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+                    camera.position.set(0, 0, 150);
+
+                    catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
+                    catalogStlRenderer.setSize(width, height, false);
+
+                    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                    directionalLight.position.set(1, 1, 1).normalize();
+                    scene.add(directionalLight);
+
+                    let mesh;
+                    const loader = new THREE.STLLoader();
+                    loader.load(stlDataUrl, function (geometry) {
+                        geometry.computeVertexNormals();
+                        geometry.center();
+                        geometry.computeBoundingSphere();
+                        const r = geometry.boundingSphere.radius || 1;
+                        const scale = 40 / r;
+                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        mesh.scale.setScalar(scale);
+                        scene.add(mesh);
+                    }, undefined, function () {
+                        const geometry = new THREE.BoxGeometry(50, 50, 50);
+                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        scene.add(mesh);
+                    });
+
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
+                        if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
+                    }
+                    animate();
+                }, 150);
+            });
         }
 
         function closeProductModal() {
@@ -436,7 +448,7 @@
 
         function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
         function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
-        function toggleCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
         function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
 
         async function loadData() {
