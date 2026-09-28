@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogo Prodotti | LS3Dmaker</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <script src="config.js"></script>
-    <script src="mailer.js"></script>
 
     <script>
         tailwind.config = {
@@ -97,52 +96,65 @@
 
     <script>
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
-        let productsCache = [], reviewsCache = [], categoriesCache = [];
+        let productsCache = [], reviewsCache = [];
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-        // getCurrentUser è definita in config.js / mailer.js; se manca, l'utente risulta non loggato
-        function safeGetUser() {
-            try { return typeof getCurrentUser === 'function' ? getCurrentUser() : null; }
-            catch (e) { return null; }
-        }
-
         function mapProduct(r) {
-            return {
+            return { 
                 id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
                 price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
                 shipping: Number(r.shipping), shortDesc: r.short_desc, longDesc: r.long_desc,
                 images: r.images || [], mainImageIndex: r.main_image_index || 0, colors: r.colors || [],
-                featured: r.featured, combinedShipping: r.combined_shipping !== false,
-                stlFileName: r.stl_file_name, stlUrl: r.stl_url
+                featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url 
             };
         }
         function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
 
-        async function fetchAllData() {
-            const [p, r, c] = await Promise.all([
+        async function fetchAll() {
+            const [p, r] = await Promise.all([
                 lsSb.from('products').select('*').order('created_at', { ascending: false }),
-                lsSb.from('reviews').select('*').order('created_at', { ascending: false }),
-                lsSb.from('categories').select('*').order('name', { ascending: true })
+                lsSb.from('reviews').select('*').order('created_at', { ascending: false })
             ]);
             if (p.error) throw p.error;
             productsCache = (p.data || []).map(mapProduct);
             reviewsCache = (r.data || []).map(mapReview);
-            categoriesCache = (c.data || []).map(item => item.name);
+        }
+
+        function getBaseCategories() {
+            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
+        }
+        function getCategories() {
+            const s = new Set(getBaseCategories());
+            productsCache.forEach(p => {
+                if (Array.isArray(p.categories)) p.categories.forEach(x => { if(x) s.add(x.trim()); });
+                else if (p.category) s.add(p.category.trim());
+            });
+            return [...s];
+        }
+
+        function getProducts() { return productsCache; }
+        function getReviews() { return reviewsCache; }
+
+        function getCurrentUser() {
+            try {
+                const user = localStorage.getItem('ls3d_logged_user');
+                if (user) return JSON.parse(user);
+            } catch (e) {}
+            return null;
         }
 
         let cart = [];
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
         let currentCategory = 'Tutti';
-
-        // Stato del visualizzatore STL
-        let catalogStlRenderer = null, catalogStlAnim = null, catalogStlToken = 0, catalogStlCleanup = null;
+        let catalogStlRenderer = null;
 
         function renderCategories() {
             const container = document.getElementById('category-filters');
             if (!container) return;
-            const categories = ['Tutti', ...categoriesCache];
+            const categories = ['Tutti', ...getCategories()];
             container.innerHTML = categories.map(cat => `
-                <button onclick="filterByCategory('${cat.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${currentCategory === cat ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white'}">
+                <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${currentCategory === cat ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white'}">
                     ${esc(cat)}
                 </button>
             `).join('');
@@ -153,12 +165,13 @@
         function renderCatalog() {
             const grid = document.getElementById('products-grid');
             if (!grid) return;
+            const products = getProducts();
             renderCategories();
 
-            const filteredProducts = currentCategory === 'Tutti'
-                ? productsCache
-                : productsCache.filter(p => {
-                    const cats = p.categories && p.categories.length ? p.categories : [p.category || ''];
+            const filteredProducts = currentCategory === 'Tutti' 
+                ? products 
+                : products.filter(p => {
+                    const cats = p.categories || [p.category || ''];
                     return cats.some(c => c.trim().toLowerCase() === currentCategory.trim().toLowerCase());
                 });
 
@@ -172,7 +185,7 @@
                 const listPrice = Number(p.price) || 0;
                 const salePrice = p.salePrice !== null && p.salePrice !== undefined ? Number(p.salePrice) : null;
                 const finalPrice = salePrice !== null ? salePrice : listPrice;
-                const shippingPrice = Number(p.shipping !== undefined && !isNaN(p.shipping) ? p.shipping : 5.00);
+                const shippingPrice = Number(p.shipping !== undefined ? p.shipping : 5.00);
 
                 let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${finalPrice.toFixed(2)}</span>`;
                 if (salePrice !== null && salePrice < listPrice) {
@@ -183,9 +196,9 @@
                     <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all">
                         <div onclick="openProductModal(${p.id})" class="cursor-pointer">
                             <div class="h-48 overflow-hidden bg-dark-bg relative">
-                                <img src="${esc(mainImg)}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
-                                ${p.stlUrl ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
+                                ${(p.stlFileName || p.stlUrl) ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
                             </div>
                             <div class="p-5 space-y-2">
                                 <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
@@ -193,7 +206,7 @@
                             </div>
                         </div>
                         <div class="p-5 pt-0 border-t border-gray-800/60 mt-4 space-y-3 font-mono">
-                            <div class="flex items-center justify-between pt-4">
+                            <div class="flex items-center justify-between">
                                 <div>${priceHtml}</div>
                                 <button onclick="openProductModal(${p.id})" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs cursor-pointer">Dettagli</button>
                             </div>
@@ -205,23 +218,22 @@
                     </div>
                 `;
             }).join('');
-            try { lucide.createIcons(); } catch (e) {}
+            try { lucide.createIcons(); } catch(e){}
         }
 
         function openProductModal(productId) {
-            const p = productsCache.find(prod => prod.id === productId);
+            const p = getProducts().find(prod => prod.id === productId);
             if (!p) return;
             const modal = document.getElementById('product-modal');
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
-            const shippingPrice = Number(p.shipping !== undefined && !isNaN(p.shipping) ? p.shipping : 5.00);
+            const shippingPrice = Number(p.shipping !== undefined ? p.shipping : 5.00);
+            
             const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
             const colorOptions = productColors.map(colorName => `<option value="${esc(colorName)}">● ${esc(colorName)}</option>`).join('');
-            const unitPrice = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price;
-            const jsTitle = p.title.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
-            const reviews = reviewsCache.filter(r => r.productTitle === p.title);
-            const currentUser = safeGetUser();
+            const reviews = getReviews().filter(r => r.productTitle === p.title);
+            const currentUser = getCurrentUser();
 
             let reviewFormHtml = currentUser ? `
                 <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
@@ -234,7 +246,7 @@
                         <option value="1">1 Stella - Scarsa</option>
                     </select>
                     <textarea id="rev-comment" placeholder="Scrivi il tuo commento..." rows="2" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none"></textarea>
-                    <button onclick="submitReview('${jsTitle}')" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Invia Recensione</button>
+                    <button onclick="submitReview('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Invia Recensione</button>
                 </div>
             ` : `
                 <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 text-center space-y-2 font-mono">
@@ -249,35 +261,34 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-3">
-                        <img id="main-modal-img" src="${esc(images[p.mainImageIndex || 0] || images[0])}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
+                        <img id="main-modal-img" src="${images[p.mainImageIndex || 0]}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
                         <div class="flex gap-2 overflow-x-auto pb-2">
-                            ${images.map(img => `<img src="${esc(img)}" onclick="document.getElementById('main-modal-img').src=this.src" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
+                            ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
-                        ${p.stlUrl ? `
+                        ${(p.stlFileName || p.stlUrl) ? `
                             <div class="space-y-1 pt-2">
-                                <div class="flex justify-between items-center">
-                                    <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
-                                    <a href="${esc(p.stlUrl)}" download="${esc(p.stlFileName || 'modello.stl')}" class="text-[10px] text-gray-300 hover:text-white underline font-mono">📥 Scarica STL</a>
-                                </div>
-                                <div id="stl-box" class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative overflow-hidden">
-                                    <canvas id="catalog-stl-canvas" style="width: 100%; height: 100%; display: block; cursor: grab;"></canvas>
-                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono pointer-events-none">Trascina per ruotare · rotellina per zoom</span>
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
+                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
+                                    <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl touch-none"></canvas>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
                                 </div>
                             </div>
                         ` : ''}
                     </div>
                     <div class="space-y-4 font-mono text-xs">
                         <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
-                        <p class="text-brand-400 font-bold text-base">€${Number(unitPrice).toFixed(2)}</p>
+                        <p class="text-brand-400 font-bold text-base">€${(p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price).toFixed(2)}</p>
+                        
                         <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 space-y-1 text-gray-300">
                             <div class="flex justify-between"><span>Costo Spedizione Base:</span> <strong class="text-white">€${shippingPrice.toFixed(2)}</strong></div>
                             <div class="flex justify-between text-brand-400"><span>Articoli successivi:</span> <strong>+€2.00 cad.</strong></div>
                         </div>
+
                         <div class="space-y-1 pt-2">
                             <label class="text-gray-400">Colore Filamento:</label>
                             <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none">${colorOptions}</select>
                         </div>
-                        <button onclick="addModalToCart('${jsTitle}', ${Number(unitPrice)}, ${shippingPrice})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
+                        <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${shippingPrice})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                     </div>
                 </div>
                 <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
@@ -287,7 +298,7 @@
                             <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
                                 <div class="flex justify-between text-gray-400 text-[10px]">
                                     <span class="font-bold text-white">${esc(r.author)}</span>
-                                    <span class="text-brand-400">${esc(r.rating)}/5 ★</span>
+                                    <span class="text-brand-400">${r.rating}/5 ★</span>
                                 </div>
                                 <p class="mt-1 text-gray-300">${esc(r.comment)}</p>
                             </div>
@@ -297,149 +308,58 @@
                 </div>
             `;
             modal.classList.remove('hidden');
-            try { lucide.createIcons(); } catch (e) {}
-            if (p.stlUrl) initCatalogStlViewer(p.stlUrl);
+            try { lucide.createIcons(); } catch(e){}
+            if (p.stlFileName || p.stlUrl) initCatalogStlViewer(p.stlUrl || p.stlFileName);
         }
 
-        // ---------- VISUALIZZATORE STL ----------
-
-        // Parser STL interno (binario + ASCII), indipendente da THREE.STLLoader
-        function parseStl(buffer) {
-            const view = new DataView(buffer);
-            const head = new TextDecoder().decode(new Uint8Array(buffer, 0, Math.min(1024, buffer.byteLength)));
-            let binary = false;
-            if (buffer.byteLength >= 84) {
-                const n = view.getUint32(80, true);
-                const expected = 84 + n * 50;
-                binary = expected === buffer.byteLength ||
-                         (expected < buffer.byteLength && !/facet\s+normal/i.test(head));
-            }
-            let pos;
-            if (binary) {
-                const n = view.getUint32(80, true);
-                pos = new Float32Array(n * 9);
-                let off = 84;
-                for (let i = 0; i < n; i++) {
-                    off += 12; // normale
-                    for (let j = 0; j < 9; j++) { pos[i * 9 + j] = view.getFloat32(off, true); off += 4; }
-                    off += 2;  // attributi
-                }
-            } else {
-                const text = new TextDecoder().decode(buffer);
-                const arr = [];
-                const re = /vertex\s+([-+\d.eE]+)\s+([-+\d.eE]+)\s+([-+\d.eE]+)/g;
-                let m;
-                while ((m = re.exec(text))) arr.push(+m[1], +m[2], +m[3]);
-                pos = new Float32Array(arr);
-            }
-            if (pos.length === 0) throw new Error('STL vuoto o non valido');
-            const geo = new THREE.BufferGeometry();
-            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            geo.computeVertexNormals();
-            return geo;
-        }
-
-        function cleanupCatalogViewer() {
-            if (catalogStlAnim) cancelAnimationFrame(catalogStlAnim);
-            catalogStlAnim = null;
-            if (catalogStlCleanup) { catalogStlCleanup(); catalogStlCleanup = null; }
-            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
-        }
-
-        function initCatalogStlViewer(url) {
-            cleanupCatalogViewer();
-            const token = ++catalogStlToken;
-            const canvas = document.getElementById('catalog-stl-canvas');
-            if (!canvas) return;
-            const box = canvas.parentElement;
-            canvas.style.touchAction = 'none';
-
-            const status = document.createElement('div');
-            status.className = 'absolute inset-0 flex items-center justify-center text-[11px] font-mono text-gray-400 pointer-events-none';
-            status.textContent = 'Caricamento modello 3D...';
-            box.appendChild(status);
-
-            const w = box.clientWidth || 320, h = box.clientHeight || 192;
-            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-            renderer.setSize(w, h, false);
-            catalogStlRenderer = renderer;
-
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x070b14);
-            const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 10000);
-            camera.position.set(0, 0, 150);
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            const l1 = new THREE.DirectionalLight(0xffffff, 0.9); l1.position.set(1, 1, 1); scene.add(l1);
-            const l2 = new THREE.DirectionalLight(0xffffff, 0.5); l2.position.set(-1, -0.5, -1); scene.add(l2);
-
-            const group = new THREE.Group();
-            scene.add(group);
-
-            // Interazione: trascina per ruotare, rotellina per zoomare
-            let dragging = false, lx = 0, ly = 0;
-            const down = e => { dragging = true; lx = e.clientX; ly = e.clientY; canvas.style.cursor = 'grabbing'; };
-            const up = () => { dragging = false; canvas.style.cursor = 'grab'; };
-            const move = e => {
-                if (!dragging) return;
-                group.rotation.y += (e.clientX - lx) * 0.01;
-                group.rotation.x += (e.clientY - ly) * 0.01;
-                lx = e.clientX; ly = e.clientY;
-            };
-            const wheel = e => { e.preventDefault(); camera.position.z *= 1 + e.deltaY * 0.001; };
-            canvas.addEventListener('pointerdown', down);
-            window.addEventListener('pointerup', up);
-            window.addEventListener('pointermove', move);
-            canvas.addEventListener('wheel', wheel, { passive: false });
-
-            let geo = null, mat = null;
-            catalogStlCleanup = () => {
-                canvas.removeEventListener('pointerdown', down);
-                window.removeEventListener('pointerup', up);
-                window.removeEventListener('pointermove', move);
-                canvas.removeEventListener('wheel', wheel);
-                if (geo) geo.dispose();
-                if (mat) mat.dispose();
-                if (status.parentNode) status.remove();
-            };
-
-            fetch(url)
-                .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
-                .then(buf => {
-                    if (token !== catalogStlToken) return;
-                    geo = parseStl(buf);
-                    geo.center();
-                    geo.computeBoundingSphere();
-                    const r = geo.boundingSphere.radius || 1;
-                    mat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2, side: THREE.DoubleSide });
-                    const mesh = new THREE.Mesh(geo, mat);
-                    mesh.rotation.x = -Math.PI / 2; // STL è Z-up
-                    group.add(mesh);
-                    camera.position.z = (r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.1;
-                    camera.near = r / 100; camera.far = r * 100; camera.updateProjectionMatrix();
-                    status.remove();
-                })
-                .catch(err => {
-                    if (token !== catalogStlToken) return;
-                    console.error('Errore STL:', err);
-                    status.textContent = 'Impossibile caricare il modello 3D';
-                    status.classList.replace('text-gray-400', 'text-red-400');
+        function initCatalogStlViewer(stlDataUrl) {
+            setTimeout(() => {
+                const canvas = document.getElementById('catalog-stl-canvas');
+                if (!canvas) return;
+                if (catalogStlRenderer) catalogStlRenderer.dispose();
+                const width = canvas.parentElement.clientWidth || 300;
+                const height = 192;
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x070b14);
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+                camera.position.set(0, 0, 150);
+                catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
+                catalogStlRenderer.setSize(width, height);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(1, 1, 1).normalize();
+                scene.add(directionalLight);
+                let mesh;
+                const loader = new THREE.STLLoader();
+                loader.load(stlDataUrl, function (geometry) {
+                    geometry.computeVertexNormals();
+                    geometry.center();
+                    geometry.computeBoundingSphere();
+                    const r = geometry.boundingSphere.radius || 1;
+                    const scale = 40 / r;
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.scale.setScalar(scale);
+                    scene.add(mesh);
+                }, undefined, function () {
+                    const geometry = new THREE.BoxGeometry(50, 50, 50);
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
                 });
-
-            (function animate() {
-                catalogStlAnim = requestAnimationFrame(animate);
-                if (!dragging) group.rotation.y += 0.006;
-                renderer.render(scene, camera);
-            })();
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
+                    if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
+                }
+                animate();
+            }, 100);
         }
 
         function closeProductModal() {
-            catalogStlToken++;
-            cleanupCatalogViewer();
+            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
             document.getElementById('product-modal').classList.add('hidden');
         }
-
-        // ---------- CARRELLO ----------
 
         function addModalToCart(title, price, shipping) {
             const colorSelect = document.getElementById('modal-color');
@@ -454,7 +374,7 @@
         }
 
         async function submitReview(productTitle) {
-            const currentUser = safeGetUser();
+            const currentUser = getCurrentUser();
             if (!currentUser) { alert("Devi effettuare l'accesso."); return; }
             const rating = parseInt(document.getElementById('rev-rating').value);
             const comment = document.getElementById('rev-comment').value.trim();
@@ -511,27 +431,20 @@
 
             if (counter) counter.innerText = totalQty;
             if (totalModal) totalModal.innerText = `€${(productsPrice + finalShipping).toFixed(2)}`;
-            try { lucide.createIcons(); } catch (e) {}
+            try { lucide.createIcons(); } catch(e){}
         }
 
         function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
         function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
-        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+        function toggleCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
-
-        // Chiudi il modale prodotto con ESC
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && !document.getElementById('product-modal').classList.contains('hidden')) closeProductModal();
-        });
 
         async function loadData() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '<p class="col-span-full text-center text-gray-500 font-mono py-12">Caricamento prodotti...</p>';
-            try { await fetchAllData(); renderCatalog(); }
+            try { await fetchAll(); renderCatalog(); }
             catch (e) { console.error(e); grid.innerHTML = '<p class="col-span-full text-center text-red-400 font-mono py-12">Impossibile caricare il catalogo. Riprova più tardi.</p>'; }
         }
-
-        try { lucide.createIcons(); } catch (e) {}
         updateCartUI();
         loadData();
     </script>
