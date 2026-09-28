@@ -33,13 +33,22 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
+    <!-- HEADER CON MENU COMPLETO -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
+            
+            <!-- Menu di Navigazione -->
+            <nav class="hidden md:flex items-center gap-8 font-mono text-xs">
+                <a href="index.html" class="text-brand-400 font-bold transition-colors">Home</a>
+                <a href="catalog.html" class="text-gray-300 hover:text-brand-400 transition-colors">Catalogo</a>
+                <a href="#about" class="text-gray-300 hover:text-brand-400 transition-colors">Chi Siamo</a>
+                <a href="#contact" class="text-gray-300 hover:text-brand-400 transition-colors">Contatti</a>
+            </nav>
+
             <div class="flex items-center gap-4">
-                <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo Completo</a>
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -63,11 +72,23 @@
             <div class="border-b border-gray-800 pb-4 flex justify-between items-end">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Prodotti in Vetrina</h2>
-                    <p class="text-xs font-mono text-gray-400 mt-1">I nostri pezzi forti in evidenza.</p>
+                    <p class="text-xs font-mono text-gray-400 mt-1">I nostri pezzi forti in evidenza con anteprima 3D.</p>
                 </div>
             </div>
             <div id="featured-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
+
+        <!-- SEZIONE CHI SIAMO -->
+        <section id="about" class="border-t border-gray-800 pt-12 space-y-4">
+            <h2 class="text-xl font-bold text-white font-mono">Chi Siamo</h2>
+            <p class="text-xs font-mono text-gray-400 leading-relaxed">LS3Dmaker nasce dalla passione per la progettazione e la manifattura additiva. Uniamo competenze ingegneristiche avanzate per offrirti stampe 3D robuste, curate nei minimi dettagli e personalizzate sulle tue esigenze.</p>
+        </section>
+
+        <!-- SEZIONE CONTATTI -->
+        <section id="contact" class="border-t border-gray-800 pt-12 space-y-4">
+            <h2 class="text-xl font-bold text-white font-mono">Contattaci</h2>
+            <p class="text-xs font-mono text-gray-400">Hai richieste particolari o file STL personalizzati da stampare? Scrivici direttamente.</p>
+        </section>
     </main>
 
     <!-- CARRELLO MODALE -->
