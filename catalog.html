@@ -15,7 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <script src="config.js"></script>
-    <script src="colors_2.js"></script>
     <script src="mailer.js"></script>
 
     <script>
@@ -61,11 +60,6 @@
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- MODALE DETTAGLIO PRODOTTO & RICHIEDI INFO -->
-    <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
-    </div>
-
     <!-- CARRELLO MODALE -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex justify-end">
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
@@ -93,13 +87,18 @@
         </div>
     </div>
 
+    <!-- MODALE PRODOTTO & RICHIEDI INFO -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
+    </div>
+
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
         LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
 
     <script>
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
-        let productsCache = [], reviewsCache = [];
+        let productsCache = [], reviewsCache = [], categoriesCache = [];
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         function mapProduct(r) {
@@ -114,14 +113,16 @@
         }
         function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
 
-        async function fetchAll() {
-            const [p, r] = await Promise.all([
+        async function fetchAllData() {
+            const [p, r, c] = await Promise.all([
                 lsSb.from('products').select('*').order('created_at', { ascending: false }),
-                lsSb.from('reviews').select('*').order('created_at', { ascending: false })
+                lsSb.from('reviews').select('*').order('created_at', { ascending: false }),
+                lsSb.from('categories').select('*').order('name', { ascending: true })
             ]);
             if (p.error) throw p.error;
             productsCache = (p.data || []).map(mapProduct);
             reviewsCache = (r.data || []).map(mapReview);
+            categoriesCache = (c.data || []).map(item => item.name);
         }
 
         let cart = [];
@@ -129,23 +130,10 @@
         let currentCategory = 'Tutti';
         let catalogStlRenderer = null;
 
-        function getBaseCategories() {
-            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
-            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
-        }
-        function getCategories() {
-            const s = new Set(getBaseCategories());
-            productsCache.forEach(p => {
-                if (Array.isArray(p.categories)) p.categories.forEach(x => { if(x) s.add(x.trim()); });
-                else if (p.category) s.add(p.category.trim());
-            });
-            return [...s];
-        }
-
         function renderCategories() {
             const container = document.getElementById('category-filters');
             if (!container) return;
-            const categories = ['Tutti', ...getCategories()];
+            const categories = ['Tutti', ...categoriesCache];
             container.innerHTML = categories.map(cat => `
                 <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${currentCategory === cat ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white'}">
                     ${esc(cat)}
@@ -223,6 +211,28 @@
             const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
             const colorOptions = productColors.map(colorName => `<option value="${esc(colorName)}">● ${esc(colorName)}</option>`).join('');
 
+            const reviews = reviewsCache.filter(r => r.productTitle === p.title);
+            const currentUser = getCurrentUser();
+
+            let reviewFormHtml = currentUser ? `
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
+                    <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${esc(currentUser.name || currentUser.username)}</span></p>
+                    <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                        <option value="5">5 Stelle - Eccellente</option>
+                        <option value="4">4 Stelle - Molto buono</option>
+                        <option value="3">3 Stelle - Buono</option>
+                        <option value="2">2 Stelle - Sufficiente</option>
+                        <option value="1">1 Stella - Scarsa</option>
+                    </select>
+                    <textarea id="rev-comment" placeholder="Scrivi il tuo commento..." rows="2" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none"></textarea>
+                    <button onclick="submitReview('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Invia Recensione</button>
+                </div>
+            ` : `
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 text-center space-y-2 font-mono">
+                    <p class="text-xs text-gray-400">Effettua l'accesso per poter lasciare recensioni.</p>
+                </div>
+            `;
+
             content.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                     <h2 class="text-lg font-bold text-white font-mono">${esc(p.title)}</h2>
@@ -248,9 +258,24 @@
                         </div>
                         <div class="flex gap-2">
                             <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${shippingPrice})" class="flex-grow py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
-                            <button onclick="openInquiryModal('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-3.5 bg-dark-surface hover:bg-gray-800 text-white font-bold rounded-xl border border-gray-700 cursor-pointer" title="Richiedi informazioni su questo prodotto">Richiedi Info</button>
+                            <button onclick="openInquiryModal('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-3.5 bg-dark-surface hover:bg-gray-800 text-white font-bold rounded-xl border border-gray-700 cursor-pointer" title="Richiedi informazioni">Richiedi Info</button>
                         </div>
                     </div>
+                </div>
+                <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
+                    <h3 class="text-sm font-bold text-white">Recensioni dei Clienti</h3>
+                    <div class="space-y-3 max-h-40 overflow-y-auto">
+                        ${reviews.length === 0 ? '<p class="text-gray-500 text-xs">Ancora nessuna recensione.</p>' : reviews.map(r => `
+                            <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
+                                <div class="flex justify-between text-gray-400 text-[10px]">
+                                    <span class="font-bold text-white">${esc(r.author)}</span>
+                                    <span class="text-brand-400">${r.rating}/5 ★</span>
+                                </div>
+                                <p class="mt-1 text-gray-300">${esc(r.comment)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${reviewFormHtml}
                 </div>
             `;
             modal.classList.remove('hidden');
@@ -273,8 +298,27 @@
             }
         }
 
-        function closeProductModal() {
-            document.getElementById('product-modal').classList.add('hidden');
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+
+        function getCurrentUser() {
+            try { const user = localStorage.getItem('ls3d_logged_user'); if (user) return JSON.parse(user); } catch (e) {}
+            return null;
+        }
+
+        async function submitReview(productTitle) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) { alert("Devi effettuare l'accesso."); return; }
+            const rating = parseInt(document.getElementById('rev-rating').value);
+            const comment = document.getElementById('rev-comment').value.trim();
+            if (!comment) { alert("Scrivi un commento."); return; }
+            const p = productsCache.find(x => x.title === productTitle);
+            if (!p) return;
+            const row = { product_id: p.id, product_title: productTitle, author: String(currentUser.name || currentUser.username).slice(0, 60), rating, comment: comment.slice(0, 1000) };
+            const { data, error } = await lsSb.from('reviews').insert(row).select().single();
+            if (error) { alert("Errore nell'invio della recensione."); return; }
+            reviewsCache.unshift(mapReview(data));
+            alert("Recensione inviata con successo!");
+            openProductModal(p.id);
         }
 
         function addModalToCart(title, price, shipping) {
@@ -342,7 +386,7 @@
         async function loadData() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '<p class="col-span-full text-center text-gray-500 font-mono py-12">Caricamento prodotti...</p>';
-            try { await fetchAll(); renderCatalog(); }
+            try { await fetchAllData(); renderCatalog(); }
             catch (e) { console.error(e); grid.innerHTML = '<p class="col-span-full text-center text-red-400 font-mono py-12">Impossibile caricare il catalogo. Riprova più tardi.</p>'; }
         }
         updateCartUI();
