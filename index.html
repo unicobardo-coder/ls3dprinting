@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS3Dmaker | Stampa 3D Professionale & Design</title>
+    <title>LS3Dmaker | Stampa 3D Professionale</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <script src="config.js"></script>
-    <script src="colors_2.js"></script>
-    <script src="i18n.js"></script>
+    <script src="mailer.js"></script>
 
     <script>
         tailwind.config = {
@@ -38,77 +38,33 @@
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            
-            <div class="hidden md:flex items-center gap-5 font-mono text-xs">
-                <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-300 hover:text-white transition-colors">Chi Siamo</a>
-                <a href="catalog.html" id="nav-catalogo" class="text-gray-300 hover:text-white transition-colors">Catalogo 3D</a>
-                <a href="info.html" id="nav-info" class="text-brand-400 hover:text-brand-300 transition-colors font-bold">Info & Preventivi</a>
-                <a href="login.html" id="nav-accedi" class="text-gray-300 hover:text-white transition-colors">Accedi / Registrati</a>
-                
-                <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
-                    <option value="it">IT</option>
-                    <option value="en">EN</option>
-                    <option value="fr">FR</option>
-                    <option value="es">ES</option>
-                    <option value="de">DE</option>
-                </select>
-
-                <a href="admin.html" id="nav-admin" class="text-brand-400 hover:text-brand-300 transition-colors font-bold border border-brand-500/30 px-3 py-1.5 rounded-lg bg-brand-500/10">Admin</a>
-            </div>
-
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
+                <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo Completo</a>
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="toggleMobileMenu()" class="md:hidden bg-dark-surface border border-gray-800 p-3 rounded-xl text-gray-300 hover:text-white cursor-pointer">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
             </div>
-        </div>
-
-        <div id="mobile-menu" class="hidden md:hidden bg-dark-card border-b border-gray-800 px-6 py-4 space-y-4 font-mono text-xs shadow-2xl">
-            <div class="flex items-center justify-between pb-2 border-b border-gray-800">
-                <span class="text-gray-400">Seleziona Lingua:</span>
-                <select id="lang-selector-mobile" onchange="changeLanguage(this.value);" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
-                    <option value="it">IT</option>
-                    <option value="en">EN</option>
-                    <option value="fr">FR</option>
-                    <option value="es">ES</option>
-                    <option value="de">DE</option>
-                </select>
-            </div>
-            <nav class="flex flex-col space-y-3">
-                <a href="chisiamo.html" class="text-gray-300 hover:text-white transition-colors py-1">Chi Siamo</a>
-                <a href="catalog.html" class="text-gray-300 hover:text-white transition-colors py-1">Catalogo 3D</a>
-                <a href="info.html" class="text-brand-400 font-bold hover:text-brand-300 transition-colors py-1">Info & Preventivi</a>
-                <a href="login.html" class="text-gray-300 hover:text-white transition-colors py-1">Accedi / Registrati</a>
-                <a href="admin.html" class="text-brand-400 font-bold hover:text-brand-300 transition-colors py-1">Admin Panel</a>
-            </nav>
         </div>
     </header>
 
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-16">
-        <div class="text-center space-y-4 py-8">
-            <h1 id="hero-title" class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampa 3D di Alta Precisione</h1>
-            <p id="hero-subtitle" class="text-xs sm:text-sm font-mono text-gray-400 max-w-2xl mx-auto">Realizziamo i tuoi progetti con materiali avanzati e finiture curate nei minimi dettagli.</p>
-            <div class="pt-4 flex flex-wrap justify-center gap-4">
-                <a href="catalog.html" id="hero-cta" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg inline-flex items-center gap-2">
-                    Esplora il Catalogo <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
-                <a href="info.html" class="px-6 py-3.5 bg-dark-surface hover:bg-gray-800 text-white font-bold rounded-xl text-xs font-mono border border-gray-700 transition-all shadow-lg inline-flex items-center gap-2">
-                    Informazioni e Preventivi <i data-lucide="help-circle" class="w-4 h-4 text-brand-400"></i>
-                </a>
+        <!-- HERO SECTION -->
+        <div class="text-center space-y-4 max-w-3xl mx-auto py-8">
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampe 3D di Alta Qualità & Modelli Custom</h1>
+            <p class="text-sm font-mono text-gray-400">Realizziamo le tue idee con precisione professionale. Sfoglia la vetrina o esplora il catalogo completo.</p>
+            <div class="pt-4 flex justify-center gap-4">
+                <a href="catalog.html" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg">Vai al Catalogo</a>
             </div>
         </div>
 
+        <!-- SEZIONE VETRINA IN EVIDENZA -->
         <div class="space-y-6">
             <div class="border-b border-gray-800 pb-4 flex justify-between items-end">
                 <div>
-                    <h2 id="vetrina-title" class="text-xl sm:text-2xl font-bold text-white tracking-tight font-mono">Prodotti in Vetrina</h2>
-                    <p id="vetrina-desc" class="text-xs font-mono text-gray-400">Clicca su un prodotto per visualizzarne i dettagli e l'anteprima 3D.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Prodotti in Vetrina</h2>
+                    <p class="text-xs font-mono text-gray-400 mt-1">I nostri pezzi forti in evidenza.</p>
                 </div>
-                <a href="catalog.html" id="vetrina-all" class="text-xs font-mono text-brand-400 hover:underline">Vedi tutti →</a>
             </div>
             <div id="featured-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
@@ -119,7 +75,7 @@
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
             <div class="space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h2 id="cart-title" class="text-base font-bold text-white flex items-center gap-2 font-mono">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2 font-mono">
                         <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i> Il tuo Carrello
                     </h2>
                     <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -127,24 +83,27 @@
                 <div id="cart-items-container" class="space-y-3 font-mono text-xs max-h-[50vh] overflow-y-auto pr-1"></div>
             </div>
             <div class="border-t border-gray-800 pt-4 space-y-4">
+                <div class="flex flex-col gap-1 font-mono text-xs text-gray-400 pb-2 border-b border-gray-800">
+                    <div class="flex justify-between"><span>Spedizione combinata:</span> <span class="text-brand-400">+€2.00 per articolo extra</span></div>
+                </div>
                 <div class="flex justify-between items-center font-bold text-sm">
-                    <span id="cart-total-label">Totale (incl. spedizione):</span>
+                    <span>Totale (incl. spedizione):</span>
                     <span id="cart-modal-total" class="text-brand-400">€0.00</span>
                 </div>
-                <button onclick="goToCheckout()" id="cart-checkout-btn" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                <button onclick="goToCheckout()" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                     Procedi al Checkout Sicuro <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE PRODOTTO -->
+    <!-- MODALE PRODOTTO & VIEWER 3D -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
     </div>
 
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
-        <span id="footer-copy">LS3DMAKER © 2026 - Tutti i diritti riservati</span>
+        LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
 
     <script>
@@ -153,11 +112,13 @@
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         function mapProduct(r) {
-            return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
+            return { 
+                id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
                 price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
                 shipping: Number(r.shipping), shortDesc: r.short_desc, longDesc: r.long_desc,
                 images: r.images || [], mainImageIndex: r.main_image_index || 0, colors: r.colors || [],
-                featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url };
+                featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url 
+            };
         }
         function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
 
@@ -171,14 +132,8 @@
             reviewsCache = (r.data || []).map(mapReview);
         }
 
-        function getProducts() { return productsCache; }
-        function getReviews() { return reviewsCache; }
-
         function getCurrentUser() {
-            try {
-                const user = localStorage.getItem('ls3d_logged_user');
-                if (user) return JSON.parse(user);
-            } catch (e) {}
+            try { const user = localStorage.getItem('ls3d_logged_user'); if (user) return JSON.parse(user); } catch (e) {}
             return null;
         }
 
@@ -186,63 +141,74 @@
         try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
         let catalogStlRenderer = null;
 
-        function renderFeaturedProducts() {
+        async function renderFeaturedProducts() {
             const grid = document.getElementById('featured-products-grid');
             if (!grid) return;
-            const products = getProducts();
-            
-            const featuredProducts = products.filter(p => p.featured === true);
-            const displayList = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 3);
-
-            if (displayList.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto in vetrina al momento.</p>`;
-                return;
-            }
-
-            grid.innerHTML = displayList.map(p => {
-                const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
-                const listPrice = Number(p.price) || 0;
-                const salePrice = p.salePrice !== null && p.salePrice !== undefined ? Number(p.salePrice) : null;
-                const finalPrice = salePrice !== null ? salePrice : listPrice;
-
-                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${finalPrice.toFixed(2)}</span>`;
-                if (salePrice !== null && salePrice < listPrice) {
-                    priceHtml = `<div class="flex items-center gap-2"><span class="font-mono font-bold text-brand-400 text-sm">€${salePrice.toFixed(2)}</span><span class="font-mono text-gray-500 text-xs line-through">€${listPrice.toFixed(2)}</span></div>`;
+            try {
+                await fetchAll();
+                const featured = productsCache.filter(p => p.featured);
+                if (featured.length === 0) {
+                    grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto in vetrina al momento. Visita il catalogo completo.</p>`;
+                    return;
                 }
 
-                return `
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all cursor-pointer" onclick="openProductModal(${p.id})">
-                        <div class="h-48 overflow-hidden bg-dark-bg relative">
-                            <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
-                            ${p.stlFileName ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
+                grid.innerHTML = featured.map(p => {
+                    const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
+                    const listPrice = Number(p.price) || 0;
+                    const salePrice = p.salePrice !== null && p.salePrice !== undefined ? Number(p.salePrice) : null;
+                    const finalPrice = salePrice !== null ? salePrice : listPrice;
+                    const shippingPrice = Number(p.shipping !== undefined ? p.shipping : 5.00);
+
+                    let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${finalPrice.toFixed(2)}</span>`;
+                    if (salePrice !== null && salePrice < listPrice) {
+                        priceHtml = `<div class="flex items-center gap-2"><span class="font-mono font-bold text-brand-400 text-sm">€${salePrice.toFixed(2)}</span><span class="font-mono text-gray-500 text-xs line-through">€${listPrice.toFixed(2)}</span></div>`;
+                    }
+
+                    return `
+                        <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all">
+                            <div onclick="openProductModal(${p.id})" class="cursor-pointer">
+                                <div class="h-48 overflow-hidden bg-dark-bg relative">
+                                    <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
+                                    ${(p.stlFileName || p.stlUrl) ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
+                                </div>
+                                <div class="p-5 space-y-2">
+                                    <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
+                                    <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${esc(p.shortDesc || '')}</p>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0 border-t border-gray-800/60 mt-4 space-y-3 font-mono">
+                                <div class="flex items-center justify-between">
+                                    <div>${priceHtml}</div>
+                                    <button onclick="openProductModal(${p.id})" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs cursor-pointer">Dettagli</button>
+                                </div>
+                                <div class="text-[10px] text-gray-400 bg-dark-bg p-2 rounded-lg border border-gray-800/80 flex justify-between items-center">
+                                    <span>Spedizione: <strong class="text-white">€${shippingPrice.toFixed(2)}</strong></span>
+                                    <span class="text-brand-400">+€2.00 per extra</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-5 space-y-2">
-                            <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
-                            <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${esc(p.shortDesc || '')}</p>
-                        </div>
-                        <div class="p-5 pt-0 flex items-center justify-between border-t border-gray-800/60 mt-4">
-                            <div>${priceHtml}</div>
-                            <span class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs font-mono">Dettagli</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            try { lucide.createIcons(); } catch(e){}
+                    `;
+                }).join('');
+                try { lucide.createIcons(); } catch(e){}
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = `<p class="col-span-full text-center text-red-400 font-mono py-12">Impossibile caricare la vetrina.</p>`;
+            }
         }
 
         function openProductModal(productId) {
-            const p = getProducts().find(prod => prod.id === productId);
+            const p = productsCache.find(prod => prod.id === productId);
             if (!p) return;
-
             const modal = document.getElementById('product-modal');
             const content = document.getElementById('product-modal-content');
             const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
+            const shippingPrice = Number(p.shipping !== undefined ? p.shipping : 5.00);
             
             const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
             const colorOptions = productColors.map(colorName => `<option value="${esc(colorName)}">● ${esc(colorName)}</option>`).join('');
 
-            const reviews = getReviews().filter(r => r.productTitle === p.title);
+            const reviews = reviewsCache.filter(r => r.productTitle === p.title);
             const currentUser = getCurrentUser();
 
             let reviewFormHtml = currentUser ? `
@@ -275,16 +241,30 @@
                         <div class="flex gap-2 overflow-x-auto pb-2">
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
+                        ${(p.stlFileName || p.stlUrl) ? `
+                            <div class="space-y-1 pt-2">
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
+                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center overflow-hidden">
+                                    <canvas id="catalog-stl-canvas" style="width: 100%; height: 100%; display: block;" class="touch-none"></canvas>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono pointer-events-none">Anteprima 3D Interattiva</span>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                     <div class="space-y-4 font-mono text-xs">
                         <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
                         <p class="text-brand-400 font-bold text-base">€${(p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price).toFixed(2)}</p>
-                        <p class="text-gray-500">Spedizione: €${(p.shipping !== undefined ? p.shipping : 5.00).toFixed(2)}</p>
+                        
+                        <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 space-y-1 text-gray-300">
+                            <div class="flex justify-between"><span>Costo Spedizione Base:</span> <strong class="text-white">€${shippingPrice.toFixed(2)}</strong></div>
+                            <div class="flex justify-between text-brand-400"><span>Articoli successivi:</span> <strong>+€2.00 cad.</strong></div>
+                        </div>
+
                         <div class="space-y-1 pt-2">
                             <label class="text-gray-400">Colore Filamento:</label>
                             <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none">${colorOptions}</select>
                         </div>
-                        <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${p.shipping !== undefined ? p.shipping : 5.00})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
+                        <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${shippingPrice})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                     </div>
                 </div>
                 <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
@@ -305,9 +285,67 @@
             `;
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
+            if (p.stlFileName || p.stlUrl) initCatalogStlViewer(p.stlUrl || p.stlFileName);
+        }
+
+        function initCatalogStlViewer(stlDataUrl) {
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const canvas = document.getElementById('catalog-stl-canvas');
+                    if (!canvas) return;
+                    if (catalogStlRenderer) {
+                        catalogStlRenderer.dispose();
+                        catalogStlRenderer = null;
+                    }
+                    const parent = canvas.parentElement;
+                    const width = parent ? (parent.clientWidth || parent.getBoundingClientRect().width || 300) : 300;
+                    const height = 192;
+
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0x070b14);
+
+                    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+                    camera.position.set(0, 0, 150);
+
+                    catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
+                    catalogStlRenderer.setSize(width, height, false);
+
+                    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                    directionalLight.position.set(1, 1, 1).normalize();
+                    scene.add(directionalLight);
+
+                    let mesh;
+                    const loader = new THREE.STLLoader();
+                    loader.load(stlDataUrl, function (geometry) {
+                        geometry.computeVertexNormals();
+                        geometry.center();
+                        geometry.computeBoundingSphere();
+                        const r = geometry.boundingSphere.radius || 1;
+                        const scale = 40 / r;
+                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        mesh.scale.setScalar(scale);
+                        scene.add(mesh);
+                    }, undefined, function () {
+                        const geometry = new THREE.BoxGeometry(50, 50, 50);
+                        const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        scene.add(mesh);
+                    });
+
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
+                        if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
+                    }
+                    animate();
+                }, 150);
+            });
         }
 
         function closeProductModal() {
+            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
             document.getElementById('product-modal').classList.add('hidden');
         }
 
@@ -343,23 +381,28 @@
             const counter = document.getElementById('cart-counter');
             const container = document.getElementById('cart-items-container');
             const totalModal = document.getElementById('cart-modal-total');
-            let totalQty = 0, productsPrice = 0, maxShipping = 0;
+            let totalQty = 0, productsPrice = 0, baseShipping = 0;
+
             if (cart.length === 0) {
                 if (container) container.innerHTML = `<p class="text-gray-500 text-center py-6">Il carrello è vuoto.</p>`;
                 if (totalModal) totalModal.innerText = "€0.00";
                 if (counter) counter.innerText = "0";
                 return;
             }
+
             if (container) {
                 container.innerHTML = cart.map((item, index) => {
-                    totalQty += item.qty;
-                    const itemTotal = item.price * item.qty;
+                    const itemQty = Number(item.qty) || 1;
+                    totalQty += itemQty;
+                    const itemTotal = (Number(item.price) || 0) * itemQty;
                     productsPrice += itemTotal;
-                    if ((item.shipping || 0) > maxShipping) maxShipping = item.shipping;
+                    const itemShipping = Number(item.shipping !== undefined ? item.shipping : 5.00);
+                    if (itemShipping > baseShipping) baseShipping = itemShipping;
+
                     return `
                         <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                             <div>
-                                <p class="font-bold text-white">${item.qty}x ${esc(item.title)}</p>
+                                <p class="font-bold text-white">${itemQty}x ${esc(item.title)}</p>
                                 <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${esc(item.color)}</span></p>
                             </div>
                             <div class="flex items-center gap-3">
@@ -370,23 +413,22 @@
                     `;
                 }).join('');
             }
+
+            const totalExtraItems = Math.max(0, totalQty - 1);
+            const finalShipping = baseShipping + (totalExtraItems * 2.00);
+
             if (counter) counter.innerText = totalQty;
-            if (totalModal) totalModal.innerText = `€${(productsPrice + maxShipping).toFixed(2)}`;
+            if (totalModal) totalModal.innerText = `€${(productsPrice + finalShipping).toFixed(2)}`;
             try { lucide.createIcons(); } catch(e){}
         }
 
         function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
         function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
-        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
         function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
 
-        async function init() {
-            try { await fetchAll(); } catch(e) { console.error(e); }
-            renderFeaturedProducts();
-            updateCartUI();
-        }
-        init();
+        renderFeaturedProducts();
+        updateCartUI();
     </script>
 </body>
 </html>
