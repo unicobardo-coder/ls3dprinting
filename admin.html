@@ -68,7 +68,7 @@
         <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di prodotti, utenti registrati e fatture.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di prodotti, categorie, colori, utenti e fatture.</p>
             </div>
             <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
@@ -163,6 +163,27 @@
                 </div>
                 <div id="admin-products-list" class="space-y-3"></div>
             </div>
+        </section>
+
+        <!-- SEZIONE GESTIONE CATEGORIE -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Categorie</h2>
+            <div class="flex gap-2">
+                <input type="text" id="new-category-input" placeholder="Nuova categoria..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2 text-white focus:outline-none flex-grow">
+                <button type="button" onclick="addNewCategory()" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer">Aggiungi Categoria</button>
+            </div>
+            <div id="admin-categories-list" class="space-y-2 pt-2"></div>
+        </section>
+
+        <!-- SEZIONE GESTIONE COLORI FILAMENTI -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Colori (Filamenti 3D)</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <input type="text" id="new-color-name" placeholder="Nome colore (es. Blu Elettrico)..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2 text-white focus:outline-none">
+                <input type="color" id="new-color-hex" value="#10b981" class="w-full h-10 bg-dark-bg border border-gray-700/80 rounded-xl px-2 cursor-pointer">
+                <button type="button" onclick="addNewColor()" class="py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer">Aggiungi Colore</button>
+            </div>
+            <div id="admin-colors-list" class="space-y-2 pt-2"></div>
         </section>
 
         <!-- SEZIONE UTENTI REGISTRATI -->
@@ -262,7 +283,10 @@
             try {
                 await fetchAll();
                 renderCategoryCheckboxes();
+                renderColorCheckboxes();
                 renderAdminProducts();
+                renderAdminCategories();
+                renderAdminColors();
                 renderAdminUsers();
                 renderAdminOrders();
                 renderAdminReviews();
@@ -297,13 +321,20 @@
         let mainImageIdx = 0;
         let currentStlFile = null, currentStlUrl = '', currentStlFileName = '';
 
-        function getBaseCategories() {
+        // --- GESTIONE DINAMICA CATEGORIE ---
+        function getManagedCategories() {
             try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
             return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
 
+        function saveManagedCategories(cats) {
+            localStorage.setItem('ls3d_categories', JSON.stringify(cats));
+            renderCategoryCheckboxes();
+            renderAdminCategories();
+        }
+
         function getCategories() {
-            const s = new Set(getBaseCategories());
+            const s = new Set(getManagedCategories());
             productsCache.forEach(p => {
                 if (Array.isArray(p.categories)) p.categories.forEach(x => { if(x) s.add(x.trim()); });
                 else if (p.category) s.add(p.category.trim());
@@ -323,10 +354,76 @@
             `).join('');
         }
 
+        function renderAdminCategories() {
+            const container = document.getElementById('admin-categories-list');
+            if (!container) return;
+            const cats = getManagedCategories();
+            container.innerHTML = cats.map((cat, idx) => `
+                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                    <span class="text-white font-bold">${esc(cat)}</span>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="renameCategory(${idx})" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer">Rinomina</button>
+                        <button type="button" onclick="deleteCategory(${idx})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addNewCategory() {
+            const input = document.getElementById('new-category-input');
+            const val = input.value.trim();
+            if (!val) { alert("Inserisci un nome per la categoria."); return; }
+            const cats = getManagedCategories();
+            if (cats.includes(val)) { alert("Questa categoria esiste già."); return; }
+            cats.push(val);
+            saveManagedCategories(cats);
+            input.value = '';
+            alert("Categoria aggiunta con successo!");
+        }
+
+        function renameCategory(idx) {
+            const cats = getManagedCategories();
+            const oldName = cats[idx];
+            const newName = prompt(`Rinomina la categoria "${oldName}":`, oldName);
+            if (!newName || !newName.trim()) return;
+            cats[idx] = newName.trim();
+            saveManagedCategories(cats);
+            alert("Categoria rinominata!");
+        }
+
+        function deleteCategory(idx) {
+            const cats = getManagedCategories();
+            if (cats.length <= 1) { alert("Devi mantenere almeno una categoria."); return; }
+            if (!confirm(`Vuoi eliminare la categoria "${cats[idx]}"?`)) return;
+            cats.splice(idx, 1);
+            saveManagedCategories(cats);
+            alert("Categoria eliminata.");
+        }
+
+
+        // --- GESTIONE DINAMICA COLORI ---
+        function getManagedColors() {
+            try { const stored = localStorage.getItem('ls3d_colors'); if (stored) return JSON.parse(stored); } catch(e) {}
+            return typeof filamentColors !== 'undefined' ? filamentColors : [
+                { name: "Nero Opaco", code: "#111827" },
+                { name: "Bianco Puro", code: "#f9fafb" },
+                { name: "Verde Brand", code: "#10b981" },
+                { name: "Rosso Fuoco", code: "#ef4444" }
+            ];
+        }
+
+        function saveManagedColors(colors) {
+            localStorage.setItem('ls3d_colors', JSON.stringify(colors));
+            window.filamentColors = colors;
+            renderColorCheckboxes();
+            renderAdminColors();
+        }
+
         function renderColorCheckboxes(selectedColors = []) {
             const container = document.getElementById('prod-colors-checkboxes');
             if (!container) return;
-            container.innerHTML = filamentColors.map(c => `
+            const colors = getManagedColors();
+            container.innerHTML = colors.map(c => `
                 <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-card p-2 rounded-lg border border-gray-800">
                     <input type="checkbox" name="product-colors" value="${esc(c.name)}" ${selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
                     <span class="w-3 h-3 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
@@ -334,6 +431,60 @@
                 </label>
             `).join('');
         }
+
+        function renderAdminColors() {
+            const container = document.getElementById('admin-colors-list');
+            if (!container) return;
+            const colors = getManagedColors();
+            container.innerHTML = colors.map((c, idx) => `
+                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
+                        <span class="text-white font-bold">${esc(c.name)}</span>
+                        <span class="text-gray-500 font-mono text-[10px]">${c.code}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="editColor(${idx})" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer">Modifica</button>
+                        <button type="button" onclick="deleteColor(${idx})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addNewColor() {
+            const nameInput = document.getElementById('new-color-name');
+            const codeInput = document.getElementById('new-color-hex');
+            const name = nameInput.value.trim();
+            const code = codeInput.value;
+            if (!name) { alert("Inserisci il nome del colore."); return; }
+            const colors = getManagedColors();
+            colors.push({ name, code });
+            saveManagedColors(colors);
+            nameInput.value = '';
+            alert("Colore aggiunto con successo!");
+        }
+
+        function editColor(idx) {
+            const colors = getManagedColors();
+            const c = colors[idx];
+            const newName = prompt("Modifica nome colore:", c.name);
+            if (newName === null) return;
+            const newCode = prompt("Modifica codice HEX (es. #10b981):", c.code);
+            if (newCode === null) return;
+            colors[idx] = { name: newName.trim() || c.name, code: newCode.trim() || c.code };
+            saveManagedColors(colors);
+            alert("Colore aggiornato!");
+        }
+
+        function deleteColor(idx) {
+            const colors = getManagedColors();
+            if (colors.length <= 1) { alert("Devi mantenere almeno un colore."); return; }
+            if (!confirm(`Vuoi eliminare il colore "${colors[idx].name}"?`)) return;
+            colors.splice(idx, 1);
+            saveManagedColors(colors);
+            alert("Colore eliminato.");
+        }
+
 
         function getProducts() { return productsCache; }
 
@@ -704,6 +855,8 @@
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             renderAdminProducts();
+            renderAdminCategories();
+            renderAdminColors();
             renderAdminUsers();
             renderAdminOrders();
             renderAdminReviews();
