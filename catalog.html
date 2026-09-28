@@ -247,9 +247,9 @@
                         ${p.stlFileName && p.stlUrl ? `
                             <div class="space-y-1 pt-2">
                                 <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
-                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
-                                    <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
-                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
+                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center overflow-hidden">
+                                    <canvas id="catalog-stl-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono pointer-events-none">Anteprima 3D Interattiva</span>
                                 </div>
                             </div>
                         ` : ''}
@@ -265,10 +265,7 @@
                             <label class="text-gray-400">Colore Filamento:</label>
                             <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none">${colorOptions}</select>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${shippingPrice})" class="flex-grow py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
-                            <button onclick="openInquiryModal('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-3.5 bg-dark-surface hover:bg-gray-800 text-white font-bold rounded-xl border border-gray-700 cursor-pointer" title="Richiedi informazioni">Richiedi Info</button>
-                        </div>
+                        <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${shippingPrice})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
                     </div>
                 </div>
                 <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
@@ -297,18 +294,24 @@
                 const canvas = document.getElementById('catalog-stl-canvas');
                 if (!canvas) return;
                 if (catalogStlRenderer) catalogStlRenderer.dispose();
-                const width = canvas.parentElement.clientWidth || 300;
+
+                const width = canvas.parentElement.clientWidth || 320;
                 const height = 192;
+
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x070b14);
+
                 const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
                 camera.position.set(0, 0, 150);
+
                 catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-                catalogStlRenderer.setSize(width, height);
-                scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                catalogStlRenderer.setSize(width, height, false);
+
+                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
                 directionalLight.position.set(1, 1, 1).normalize();
                 scene.add(directionalLight);
+
                 let mesh;
                 const loader = new THREE.STLLoader();
                 loader.load(stlDataUrl, function (geometry) {
@@ -316,40 +319,30 @@
                     geometry.center();
                     geometry.computeBoundingSphere();
                     const r = geometry.boundingSphere.radius || 1;
-                    const scale = 40 / r;
+                    const scale = 50 / r;
                     const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
                     mesh = new THREE.Mesh(geometry, material);
                     mesh.scale.setScalar(scale);
                     scene.add(mesh);
-                }, undefined, function () {
+                }, undefined, function (error) {
+                    console.error('Errore caricamento STL:', error);
+                    // Fallback visuale in caso di errore di rete/CORS
                     const geometry = new THREE.BoxGeometry(50, 50, 50);
-                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    const material = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
                     mesh = new THREE.Mesh(geometry, material);
                     scene.add(mesh);
                 });
+
                 function animate() {
                     requestAnimationFrame(animate);
-                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
+                    if (mesh) {
+                        mesh.rotation.x += 0.005;
+                        mesh.rotation.y += 0.008;
+                    }
                     if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
                 }
                 animate();
-            }, 50);
-        }
-
-        function openInquiryModal(productTitle) {
-            const email = prompt(`Inserisci la tua email per richiedere informazioni su "${productTitle}":`);
-            if (!email) return;
-            const message = prompt("Scrivi il tuo messaggio o la richiesta personalizzata:");
-            if (!message) return;
-
-            if (typeof sendContactEmail === 'function') {
-                sendContactEmail({ name: "Cliente Catalogo", email: email, message: `Richiesta info per prodotto: ${productTitle}\n\nMessaggio: ${message}` }, 
-                    () => alert("Richiesta inviata con successo! Ti risponderemo presto."),
-                    (err) => alert("Errore durante l'invio della richiesta.")
-                );
-            } else {
-                alert("Servizio email non disponibile.");
-            }
+            }, 100);
         }
 
         function closeProductModal() {
@@ -357,9 +350,16 @@
             document.getElementById('product-modal').classList.add('hidden');
         }
 
-        function getCurrentUser() {
-            try { const user = localStorage.getItem('ls3d_logged_user'); if (user) return JSON.parse(user); } catch (e) {}
-            return null;
+        function addModalToCart(title, price, shipping) {
+            const colorSelect = document.getElementById('modal-color');
+            const selectedColor = colorSelect ? colorSelect.value : 'Standard';
+            const existingIndex = cart.findIndex(i => i.title === title && i.color === selectedColor);
+            if (existingIndex > -1) cart[existingIndex].qty += 1;
+            else cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
+            saveCart();
+            updateCartUI();
+            closeProductModal();
+            toggleCartModal();
         }
 
         async function submitReview(productTitle) {
@@ -376,18 +376,6 @@
             reviewsCache.unshift(mapReview(data));
             alert("Recensione inviata con successo!");
             openProductModal(p.id);
-        }
-
-        function addModalToCart(title, price, shipping) {
-            const colorSelect = document.getElementById('modal-color');
-            const selectedColor = colorSelect ? colorSelect.value : 'Standard';
-            const existingIndex = cart.findIndex(i => i.title === title && i.color === selectedColor);
-            if (existingIndex > -1) cart[existingIndex].qty += 1;
-            else cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
-            saveCart();
-            updateCartUI();
-            closeProductModal();
-            toggleCartModal();
         }
 
         function updateCartUI() {
@@ -437,7 +425,7 @@
 
         function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
         function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
-        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+        function toggleCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
 
         async function loadData() {
