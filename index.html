@@ -33,14 +33,14 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- HEADER CON MENU ORIGINALE E ACCESSO UTENTI/ADMIN -->
+    <!-- HEADER CON MENU DESKTOP E MOBILE HAMBURGER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             
-            <!-- Menu di Navigazione Originale -->
+            <!-- Menu di Navigazione Desktop -->
             <nav class="hidden md:flex items-center gap-6 font-mono text-xs">
                 <a href="index.html" class="text-brand-400 font-bold transition-colors">Home</a>
                 <a href="catalog.html" class="text-gray-300 hover:text-brand-400 transition-colors">Catalogo 3D</a>
@@ -57,7 +57,20 @@
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </button>
+                <!-- Pulsante Hamburger Mobile -->
+                <button onclick="toggleMobileMenu()" class="md:hidden bg-dark-surface border border-gray-800 p-3 rounded-xl text-gray-300 hover:text-white cursor-pointer">
+                    <i data-lucide="menu" class="w-5 h-5 text-brand-400"></i>
+                </button>
             </div>
+        </div>
+
+        <!-- MENU MOBILE A TENDINA -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-card border-b border-gray-800 px-6 py-4 space-y-3 font-mono text-xs">
+            <a href="index.html" class="block text-brand-400 font-bold py-2">Home</a>
+            <a href="catalog.html" class="block text-gray-300 hover:text-white py-2">Catalogo 3D</a>
+            <a href="chisiamo.html" class="block text-gray-300 hover:text-white py-2">Chi Siamo</a>
+            <a href="admin.html" class="block text-gray-300 hover:text-white py-2">Admin</a>
+            <a href="login.html" id="mobile-auth-link" class="block text-brand-400 py-2 border-t border-gray-800 pt-3">👤 Accedi / Profilo</a>
         </div>
     </header>
 
@@ -154,10 +167,22 @@
             const user = getCurrentUser();
             const authText = document.getElementById('auth-text');
             const authLink = document.getElementById('auth-link');
-            if (user && authText && authLink) {
-                authText.innerText = user.name || user.username || 'Profilo';
-                authLink.href = 'profile.html';
+            const mobileAuthLink = document.getElementById('mobile-auth-link');
+            if (user) {
+                if (authText && authLink) {
+                    authText.innerText = user.name || user.username || 'Profilo';
+                    authLink.href = 'profile.html';
+                }
+                if (mobileAuthLink) {
+                    mobileAuthLink.innerText = `👤 Profilo (${user.name || user.username})`;
+                    mobileAuthLink.href = 'profile.html';
+                }
             }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
         }
 
         let cart = [];
