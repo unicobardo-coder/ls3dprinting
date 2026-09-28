@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin | LS3Dmaker</title>
+    <title>Pannello Admin - LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
     <script src="config.js"></script>
+    <script src="colors_2.js"></script>
 
     <script>
         tailwind.config = {
@@ -28,206 +32,663 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl font-mono text-xs">
+            <div class="text-center space-y-2">
+                <h2 class="text-xl font-bold text-white tracking-tight">Area Riservata Admin</h2>
+                <p class="text-gray-400">Accedi con il tuo account admin.</p>
+            </div>
+            <form onsubmit="checkAdminPassword(event)" class="space-y-4">
+                <input type="email" id="admin-email-input" placeholder="Email..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                <input type="password" id="admin-password-input" placeholder="Password..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Accedi</button>
+            </form>
+            <div class="text-center">
+                <a href="index.html" class="text-gray-500 hover:text-gray-300 underline">← Torna al sito</a>
+            </div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85 hidden" id="admin-header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            <div class="flex items-center gap-4 font-mono text-xs">
-                <a href="index.html" class="text-gray-300 hover:text-brand-400 transition-colors">Home</a>
-                <a href="catalog.html" class="text-gray-300 hover:text-brand-400 transition-colors">Catalogo</a>
-                <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition-colors cursor-pointer">Esci</button>
+            <div class="flex items-center gap-4">
+                <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo</a>
+                <button onclick="logoutAdmin()" class="text-xs font-mono text-red-400 hover:text-red-300 underline cursor-pointer">Esci</button>
             </div>
         </div>
     </header>
 
-    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-8">
-        <div class="flex justify-between items-center border-b border-gray-800 pb-6">
+    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12 hidden" id="admin-main-content">
+        <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello Amministrativo</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestisci i prodotti, i prezzi, le offerte e la vetrina di LS3Dmaker.</p>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di prodotti, utenti registrati e fatture.</p>
             </div>
-            <button onclick="openProductForm()" class="px-5 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg cursor-pointer">
-                + Nuovo Prodotto
+            <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
             </button>
         </div>
 
-        <div id="admin-products-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
+                <button type="button" onclick="resetProductForm()" id="cancel-edit-btn" class="hidden text-xs text-gray-400 hover:text-white font-mono underline cursor-pointer">Annulla Modifica</button>
+            </div>
+
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-mono">
+                <input type="hidden" id="edit-product-index" value="">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Titolo Prodotto *</label>
+                        <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Categorie Multiple *</label>
+                        <div id="prod-categories-checkboxes" class="bg-dark-bg border border-gray-700/80 rounded-xl p-3 max-h-36 overflow-y-auto space-y-2"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Prezzo Listino (€) *</label>
+                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Prezzo Scontato (€)</label>
+                        <input type="number" step="0.01" id="prod-saleprice" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Spedizione (€) *</label>
+                        <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
+                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Descrizione Lunga / Dettagliata *</label>
+                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                </div>
+
+                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Immagini Prodotto (Carica dal PC)</label>
+                    <input type="file" id="prod-file-input" accept="image/*" multiple onchange="handleImageFiles(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
+                    <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
+                </div>
+
+                <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Modello 3D (.STL)</label>
+                    <input type="file" id="prod-stl-input" accept=".stl" onchange="handleStlUpload(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
+                    <input type="hidden" id="prod-stl-name" value="">
+                    <div id="stl-viewer-container" class="w-full h-12 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center px-4 mt-3">
+                        <span id="stl-file-label" class="text-xs font-mono text-brand-400 font-bold">Nessun file caricato</span>
+                        <button type="button" onclick="removeStlFile()" class="absolute right-3 px-2.5 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer">Rimuovi STL</button>
+                    </div>
+                </div>
+
+                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
+                    <label class="block text-white font-bold">Colori Disponibili per questo Prodotto</label>
+                    <div id="prod-colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2"></div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
+                        <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="prod-combined-shipping" class="w-5 h-5 accent-brand-500 rounded cursor-pointer" checked>
+                        <label for="prod-combined-shipping" class="text-white font-bold cursor-pointer">Abilita Spedizione Combinata (+€2.00 su articoli extra)</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
+            </form>
+
+            <div class="pt-8 border-t border-gray-800 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <h3 class="text-sm font-bold text-white font-mono">Prodotti Esistenti nel Database</h3>
+                    <input type="text" id="admin-search-input" oninput="renderAdminProducts()" placeholder="Cerca prodotto per nome..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
+                </div>
+                <div id="admin-products-list" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Controllo Utenti Registrati</h2>
+            <div id="admin-users-list" class="space-y-3"></div>
+        </section>
+
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Ordini & Fatture</h2>
+            <div id="admin-orders-list" class="space-y-3"></div>
+        </section>
+
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Recensioni / Commenti</h2>
+            <div id="admin-reviews-list" class="space-y-3"></div>
+        </section>
     </main>
 
-    <!-- MODALE AGGIUNGI / MODIFICA PRODOTTO -->
-    <div id="product-form-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-dark-card border border-gray-800 w-full max-w-xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                <h2 id="modal-title" class="text-lg font-bold text-white font-mono">Aggiungi Prodotto</h2>
-                <button onclick="closeProductForm()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 font-sans">
+        <div class="bg-white text-gray-900 w-full max-w-2xl rounded-2xl p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start border-b pb-4">
+                <div>
+                    <h3 class="text-xl font-extrabold" id="inv-modal-number">Fattura N. 2026/01</h3>
+                    <p class="text-xs text-gray-500" id="inv-modal-date">Data: 27/09/2026</p>
+                </div>
+                <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-gray-700 font-bold text-lg cursor-pointer">✕</button>
             </div>
-            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 font-mono text-xs">
-                <input type="hidden" id="prod-id">
+            <div class="grid grid-cols-2 gap-4 text-xs">
                 <div>
-                    <label class="text-gray-400">Titolo Prodotto *</label>
-                    <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-gray-400">Prezzo Listino (€) *</label>
-                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1">
-                    </div>
-                    <div>
-                        <label class="text-gray-400">Prezzo in Offerta (€)</label>
-                        <input type="number" step="0.01" id="prod-sale-price" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1" placeholder="Lascia vuoto se non in offerta">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-gray-400">Spedizione Base (€)</label>
-                        <input type="number" step="0.01" id="prod-shipping" value="5.00" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1">
-                    </div>
-                    <div>
-                        <label class="text-gray-400">Categorie (separate da virgola)</label>
-                        <input type="text" id="prod-categories" placeholder="Accessori, Gadget" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1">
-                    </div>
+                    <p class="font-bold text-gray-700">Cedente:</p>
+                    <p>LS3DMAKER di Luigi Schiavello</p>
+                    <p>Bologna, Italia</p>
                 </div>
                 <div>
-                    <label class="text-gray-400">Descrizione Breve</label>
-                    <input type="text" id="prod-short-desc" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1">
+                    <p class="font-bold text-gray-700">Cliente:</p>
+                    <p id="inv-modal-client">-</p>
+                    <p id="inv-modal-email" class="text-gray-500">-</p>
+                    <p id="inv-modal-address" class="text-gray-500">-</p>
                 </div>
-                <div>
-                    <label class="text-gray-400">Descrizione Dettagliata</label>
-                    <textarea id="prod-long-desc" rows="3" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1"></textarea>
-                </div>
-                <div>
-                    <label class="text-gray-400">URL Immagini (separate da virgola)</label>
-                    <input type="text" id="prod-images" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1" placeholder="https://...">
-                </div>
-                <div>
-                    <label class="text-gray-400">URL File STL (Anteprima 3D)</label>
-                    <input type="text" id="prod-stl-url" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none mt-1" placeholder="Link al file .stl">
-                </div>
-                <div class="flex items-center gap-3 pt-2">
-                    <input type="checkbox" id="prod-featured" class="w-4 h-4 accent-brand-500 rounded">
-                    <label class="text-gray-300">Mostra in Vetrina (Homepage)</label>
-                </div>
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="closeProductForm()" class="px-4 py-2.5 bg-gray-800 text-gray-300 rounded-xl cursor-pointer">Annulla</button>
-                    <button type="submit" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer">Salva Prodotto</button>
-                </div>
-            </form>
+            </div>
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b text-gray-500 text-left">
+                        <th class="py-2">Prodotto</th>
+                        <th class="py-2 text-center">Qt.</th>
+                        <th class="py-2 text-right">Totale</th>
+                    </tr>
+                </thead>
+                <tbody id="inv-modal-items"></tbody>
+            </table>
+            <div class="flex justify-between items-center border-t pt-4 font-bold text-sm">
+                <span>Totale Documento:</span>
+                <span id="inv-modal-total" class="text-emerald-600">€0.00</span>
+            </div>
+            <div class="text-center pt-2">
+                <button onclick="closeInvoiceModal()" class="px-6 py-2 bg-gray-900 text-white rounded-xl text-xs font-mono cursor-pointer">Chiudi Anteprima</button>
+            </div>
         </div>
     </div>
 
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
-        LS3DMAKER © 2026 - Tutti i diritti riservati
+        LS3DMAKER © 2026 - Admin Panel
     </footer>
 
     <script>
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
-        let adminProducts = [];
+        let productsCache = [], reviewsCache = [];
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        
+        function mapProduct(r) {
+            return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
+                price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
+                shipping: Number(r.shipping), shortDesc: r.short_desc, longDesc: r.long_desc,
+                images: r.images || [], mainImageIndex: r.main_image_index || 0, colors: r.colors || [],
+                featured: r.featured, combinedShipping: r.combined_shipping !== false,
+                stlFileName: r.stl_file_name, stlUrl: r.stl_url };
+        }
+        function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
 
-        async function loadAdminProducts() {
+        async function fetchAll() {
+            const [p, r] = await Promise.all([
+                lsSb.from('products').select('*').order('created_at', { ascending: false }),
+                lsSb.from('reviews').select('*').order('created_at', { ascending: false })
+            ]);
+            if (p.error) throw p.error;
+            productsCache = (p.data || []).map(mapProduct);
+            reviewsCache = (r.data || []).map(mapReview);
+        }
+
+        async function forceSyncData() {
+            const btn = event?.target;
+            if (btn) btn.disabled = true;
+            try {
+                await fetchAll();
+                renderCategoryCheckboxes();
+                renderAdminProducts();
+                renderAdminUsers();
+                renderAdminOrders();
+                renderAdminReviews();
+                alert("Sincronizzazione completata con successo!");
+            } catch (e) {
+                console.error(e);
+                alert("Errore di sincronizzazione: " + e.message);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function checkAdminPassword(e) {
+            e.preventDefault();
+            const email = document.getElementById('admin-email-input').value.trim();
+            const password = document.getElementById('admin-password-input').value;
+            const { error } = await lsSb.auth.signInWithPassword({ email, password });
+            if (error) { alert("Credenziali errate."); return; }
+            revealAdminPanel();
+        }
+
+        function revealAdminPanel() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('admin-header').classList.remove('hidden');
+            document.getElementById('admin-main-content').classList.remove('hidden');
+            initAdminDashboard();
+        }
+
+        async function logoutAdmin() { await lsSb.auth.signOut(); location.reload(); }
+
+        let currentEditingImages = [];
+        let mainImageIdx = 0;
+        let currentStlFile = null, currentStlUrl = '', currentStlFileName = '';
+
+        function getBaseCategories() {
+            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
+        }
+
+        function getCategories() {
+            const s = new Set(getBaseCategories());
+            productsCache.forEach(p => {
+                if (Array.isArray(p.categories)) p.categories.forEach(x => { if(x) s.add(x.trim()); });
+                else if (p.category) s.add(p.category.trim());
+            });
+            return [...s];
+        }
+
+        function renderCategoryCheckboxes(selectedCategories = []) {
+            const container = document.getElementById('prod-categories-checkboxes');
+            if (!container) return;
+            const cats = getCategories();
+            container.innerHTML = cats.map(c => `
+                <label class="flex items-center gap-2 text-white cursor-pointer">
+                    <input type="checkbox" name="product-categories" value="${esc(c)}" ${selectedCategories.includes(c) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
+                    <span>${esc(c)}</span>
+                </label>
+            `).join('');
+        }
+
+        function renderColorCheckboxes(selectedColors = []) {
+            const container = document.getElementById('prod-colors-checkboxes');
+            if (!container) return;
+            container.innerHTML = filamentColors.map(c => `
+                <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-card p-2 rounded-lg border border-gray-800">
+                    <input type="checkbox" name="product-colors" value="${esc(c.name)}" ${selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
+                    <span class="w-3 h-3 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
+                    <span class="text-[11px]">${esc(c.name)}</span>
+                </label>
+            `).join('');
+        }
+
+        function getProducts() { return productsCache; }
+
+        function handleImageFiles(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        let width = img.width, height = img.height;
+                        const maxDim = 1200;
+                        if (width > height && width > maxDim) { height = Math.round(height * (maxDim / width)); width = maxDim; }
+                        else if (height > maxDim) { width = Math.round(width * (maxDim / height)); height = maxDim; }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        currentEditingImages.push(canvas.toDataURL('image/jpeg', 0.82));
+                        renderImagesPreview();
+                    };
+                    img.onerror = function() { currentEditingImages.push(e.target.result); renderImagesPreview(); };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function removeImageUrl(idx) {
+            currentEditingImages.splice(idx, 1);
+            if (mainImageIdx >= currentEditingImages.length) mainImageIdx = Math.max(0, currentEditingImages.length - 1);
+            renderImagesPreview();
+        }
+
+        function setMainImage(idx) { mainImageIdx = idx; renderImagesPreview(); }
+
+        function renderImagesPreview() {
+            const container = document.getElementById('admin-images-preview');
+            if (!container) return;
+            if (currentEditingImages.length === 0) { container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto caricata dal PC.</p>`; return; }
+            container.innerHTML = currentEditingImages.map((img, idx) => `
+                <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500 ring-2 ring-brand-500/50' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
+                    <img src="${img}" class="w-full h-20 object-cover rounded-lg">
+                    <div class="flex items-center justify-between w-full text-[10px] pt-1">
+                        <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold underline' : 'text-gray-400 hover:text-white'} cursor-pointer">Principale</button>
+                        <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300 font-bold cursor-pointer">Elimina</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleStlUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 50 * 1024 * 1024) { alert("File troppo grande (max 50 MB)."); event.target.value = ''; return; }
+            currentStlFile = file;
+            currentStlFileName = file.name;
+            document.getElementById('prod-stl-name').value = file.name;
+            document.getElementById('stl-file-label').innerText = "File STL: " + file.name;
+            document.getElementById('stl-viewer-container').classList.remove('hidden');
+        }
+
+        function removeStlFile() {
+            currentStlFile = null; currentStlUrl = ''; currentStlFileName = '';
+            document.getElementById('prod-stl-input').value = '';
+            document.getElementById('prod-stl-name').value = '';
+            document.getElementById('stl-viewer-container').classList.add('hidden');
+        }
+
+        const rid = () => Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        async function uploadToStorage(path, blob, contentType) {
+            const { error } = await lsSb.storage.from('catalog').upload(path, blob, { contentType, cacheControl: '31536000', upsert: false });
+            if (error) throw error;
+            return lsSb.storage.from('catalog').getPublicUrl(path).data.publicUrl;
+        }
+
+        async function saveProduct(e) {
+            e.preventDefault();
+            const index = document.getElementById('edit-product-index').value;
+            const categories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
+            if (categories.length === 0) { alert("Seleziona almeno una categoria."); return; }
+            const colors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(el => el.value);
+            if (colors.length === 0) { alert("Seleziona almeno un colore disponibile."); return; }
+            if (currentEditingImages.length === 0) { alert("Carica almeno un'immagine dal PC prima di salvare."); return; }
+            const salePriceInput = document.getElementById('prod-saleprice').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.textContent = 'Salvataggio in corso...';
+            try {
+                const images = [];
+                for (const img of currentEditingImages) {
+                    if (img.startsWith('data:')) {
+                        const blob = await (await fetch(img)).blob();
+                        images.push(await uploadToStorage('images/' + rid() + '.jpg', blob, 'image/jpeg'));
+                    } else images.push(img);
+                }
+                let stlUrl = currentStlUrl;
+                if (currentStlFile) stlUrl = await uploadToStorage('models/' + rid() + '.stl', currentStlFile, 'application/octet-stream');
+                const row = {
+                    title: document.getElementById('prod-title').value.trim(),
+                    categories, colors, images,
+                    main_image_index: Math.min(mainImageIdx, images.length - 1),
+                    price: parseFloat(document.getElementById('prod-price').value),
+                    sale_price: salePriceInput ? parseFloat(salePriceInput) : null,
+                    shipping: parseFloat(document.getElementById('prod-shipping').value) || 5.00,
+                    short_desc: document.getElementById('prod-desc').value.trim(),
+                    long_desc: document.getElementById('prod-longdesc').value.trim(),
+                    featured: document.getElementById('prod-featured').checked,
+                    combined_shipping: document.getElementById('prod-combined-shipping').checked,
+                    stl_file_name: stlUrl ? currentStlFileName : '', stl_url: stlUrl || ''
+                };
+                
+                const q = index !== '' ? lsSb.from('products').update(row).eq('id', productsCache[index].id) : lsSb.from('products').insert(row);
+                const { error } = await q;
+                if (error) throw error;
+                
+                await fetchAll();
+                resetProductForm();
+                renderCategoryCheckboxes();
+                renderAdminProducts();
+                alert("Prodotto salvato e sincronizzato con successo!");
+            } catch (err) {
+                console.error(err);
+                alert("Errore nel salvataggio: " + (err.message || err));
+            } finally {
+                btn.disabled = false; btn.textContent = 'Salva Prodotto';
+            }
+        }
+
+        function editProduct(idx) {
+            const p = getProducts()[idx];
+            document.getElementById('edit-product-index').value = idx;
+            document.getElementById('prod-title').value = p.title;
+            renderCategoryCheckboxes(p.categories || [p.category || '']);
+            renderColorCheckboxes(p.colors || []);
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
+            document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
+            document.getElementById('prod-desc').value = p.shortDesc || '';
+            document.getElementById('prod-longdesc').value = p.longDesc || '';
+            document.getElementById('prod-featured').checked = p.featured || false;
+            document.getElementById('prod-combined-shipping').checked = p.combinedShipping !== false;
+            currentEditingImages = [...(p.images || [])];
+            mainImageIdx = p.mainImageIndex || 0;
+            renderImagesPreview();
+            currentStlFileName = p.stlFileName || '';
+            currentStlFile = null; currentStlUrl = p.stlUrl || '';
+            document.getElementById('prod-stl-name').value = currentStlFileName;
+            if (currentStlFileName) {
+                document.getElementById('stl-file-label').innerText = "File STL: " + currentStlFileName;
+                document.getElementById('stl-viewer-container').classList.remove('hidden');
+            } else {
+                document.getElementById('stl-viewer-container').classList.add('hidden');
+            }
+            document.getElementById('product-form-title').innerText = "Modifica Prodotto";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetProductForm() {
+            document.getElementById('product-form').reset();
+            document.getElementById('edit-product-index').value = '';
+            document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            renderCategoryCheckboxes();
+            renderColorCheckboxes();
+            currentEditingImages = []; mainImageIdx = 0; renderImagesPreview();
+            removeStlFile();
+        }
+
+        async function deleteProduct(idx) {
+            if (!confirm("Vuoi eliminare definitivamente questo prodotto?")) return;
+            const p = productsCache[idx];
+            const { error } = await lsSb.from('products').delete().eq('id', p.id);
+            if (error) { alert("Errore durante l'eliminazione: " + error.message); return; }
+            await fetchAll(); 
+            renderCategoryCheckboxes();
+            renderAdminProducts(); 
+            renderAdminReviews();
+            alert("Prodotto eliminato correttamente.");
+        }
+
+        function renderAdminProducts() {
             const container = document.getElementById('admin-products-list');
-            container.innerHTML = '<p class="col-span-full text-center text-gray-500 font-mono py-12">Caricamento prodotti...</p>';
-            const { data, error } = await lsSb.from('products').select('*').order('created_at', { ascending: false });
-            if (error) { container.innerHTML = '<p class="col-span-full text-center text-red-400 font-mono">Errore nel caricamento.</p>'; return; }
-            adminProducts = data || [];
+            if (!container) return;
+            const searchVal = document.getElementById('admin-search-input')?.value.toLowerCase() || '';
+            const products = getProducts().filter(p => p.title.toLowerCase().includes(searchVal));
             
-            if (adminProducts.length === 0) {
-                container.innerHTML = '<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto presente.</p>';
-                return;
+            if (products.length === 0) { 
+                container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">Nessun prodotto trovato nel database.</p>`; 
+                return; 
             }
 
-            container.innerHTML = adminProducts.map(p => {
-                const img = (p.images && p.images.length > 0) ? p.images[0] : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400';
+            container.innerHTML = products.map((p) => {
+                const realIdx = productsCache.findIndex(item => item.id === p.id);
+                const catsText = (p.categories || [p.category || 'Generale']).join(', ');
+                const mainImg = p.images?.[p.mainImageIndex || 0] || '';
                 return `
-                    <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between">
-                        <div class="p-4 flex gap-4 items-center border-b border-gray-800/80">
-                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-gray-800">
+                    <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
+                        <div class="flex items-center gap-3">
+                            <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150'">
                             <div>
-                                <h3 class="font-bold text-white text-sm">${esc(p.title)}</h3>
-                                <p class="text-xs text-brand-400 font-mono font-bold mt-1">€${Number(p.price).toFixed(2)} ${p.featured ? '<span class="ml-2 bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded text-[10px]">In Vetrina</span>' : ''}</p>
+                                <p class="font-bold text-white">${esc(p.title)} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
+                                <p class="text-[10px] text-gray-400">Cat: ${esc(catsText)} | Prezzo: €${p.price} | Sped. Comb.: ${p.combinedShipping !== false ? 'Sì' : 'No'}</p>
                             </div>
                         </div>
-                        <div class="p-4 flex justify-end gap-2 font-mono text-xs">
-                            <button onclick="editProduct(${p.id})" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl cursor-pointer">Modifica</button>
-                            <button onclick="deleteProduct(${p.id})" class="px-3 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-xl cursor-pointer">Elimina</button>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="editProduct(${realIdx})" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer transition-all">Modifica</button>
+                            <button type="button" onclick="deleteProduct(${realIdx})" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer transition-all">Elimina</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function openProductForm() {
-            document.getElementById('modal-title').innerText = "Nuovo Prodotto";
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('product-form-modal').classList.remove('hidden');
+        function renderAdminUsers() {
+            const container = document.getElementById('admin-users-list');
+            if (!container) return;
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch (e) {}
+            if (users.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessun utente registrato nel browser.</p>`; return; }
+            container.innerHTML = users.map((u, idx) => `
+                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                    <div>
+                        <p class="font-bold text-white">${esc(u.username || u.name)}</p>
+                        <p class="text-[10px] text-gray-400">Email: ${esc(u.email)}</p>
+                    </div>
+                    <button type="button" onclick="deleteUser(${idx})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina Utente</button>
+                </div>
+            `).join('');
         }
 
-        function closeProductForm() {
-            document.getElementById('product-form-modal').classList.add('hidden');
+        function deleteUser(idx) {
+            if (!confirm("Vuoi eliminare questo utente registrato?")) return;
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch (e) {}
+            users.splice(idx, 1);
+            localStorage.setItem('ls3d_users', JSON.stringify(users));
+            renderAdminUsers();
         }
 
-        function editProduct(id) {
-            const p = adminProducts.find(x => x.id === id);
-            if (!p) return;
-            document.getElementById('modal-title').innerText = "Modifica Prodotto";
-            document.getElementById('prod-id').value = p.id;
-            document.getElementById('prod-title').value = p.title || '';
-            document.getElementById('prod-price').value = p.price || '';
-            document.getElementById('prod-sale-price').value = p.sale_price !== null ? p.sale_price : '';
-            document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
-            document.getElementById('prod-categories').value = Array.isArray(p.categories) ? p.categories.join(', ') : (p.category || '');
-            document.getElementById('prod-short-desc').value = p.short_desc || '';
-            document.getElementById('prod-long-desc').value = p.long_desc || '';
-            document.getElementById('prod-images').value = Array.isArray(p.images) ? p.images.join(', ') : '';
-            document.getElementById('prod-stl-url').value = p.stl_url || '';
-            document.getElementById('prod-featured').checked = !!p.featured;
-            document.getElementById('product-form-modal').classList.remove('hidden');
+        function renderAdminOrders() {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+            const container = document.getElementById('admin-orders-list');
+            if (!container) return;
+            if (orders.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessun ordine o fattura registrata.</p>`; return; }
+            container.innerHTML = orders.map((o, idx) => `
+                <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
+                    <div class="flex justify-between text-white font-bold">
+                        <span>Fattura n. ${esc(o.number)} (${esc(o.id)})</span>
+                        <span class="text-brand-400">€${Number(o.total || 0).toFixed(2)}</span>
+                    </div>
+                    <p class="text-gray-400">Cliente: ${esc(o.name)} (${esc(o.email)}) - Pagamento: <strong class="text-white">${esc(o.gateway)}</strong></p>
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
+                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg cursor-pointer">📥 XML AdE</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        async function saveProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById('prod-id').value;
-            const title = document.getElementById('prod-title').value.trim();
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const salePriceVal = document.getElementById('prod-sale-price').value.trim();
-            const sale_price = salePriceVal === '' ? null : parseFloat(salePriceVal);
-            const shipping = parseFloat(document.getElementById('prod-shipping').value) || 5.00;
-            const categories = document.getElementById('prod-categories').value.split(',').map(s => s.trim()).filter(Boolean);
-            const short_desc = document.getElementById('prod-short-desc').value.trim();
-            const long_desc = document.getElementById('prod-long-desc').value.trim();
-            const images = document.getElementById('prod-images').value.split(',').map(s => s.trim()).filter(Boolean);
-            const stl_url = document.getElementById('prod-stl-url').value.trim() || null;
-            const featured = document.getElementById('prod-featured').checked;
-
-            const payload = { title, price, sale_price, shipping, categories, category: categories[0] || 'Generale', short_desc, long_desc, images, stl_url, featured };
-
-            let res;
-            if (id) {
-                res = await lsSb.from('products').update(payload).eq('id', id);
-            } else {
-                res = await lsSb.from('products').insert([payload]);
-            }
-
-            if (res.error) { alert("Errore nel salvataggio del prodotto."); return; }
-            closeProductForm();
-            loadAdminProducts();
+        function viewInvoiceModal(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) {}
+            const o = orders[idx];
+            if (!o) return;
+            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
+            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
+            document.getElementById('inv-modal-client').innerText = o.name;
+            document.getElementById('inv-modal-email').innerText = o.email;
+            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
+            document.getElementById('inv-modal-total').innerText = `€${Number(o.total || 0).toFixed(2)}`;
+            const itemsContainer = document.getElementById('inv-modal-items');
+            itemsContainer.innerHTML = (o.items || []).map(item => `
+                <tr class="border-b border-gray-100">
+                    <td class="py-2">
+                        <p class="font-bold">${esc(item.title)}</p>
+                        <p class="text-[10px] text-gray-500">Colore: ${esc(item.color || 'Standard')}</p>
+                    </td>
+                    <td class="py-2 text-center">${item.quantity || item.qty || 1}</td>
+                    <td class="py-2 text-right font-mono">€${(((Number(item.price) || 0) * (Number(item.quantity || item.qty) || 1))).toFixed(2)}</td>
+                </tr>
+            `).join('');
+            document.getElementById('invoice-modal').classList.remove('hidden');
         }
 
-        async function deleteProduct(id) {
-            if (!confirm("Sei sicuro di voler eliminare questo prodotto?")) return;
-            const { error } = await lsSb.from('products').delete().eq('id', id);
-            if (error) { alert("Errore durante l'eliminazione."); return; }
-            loadAdminProducts();
+        function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
+
+        function downloadXmlAdmin(idx) {
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) {}
+            const o = orders[idx];
+            if (!o) return;
+            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<FatturaElettronica versione="FPR12">
+    <FatturaElettronicaHeader>
+        <DatiTrasmissione>
+            <IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdTrasmittente>
+            <ProgressivoInvio>${o.id}</ProgressivoInvio>
+            <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+        </DatiTrasmissione>
+        <CedentePrestatore>
+            <DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3Dmaker</Denominazione></Anagrafica></DatiAnagrafici>
+        </CedentePrestatore>
+        <CessionarioCommittente>
+            <DatiAnagrafici><Anagrafica><Denominazione>${esc(o.name)}</Denominazione></Anagrafica></DatiAnagrafici>
+        </CessionarioCommittente>
+    </FatturaElettronicaHeader>
+    <FatturaElettronicaBody>
+        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${o.date}</Data><Numero>${o.number}</Numero><ImportoTotaleDocumento>${o.total.toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
+    </FatturaElettronicaBody>
+</FatturaElettronica>`;
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Fattura_${o.number.replace('/', '_')}.xml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        function logoutAdmin() {
-            localStorage.removeItem('ls3d_logged_user');
-            window.location.href = 'index.html';
+        function getReviews() { return reviewsCache; }
+
+        async function deleteReview(id) {
+            const { error } = await lsSb.from('reviews').delete().eq('id', id);
+            if (error) { alert("Errore: " + error.message); return; }
+            reviewsCache = reviewsCache.filter(r => r.id !== id);
+            renderAdminReviews();
         }
 
-        loadAdminProducts();
+        function renderAdminReviews() {
+            const container = document.getElementById('admin-reviews-list');
+            if (!container) return;
+            const revs = getReviews();
+            if (revs.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessuna recensione.</p>`; return; }
+            container.innerHTML = revs.map((r) => `
+                <div class="flex justify-between items-start bg-dark-bg p-4 rounded-xl border border-gray-800">
+                    <div>
+                        <p class="font-bold text-white">${esc(r.author)} <span class="text-brand-400">(${r.rating}/5 ★)</span> su ${esc(r.productTitle)}</p>
+                        <p class="text-gray-400 mt-1">${esc(r.comment)}</p>
+                    </div>
+                    <button type="button" onclick="deleteReview(${r.id})" class="text-red-400 hover:text-red-300 cursor-pointer">Elimina</button>
+                </div>
+            `).join('');
+        }
+
+        async function initAdminDashboard() {
+            try { await fetchAll(); } catch (e) { console.error(e); alert("Errore nel caricamento: " + e.message); }
+            renderCategoryCheckboxes();
+            renderColorCheckboxes();
+            renderAdminProducts();
+            renderAdminUsers();
+            renderAdminOrders();
+            renderAdminReviews();
+            renderImagesPreview();
+            try { lucide.createIcons(); } catch(e){}
+        }
+
+        lsSb.auth.getSession().then(({ data }) => { if (data.session) revealAdminPanel(); });
     </script>
 </body>
 </html>
