@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS3Dmaker | Stampa 3D Professionale</title>
+    <title>LS3Dmaker | Stampa 3D Professionale & Design</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <script src="config.js"></script>
-    <script src="mailer.js"></script>
+    <script src="colors_2.js"></script>
+    <script src="i18n.js"></script>
 
     <script>
         tailwind.config = {
@@ -33,54 +33,69 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- HEADER CON MENU DESKTOP, LINK ADMIN E MENU MOBILE -->
+    <!-- HEADER CON NAVIGAZIONE, LINGUE E INFO.HTML -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             
-            <!-- Menu di Navigazione Desktop -->
-            <nav class="hidden md:flex items-center gap-6 font-mono text-xs">
-                <a href="index.html" class="text-brand-400 font-bold transition-colors">Home</a>
-                <a href="catalog.html" class="text-gray-300 hover:text-brand-400 transition-colors">Catalogo 3D</a>
-                <a href="chisiamo.html" class="text-gray-300 hover:text-brand-400 transition-colors">Chi Siamo</a>
-                <a href="admin.html" class="text-gray-300 hover:text-brand-400 transition-colors">Admin</a>
-            </nav>
+            <!-- Menu Desktop -->
+            <div class="hidden md:flex items-center gap-6 font-mono text-xs">
+                <a href="index.html" class="text-brand-400 font-bold transition-colors" id="nav-home">Home</a>
+                <a href="catalog.html" class="text-gray-300 hover:text-brand-400 transition-colors" id="nav-catalogo">Catalogo 3D</a>
+                <a href="info.html" class="text-gray-300 hover:text-brand-400 transition-colors" id="nav-contattami">Contattami / Info</a>
+                <a href="login.html" id="auth-link" class="text-gray-300 hover:text-brand-400 transition-colors">Accedi / Profilo</a>
+                <a href="admin.html" class="text-gray-300 hover:text-brand-400 transition-colors" id="nav-admin">Admin</a>
+
+                <!-- Selettore Lingue -->
+                <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-dark-surface border border-gray-800 text-gray-300 rounded-lg p-1.5 focus:outline-none cursor-pointer">
+                    <option value="it">IT</option>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
+                </select>
+            </div>
 
             <div class="flex items-center gap-3">
-                <a href="login.html" id="auth-link" class="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-surface border border-gray-800 rounded-xl text-xs font-mono text-gray-300 hover:border-brand-500/50 hover:text-white transition-colors">
-                    <i data-lucide="user" class="w-4 h-4 text-brand-400"></i>
-                    <span id="auth-text">Accedi</span>
-                </a>
                 <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
                     <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <!-- Pulsante Hamburger Mobile -->
                 <button onclick="toggleMobileMenu()" class="md:hidden bg-dark-surface border border-gray-800 p-3 rounded-xl text-gray-300 hover:text-white cursor-pointer">
                     <i data-lucide="menu" class="w-5 h-5 text-brand-400"></i>
                 </button>
             </div>
         </div>
 
-        <!-- MENU MOBILE A TENDINA -->
+        <!-- Menu Mobile a Tendina -->
         <div id="mobile-menu" class="hidden md:hidden bg-dark-card border-b border-gray-800 px-6 py-4 space-y-3 font-mono text-xs">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                <span class="text-gray-400">Lingua / Language:</span>
+                <select id="lang-selector-mobile" onchange="changeLanguage(this.value); document.getElementById('lang-selector').value=this.value;" class="bg-dark-surface border border-gray-800 text-gray-300 rounded-lg p-1.5 focus:outline-none cursor-pointer">
+                    <option value="it">IT</option>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
+                </select>
+            </div>
             <a href="index.html" class="block text-brand-400 font-bold py-2">Home</a>
             <a href="catalog.html" class="block text-gray-300 hover:text-white py-2">Catalogo 3D</a>
-            <a href="chisiamo.html" class="block text-gray-300 hover:text-white py-2">Chi Siamo</a>
-            <a href="admin.html" class="block text-gray-300 hover:text-white py-2">Admin</a>
-            <a href="login.html" id="mobile-auth-link" class="block text-brand-400 py-2 border-t border-gray-800 pt-3">👤 Accedi / Profilo</a>
+            <a href="info.html" class="block text-gray-300 hover:text-white py-2">Contattami / Info</a>
+            <a href="login.html" id="mobile-auth-link" class="block text-gray-300 hover:text-white py-2">Area Clienti / Accedi</a>
+            <a href="admin.html" class="block text-gray-300 hover:text-white py-2 border-t border-gray-800 pt-3">Pannello Admin</a>
         </div>
     </header>
 
     <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-16">
         <!-- HERO SECTION -->
         <div class="text-center space-y-4 max-w-3xl mx-auto py-8">
-            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampe 3D di Alta Qualità & Modelli Custom</h1>
-            <p class="text-sm font-mono text-gray-400">Realizziamo le tue idee con precisione professionale. Sfoglia la vetrina o esplora il catalogo completo.</p>
+            <h1 id="hero-title" class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampe 3D di Alta Qualità & Modelli Custom</h1>
+            <p id="hero-subtitle" class="text-sm font-mono text-gray-400">Realizziamo le tue idee con precisione professionale. Sfoglia la vetrina o esplora il catalogo completo.</p>
             <div class="pt-4 flex justify-center gap-4">
-                <a href="catalog.html" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg">Vai al Catalogo</a>
+                <a href="catalog.html" id="hero-cta" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg">Vai al Catalogo</a>
             </div>
         </div>
 
@@ -88,9 +103,10 @@
         <div class="space-y-6">
             <div class="border-b border-gray-800 pb-4 flex justify-between items-end">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Prodotti in Vetrina</h2>
-                    <p class="text-xs font-mono text-gray-400 mt-1">I nostri pezzi forti in evidenza con anteprima 3D.</p>
+                    <h2 id="vetrina-title" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Prodotti in Vetrina</h2>
+                    <p id="vetrina-desc" class="text-xs font-mono text-gray-400 mt-1">I nostri pezzi forti in evidenza con anteprima 3D.</p>
                 </div>
+                <a href="catalog.html" id="vetrina-all" class="text-xs font-mono text-brand-400 hover:underline">Vedi tutti →</a>
             </div>
             <div id="featured-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
@@ -101,7 +117,7 @@
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
             <div class="space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <h2 class="text-base font-bold text-white flex items-center gap-2 font-mono">
+                    <h2 id="cart-title" class="text-base font-bold text-white flex items-center gap-2 font-mono">
                         <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i> Il tuo Carrello
                     </h2>
                     <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -113,10 +129,10 @@
                     <div class="flex justify-between"><span>Spedizione combinata:</span> <span class="text-brand-400">+€2.00 per articolo extra</span></div>
                 </div>
                 <div class="flex justify-between items-center font-bold text-sm">
-                    <span>Totale (incl. spedizione):</span>
+                    <span id="cart-total-label">Totale (incl. spedizione):</span>
                     <span id="cart-modal-total" class="text-brand-400">€0.00</span>
                 </div>
-                <button onclick="goToCheckout()" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                <button onclick="goToCheckout()" id="cart-checkout-btn" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                     Procedi al Checkout Sicuro <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -129,7 +145,7 @@
     </div>
 
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
-        LS3DMAKER © 2026 - Tutti i diritti riservati
+        <span id="footer-copy">LS3DMAKER © 2026 - Tutti i diritti riservati</span>
     </footer>
 
     <script>
@@ -165,18 +181,21 @@
 
         function checkAuthUI() {
             const user = getCurrentUser();
-            const authText = document.getElementById('auth-text');
             const authLink = document.getElementById('auth-link');
             const mobileAuthLink = document.getElementById('mobile-auth-link');
             if (user) {
-                if (authText && authLink) {
-                    authText.innerText = user.name || user.username || 'Profilo';
+                const name = user.name || user.username || 'Profilo';
+                if (authLink) {
+                    authLink.innerText = `👤 ${name}`;
                     authLink.href = 'profile.html';
                 }
                 if (mobileAuthLink) {
-                    mobileAuthLink.innerText = `👤 Profilo (${user.name || user.username})`;
+                    mobileAuthLink.innerText = `👤 Profilo (${name})`;
                     mobileAuthLink.href = 'profile.html';
                 }
+            } else {
+                if (authLink) authLink.href = 'login.html';
+                if (mobileAuthLink) mobileAuthLink.href = 'login.html';
             }
         }
 
@@ -195,12 +214,14 @@
             try {
                 await fetchAll();
                 const featured = productsCache.filter(p => p.featured);
-                if (featured.length === 0) {
-                    grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto in vetrina al momento. Visita il catalogo completo.</p>`;
+                const displayList = featured.length > 0 ? featured : productsCache.slice(0, 3);
+                
+                if (displayList.length === 0) {
+                    grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto in vetrina al momento.</p>`;
                     return;
                 }
 
-                grid.innerHTML = featured.map(p => {
+                grid.innerHTML = displayList.map(p => {
                     const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
                     const listPrice = Number(p.price) || 0;
                     const salePrice = p.salePrice !== null && p.salePrice !== undefined ? Number(p.salePrice) : null;
