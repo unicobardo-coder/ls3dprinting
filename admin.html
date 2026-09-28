@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin - LS3Dmaker</title>
+    <title>Catalogo Prodotti | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
     <script src="config.js"></script>
 
     <script>
@@ -31,802 +31,422 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
-    <!-- LOGIN MODALE ADMIN -->
-    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-dark-card border border-gray-800 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl font-mono text-xs">
-            <div class="text-center space-y-2">
-                <h2 class="text-xl font-bold text-white tracking-tight">Area Riservata Admin</h2>
-                <p class="text-gray-400">Accedi con il tuo account admin.</p>
-            </div>
-            <form onsubmit="checkAdminPassword(event)" class="space-y-4">
-                <input type="email" id="admin-email-input" placeholder="Email..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                <input type="password" id="admin-password-input" placeholder="Password..." required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Accedi</button>
-            </form>
-            <div class="text-center">
-                <a href="index.html" class="text-gray-500 hover:text-gray-300 underline">← Torna al sito</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- HEADER -->
-    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85 hidden" id="admin-header">
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
             <div class="flex items-center gap-4">
-                <a href="catalog.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Catalogo</a>
-                <button onclick="logoutAdmin()" class="text-xs font-mono text-red-400 hover:text-red-300 underline cursor-pointer">Esci</button>
+                <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">Home</a>
+                <button onclick="toggleCartModal()" class="relative bg-dark-surface border border-gray-800 p-3 rounded-xl hover:border-brand-500/50 transition-colors cursor-pointer flex items-center gap-2">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-400"></i>
+                    <span id="cart-counter" class="absolute -top-2 -right-2 bg-brand-500 text-black font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-12 hidden" id="admin-main-content">
-        <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-grow space-y-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-800 pb-6">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione cloud centralizzata su Supabase.</p>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catalogo 3D</h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">Scegli tra i nostri modelli stampati in alta definizione e visualizzane l'anteprima 3D.</p>
             </div>
-            <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
-            </button>
         </div>
 
-        <!-- SEZIONE PRODOTTI -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
-                <button type="button" onclick="resetProductForm()" id="cancel-edit-btn" class="hidden text-xs text-gray-400 hover:text-white font-mono underline cursor-pointer">Annulla Modifica</button>
-            </div>
-
-            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-mono">
-                <input type="hidden" id="edit-product-index" value="">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-400 mb-1">Titolo Prodotto *</label>
-                        <input type="text" id="prod-title" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 mb-1">Categorie Multiple *</label>
-                        <div id="prod-categories-checkboxes" class="bg-dark-bg border border-gray-700/80 rounded-xl p-3 max-h-36 overflow-y-auto space-y-2"></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-gray-400 mb-1">Prezzo Listino (€) *</label>
-                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 mb-1">Prezzo Scontato (€)</label>
-                        <input type="number" step="0.01" id="prod-saleprice" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 mb-1">Spedizione (€) *</label>
-                        <input type="number" step="0.01" id="prod-shipping" value="5.00" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-gray-400 mb-1">Descrizione Breve *</label>
-                    <textarea id="prod-desc" required rows="2" placeholder="Breve descrizione..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-gray-400 mb-1">Descrizione Lunga / Dettagliata *</label>
-                    <textarea id="prod-longdesc" required rows="5" placeholder="Descrizione approfondita..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:outline-none"></textarea>
-                </div>
-
-                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
-                    <label class="block text-white font-bold">Immagini Prodotto (Carica dal PC)</label>
-                    <input type="file" id="prod-file-input" accept="image/*" multiple onchange="handleImageFiles(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
-                    <div id="admin-images-preview" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3"></div>
-                </div>
-
-                <div class="space-y-2 border border-gray-800 p-4 rounded-xl bg-dark-bg">
-                    <label class="block text-white font-bold">Modello 3D (.STL)</label>
-                    <input type="file" id="prod-stl-input" accept=".stl" onchange="handleStlUpload(event)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-400 cursor-pointer">
-                    <input type="hidden" id="prod-stl-name" value="">
-                    <div id="stl-viewer-container" class="w-full h-12 bg-dark-card rounded-xl border border-gray-800 relative hidden flex items-center px-4 mt-3">
-                        <span id="stl-file-label" class="text-xs font-mono text-brand-400 font-bold">Nessun file caricato</span>
-                        <button type="button" onclick="removeStlFile()" class="absolute right-3 px-2.5 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer">Rimuovi STL</button>
-                    </div>
-                </div>
-
-                <div class="space-y-3 border border-gray-800 p-4 rounded-xl bg-dark-bg">
-                    <label class="block text-white font-bold">Colori Disponibili per questo Prodotto</label>
-                    <div id="prod-colors-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2"></div>
-                </div>
-
-                <div class="space-y-3 pt-2">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" id="prod-featured" class="w-5 h-5 accent-brand-500 rounded cursor-pointer">
-                        <label for="prod-featured" class="text-white font-bold cursor-pointer">Metti in Vetrina (Evidenza Home)</label>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" id="prod-combined-shipping" class="w-5 h-5 accent-brand-500 rounded cursor-pointer" checked>
-                        <label for="prod-combined-shipping" class="text-white font-bold cursor-pointer">Abilita Spedizione Combinata (+€2.00 su articoli extra)</label>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer">Salva Prodotto</button>
-            </form>
-
-            <div class="pt-8 border-t border-gray-800 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <h3 class="text-sm font-bold text-white font-mono">Prodotti Esistenti nel Database</h3>
-                    <input type="text" id="admin-search-input" oninput="renderAdminProducts()" placeholder="Cerca prodotto per nome..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
-                </div>
-                <div id="admin-products-list" class="space-y-3"></div>
-            </div>
-        </section>
-
-        <!-- SEZIONE GESTIONE CATEGORIE (CLOUD) -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Gestione Categorie (Supabase)</h2>
-            <div class="flex gap-2">
-                <input type="text" id="new-category-input" placeholder="Nuova categoria..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2 text-white focus:outline-none flex-grow">
-                <button type="button" onclick="addNewCategory()" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer">Aggiungi Categoria</button>
-            </div>
-            <div id="admin-categories-list" class="space-y-2 pt-2"></div>
-        </section>
-
-        <!-- SEZIONE GESTIONE COLORI (CLOUD) -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Gestione Colori Filamenti (Supabase)</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <input type="text" id="new-color-name" placeholder="Nome colore (es. Blu Elettrico)..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2 text-white focus:outline-none">
-                <input type="color" id="new-color-hex" value="#10b981" class="w-full h-10 bg-dark-bg border border-gray-700/80 rounded-xl px-2 cursor-pointer">
-                <button type="button" onclick="addNewColor()" class="py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer">Aggiungi Colore</button>
-            </div>
-            <div id="admin-colors-list" class="space-y-2 pt-2"></div>
-        </section>
-
-        <!-- SEZIONE UTENTI REGISTRATI -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Controllo Utenti Registrati</h2>
-            <div id="admin-users-list" class="space-y-3"></div>
-        </section>
-
-        <!-- SEZIONE FATTURE E ORDINI -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Gestione Ordini & Fatture</h2>
-            <div id="admin-orders-list" class="space-y-3"></div>
-        </section>
-
-        <!-- SEZIONE RECENSIONI -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Gestione Recensioni / Commenti</h2>
-            <div id="admin-reviews-list" class="space-y-3"></div>
-        </section>
+        <div id="category-filters" class="flex flex-wrap gap-2 font-mono text-xs"></div>
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- MODALE ANTEPRIMA FATTURA -->
-    <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 font-sans">
-        <div class="bg-white text-gray-900 w-full max-w-2xl rounded-2xl p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start border-b pb-4">
-                <div>
-                    <h3 class="text-xl font-extrabold" id="inv-modal-number">Fattura N. 2026/01</h3>
-                    <p class="text-xs text-gray-500" id="inv-modal-date">Data: 28/09/2026</p>
+    <!-- CARRELLO MODALE -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex justify-end">
+        <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2 font-mono">
+                        <i data-lucide="shopping-cart" class="w-4 h-4 text-brand-400"></i> Il tuo Carrello
+                    </h2>
+                    <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-gray-700 font-bold text-lg cursor-pointer">✕</button>
+                <div id="cart-items-container" class="space-y-3 font-mono text-xs max-h-[50vh] overflow-y-auto pr-1"></div>
             </div>
-            <div class="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                    <p class="font-bold text-gray-700">Cedente:</p>
-                    <p>LS3DMAKER di Luigi Schiavello</p>
-                    <p>Bologna, Italia</p>
+            <div class="border-t border-gray-800 pt-4 space-y-4">
+                <div class="flex flex-col gap-1 font-mono text-xs text-gray-400 pb-2 border-b border-gray-800">
+                    <div class="flex justify-between"><span>Spedizione combinata:</span> <span class="text-brand-400">+€2.00 per articolo extra</span></div>
                 </div>
-                <div>
-                    <p class="font-bold text-gray-700">Cliente:</p>
-                    <p id="inv-modal-client">-</p>
-                    <p id="inv-modal-email" class="text-gray-500">-</p>
-                    <p id="inv-modal-address" class="text-gray-500">-</p>
+                <div class="flex justify-between items-center font-bold text-sm">
+                    <span>Totale (incl. spedizione):</span>
+                    <span id="cart-modal-total" class="text-brand-400">€0.00</span>
                 </div>
-            </div>
-            <table class="w-full text-xs">
-                <thead>
-                    <tr class="border-b text-gray-500 text-left">
-                        <th class="py-2">Prodotto</th>
-                        <th class="py-2 text-center">Qt.</th>
-                        <th class="py-2 text-right">Totale</th>
-                    </tr>
-                </thead>
-                <tbody id="inv-modal-items"></tbody>
-            </table>
-            <div class="flex justify-between items-center border-t pt-4 font-bold text-sm">
-                <span>Totale Documento:</span>
-                <span id="inv-modal-total" class="text-emerald-600">€0.00</span>
-            </div>
-            <div class="text-center pt-2">
-                <button onclick="closeInvoiceModal()" class="px-6 py-2 bg-gray-900 text-white rounded-xl text-xs font-mono cursor-pointer">Chiudi Anteprima</button>
+                <button onclick="goToCheckout()" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    Procedi al Checkout Sicuro <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- MODALE PRODOTTO & VIEWER 3D -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
+    </div>
+
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
-        LS3DMAKER © 2026 - Admin Panel
+        LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
 
     <script>
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
-        let productsCache = [], reviewsCache = [], categoriesCache = [], colorsCache = [];
+        let productsCache = [], reviewsCache = [];
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-        
+
         function mapProduct(r) {
-            return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
+            return { 
+                id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
                 price: Number(r.price), salePrice: r.sale_price === null ? null : Number(r.sale_price),
                 shipping: Number(r.shipping), shortDesc: r.short_desc, longDesc: r.long_desc,
                 images: r.images || [], mainImageIndex: r.main_image_index || 0, colors: r.colors || [],
-                featured: r.featured, combinedShipping: r.combined_shipping !== false,
-                stlFileName: r.stl_file_name, stlUrl: r.stl_url };
+                featured: r.featured, stlFileName: r.stl_file_name, stlUrl: r.stl_url 
+            };
         }
         function mapReview(x) { return { id: x.id, productId: x.product_id, productTitle: x.product_title, author: x.author, rating: x.rating, comment: x.comment }; }
 
         async function fetchAll() {
-            const [p, r, c, col] = await Promise.all([
+            const [p, r] = await Promise.all([
                 lsSb.from('products').select('*').order('created_at', { ascending: false }),
-                lsSb.from('reviews').select('*').order('created_at', { ascending: false }),
-                lsSb.from('categories').select('*').order('name', { ascending: true }),
-                lsSb.from('filament_colors').select('*').order('name', { ascending: true })
+                lsSb.from('reviews').select('*').order('created_at', { ascending: false })
             ]);
             if (p.error) throw p.error;
             productsCache = (p.data || []).map(mapProduct);
             reviewsCache = (r.data || []).map(mapReview);
-            categoriesCache = (c.data || []);
-            colorsCache = (col.data || []);
         }
 
-        async function forceSyncData() {
-            const btn = event?.target;
-            if (btn) btn.disabled = true;
-            try {
-                await fetchAll();
-                renderCategoryCheckboxes();
-                renderColorCheckboxes();
-                renderAdminProducts();
-                renderAdminCategories();
-                renderAdminColors();
-                renderAdminUsers();
-                renderAdminOrders();
-                renderAdminReviews();
-                alert("Sincronizzazione completata con successo!");
-            } catch (e) {
-                console.error(e);
-                alert("Errore di sincronizzazione: " + e.message);
-            } finally {
-                if (btn) btn.disabled = false;
-            }
+        function getBaseCategories() {
+            try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
+            return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
-
-        async function checkAdminPassword(e) {
-            e.preventDefault();
-            const email = document.getElementById('admin-email-input').value.trim();
-            const password = document.getElementById('admin-password-input').value;
-            const { error } = await lsSb.auth.signInWithPassword({ email, password });
-            if (error) { alert("Credenziali errate."); return; }
-            revealAdminPanel();
-        }
-
-        function revealAdminPanel() {
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('admin-header').classList.remove('hidden');
-            document.getElementById('admin-main-content').classList.remove('hidden');
-            initAdminDashboard();
-        }
-
-        async function logoutAdmin() { await lsSb.auth.signOut(); location.reload(); }
-
-        let currentEditingImages = [];
-        let mainImageIdx = 0;
-        let currentStlFile = null, currentStlUrl = '', currentStlFileName = '';
-
-        // --- GESTIONE CATEGORIE SU SUPABASE ---
-        function renderCategoryCheckboxes(selectedCategories = []) {
-            const container = document.getElementById('prod-categories-checkboxes');
-            if (!container) return;
-            container.innerHTML = categoriesCache.map(cat => `
-                <label class="flex items-center gap-2 text-white cursor-pointer">
-                    <input type="checkbox" name="product-categories" value="${esc(cat.name)}" ${selectedCategories.includes(cat.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
-                    <span>${esc(cat.name)}</span>
-                </label>
-            `).join('');
-        }
-
-        function renderAdminCategories() {
-            const container = document.getElementById('admin-categories-list');
-            if (!container) return;
-            container.innerHTML = categoriesCache.map((cat) => `
-                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
-                    <span class="text-white font-bold">${esc(cat.name)}</span>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="renameCategory(${cat.id}, '${esc(cat.name)}')" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer">Rinomina</button>
-                        <button type="button" onclick="deleteCategory(${cat.id})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function addNewCategory() {
-            const input = document.getElementById('new-category-input');
-            const name = input.value.trim();
-            if (!name) { alert("Inserisci un nome per la categoria."); return; }
-            const { error } = await lsSb.from('categories').insert([{ name }]);
-            if (error) { alert("Errore: " + error.message); return; }
-            input.value = '';
-            await fetchAll();
-            renderCategoryCheckboxes();
-            renderAdminCategories();
-            alert("Categoria aggiunta con successo!");
-        }
-
-        async function renameCategory(id, oldName) {
-            const newName = prompt(`Rinomina la categoria "${oldName}":`, oldName);
-            if (!newName || !newName.trim()) return;
-            const { error } = await lsSb.from('categories').update({ name: newName.trim() }).eq('id', id);
-            if (error) { alert("Errore: " + error.message); return; }
-            await fetchAll();
-            renderCategoryCheckboxes();
-            renderAdminCategories();
-            alert("Categoria rinominata!");
-        }
-
-        async function deleteCategory(id) {
-            if (!confirm("Vuoi eliminare questa categoria?")) return;
-            const { error } = await lsSb.from('categories').delete().eq('id', id);
-            if (error) { alert("Errore: " + error.message); return; }
-            await fetchAll();
-            renderCategoryCheckboxes();
-            renderAdminCategories();
-            alert("Categoria eliminata.");
-        }
-
-        // --- GESTIONE COLORI SU SUPABASE ---
-        function renderColorCheckboxes(selectedColors = []) {
-            const container = document.getElementById('prod-colors-checkboxes');
-            if (!container) return;
-            container.innerHTML = colorsCache.map(c => `
-                <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-card p-2 rounded-lg border border-gray-800">
-                    <input type="checkbox" name="product-colors" value="${esc(c.name)}" ${selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
-                    <span class="w-3 h-3 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
-                    <span class="text-[11px]">${esc(c.name)}</span>
-                </label>
-            `).join('');
-        }
-
-        function renderAdminColors() {
-            const container = document.getElementById('admin-colors-list');
-            if (!container) return;
-            container.innerHTML = colorsCache.map((c) => `
-                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
-                    <div class="flex items-center gap-3">
-                        <span class="w-4 h-4 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
-                        <span class="text-white font-bold">${esc(c.name)}</span>
-                        <span class="text-gray-500 font-mono text-[10px]">${c.code}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="editColor(${c.id}, '${esc(c.name)}', '${esc(c.code)}')" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer">Modifica</button>
-                        <button type="button" onclick="deleteColor(${c.id})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function addNewColor() {
-            const nameInput = document.getElementById('new-color-name');
-            const codeInput = document.getElementById('new-color-hex');
-            const name = nameInput.value.trim();
-            const code = codeInput.value;
-            if (!name) { alert("Inserisci il nome del colore."); return; }
-            const { error } = await lsSb.from('filament_colors').insert([{ name, code }]);
-            if (error) { alert("Errore: " + error.message); return; }
-            nameInput.value = '';
-            await fetchAll();
-            renderColorCheckboxes();
-            renderAdminColors();
-            alert("Colore aggiunto con successo!");
-        }
-
-        async function editColor(id, oldName, oldCode) {
-            const newName = prompt("Modifica nome colore:", oldName);
-            if (newName === null) return;
-            const newCode = prompt("Modifica codice HEX:", oldCode);
-            if (newCode === null) return;
-            const { error } = await lsSb.from('filament_colors').update({ name: newName.trim(), code: newCode.trim() }).eq('id', id);
-            if (error) { alert("Errore: " + error.message); return; }
-            await fetchAll();
-            renderColorCheckboxes();
-            renderAdminColors();
-            alert("Colore aggiornato!");
-        }
-
-        async function deleteColor(id) {
-            if (!confirm("Vuoi eliminare questo colore?")) return;
-            const { error } = await lsSb.from('filament_colors').delete().eq('id', id);
-            if (error) { alert("Errore: " + error.message); return; }
-            await fetchAll();
-            renderColorCheckboxes();
-            renderAdminColors();
-            alert("Colore eliminato.");
+        function getCategories() {
+            const s = new Set(getBaseCategories());
+            productsCache.forEach(p => {
+                if (Array.isArray(p.categories)) p.categories.forEach(x => { if(x) s.add(x.trim()); });
+                else if (p.category) s.add(p.category.trim());
+            });
+            return [...s];
         }
 
         function getProducts() { return productsCache; }
+        function getReviews() { return reviewsCache; }
 
-        function handleImageFiles(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        let width = img.width, height = img.height;
-                        const maxDim = 1200;
-                        if (width > height && width > maxDim) { height = Math.round(height * (maxDim / width)); width = maxDim; }
-                        else if (height > maxDim) { width = Math.round(width * (maxDim / height)); height = maxDim; }
-                        canvas.width = width; canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        currentEditingImages.push(canvas.toDataURL('image/jpeg', 0.82));
-                        renderImagesPreview();
-                    };
-                    img.onerror = function() { currentEditingImages.push(e.target.result); renderImagesPreview(); };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-            event.target.value = '';
+        function getCurrentUser() {
+            try {
+                const user = localStorage.getItem('ls3d_logged_user');
+                if (user) return JSON.parse(user);
+            } catch (e) {}
+            return null;
         }
 
-        function removeImageUrl(idx) {
-            currentEditingImages.splice(idx, 1);
-            if (mainImageIdx >= currentEditingImages.length) mainImageIdx = Math.max(0, currentEditingImages.length - 1);
-            renderImagesPreview();
-        }
+        let cart = [];
+        try { cart = JSON.parse(localStorage.getItem('ls3d_cart')) || []; } catch (e) { cart = []; }
+        let currentCategory = 'Tutti';
+        let catalogStlRenderer = null;
 
-        function setMainImage(idx) { mainImageIdx = idx; renderImagesPreview(); }
-
-        function renderImagesPreview() {
-            const container = document.getElementById('admin-images-preview');
+        function renderCategories() {
+            const container = document.getElementById('category-filters');
             if (!container) return;
-            if (currentEditingImages.length === 0) { container.innerHTML = `<p class="col-span-full text-gray-500 text-xs">Nessuna foto caricata dal PC.</p>`; return; }
-            container.innerHTML = currentEditingImages.map((img, idx) => `
-                <div class="relative bg-dark-bg border ${idx === mainImageIdx ? 'border-brand-500 ring-2 ring-brand-500/50' : 'border-gray-800'} p-2 rounded-xl flex flex-col items-center gap-2">
-                    <img src="${img}" class="w-full h-20 object-cover rounded-lg">
-                    <div class="flex items-center justify-between w-full text-[10px] pt-1">
-                        <button type="button" onclick="setMainImage(${idx})" class="${idx === mainImageIdx ? 'text-brand-400 font-bold underline' : 'text-gray-400 hover:text-white'} cursor-pointer">Principale</button>
-                        <button type="button" onclick="removeImageUrl(${idx})" class="text-red-400 hover:text-red-300 font-bold cursor-pointer">Elimina</button>
-                    </div>
-                </div>
+            const categories = ['Tutti', ...getCategories()];
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterByCategory('${cat.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl border transition-all cursor-pointer ${currentCategory === cat ? 'bg-brand-500 text-black font-bold border-brand-500 shadow-md' : 'bg-dark-card text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white'}">
+                    ${esc(cat)}
+                </button>
             `).join('');
         }
 
-        function handleStlUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 50 * 1024 * 1024) { alert("File troppo grande (max 50 MB)."); event.target.value = ''; return; }
-            currentStlFile = file;
-            currentStlFileName = file.name;
-            document.getElementById('prod-stl-name').value = file.name;
-            document.getElementById('stl-file-label').innerText = "File STL: " + file.name;
-            document.getElementById('stl-viewer-container').classList.remove('hidden');
-        }
+        function filterByCategory(category) { currentCategory = category; renderCatalog(); }
 
-        function removeStlFile() {
-            currentStlFile = null; currentStlUrl = ''; currentStlFileName = '';
-            document.getElementById('prod-stl-input').value = '';
-            document.getElementById('prod-stl-name').value = '';
-            document.getElementById('stl-viewer-container').classList.add('hidden');
-        }
+        function renderCatalog() {
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+            const products = getProducts();
+            renderCategories();
 
-        const rid = () => Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-        async function uploadToStorage(path, blob, contentType) {
-            const { error } = await lsSb.storage.from('catalog').upload(path, blob, { contentType, cacheControl: '31536000', upsert: false });
-            if (error) throw error;
-            return lsSb.storage.from('catalog').getPublicUrl(path).data.publicUrl;
-        }
+            const filteredProducts = currentCategory === 'Tutti' 
+                ? products 
+                : products.filter(p => {
+                    const cats = p.categories || [p.category || ''];
+                    return cats.some(c => c.trim().toLowerCase() === currentCategory.trim().toLowerCase());
+                });
 
-        async function saveProduct(e) {
-            e.preventDefault();
-            const index = document.getElementById('edit-product-index').value;
-            const categories = Array.from(document.querySelectorAll('input[name="product-categories"]:checked')).map(el => el.value);
-            if (categories.length === 0) { alert("Seleziona almeno una categoria."); return; }
-            const colors = Array.from(document.querySelectorAll('input[name="product-colors"]:checked')).map(el => el.value);
-            if (colors.length === 0) { alert("Seleziona almeno un colore disponibile."); return; }
-            if (currentEditingImages.length === 0) { alert("Carica almeno un'immagine dal PC prima di salvare."); return; }
-            const salePriceInput = document.getElementById('prod-saleprice').value;
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true; btn.textContent = 'Salvataggio in corso...';
-            try {
-                const images = [];
-                for (const img of currentEditingImages) {
-                    if (img.startsWith('data:')) {
-                        const blob = await (await fetch(img)).blob();
-                        images.push(await uploadToStorage('images/' + rid() + '.jpg', blob, 'image/jpeg'));
-                    } else images.push(img);
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 font-mono py-12">Nessun prodotto disponibile in questa categoria.</p>`;
+                return;
+            }
+
+            grid.innerHTML = filteredProducts.map(p => {
+                const mainImg = p.images && p.images.length > 0 ? p.images[p.mainImageIndex || 0] : "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80";
+                const listPrice = Number(p.price) || 0;
+                const salePrice = p.salePrice !== null && p.salePrice !== undefined ? Number(p.salePrice) : null;
+                const finalPrice = salePrice !== null ? salePrice : listPrice;
+                const shippingPrice = Number(p.shipping !== undefined ? p.shipping : 5.00);
+
+                let priceHtml = `<span class="font-mono font-bold text-brand-400 text-sm">€${finalPrice.toFixed(2)}</span>`;
+                if (salePrice !== null && salePrice < listPrice) {
+                    priceHtml = `<div class="flex items-center gap-2"><span class="font-mono font-bold text-brand-400 text-sm">€${salePrice.toFixed(2)}</span><span class="font-mono text-gray-500 text-xs line-through">€${listPrice.toFixed(2)}</span></div>`;
                 }
-                let stlUrl = currentStlUrl;
-                if (currentStlFile) stlUrl = await uploadToStorage('models/' + rid() + '.stl', currentStlFile, 'application/octet-stream');
-                
-                const row = {
-                    title: document.getElementById('prod-title').value.trim(),
-                    categories, colors, images,
-                    main_image_index: Math.min(mainImageIdx, images.length - 1),
-                    price: parseFloat(document.getElementById('prod-price').value),
-                    sale_price: salePriceInput ? parseFloat(salePriceInput) : null,
-                    shipping: parseFloat(document.getElementById('prod-shipping').value) || 5.00,
-                    short_desc: document.getElementById('prod-desc').value.trim(),
-                    long_desc: document.getElementById('prod-longdesc').value.trim(),
-                    featured: document.getElementById('prod-featured').checked,
-                    combined_shipping: document.getElementById('prod-combined-shipping').checked,
-                    stl_file_name: stlUrl ? currentStlFileName : '', stl_url: stlUrl || ''
-                };
-                
-                const q = index !== '' ? lsSb.from('products').update(row).eq('id', productsCache[index].id) : lsSb.from('products').insert(row);
-                const { error } = await q;
-                if (error) throw error;
-                
-                await fetchAll();
-                resetProductForm();
-                renderCategoryCheckboxes();
-                renderAdminProducts();
-                alert("Prodotto salvato e sincronizzato con successo!");
-            } catch (err) {
-                console.error(err);
-                alert("Errore nel salvataggio: " + (err.message || err));
-            } finally {
-                btn.disabled = false; btn.textContent = 'Salva Prodotto';
-            }
-        }
 
-        function editProduct(idx) {
-            const p = getProducts()[idx];
-            document.getElementById('edit-product-index').value = idx;
-            document.getElementById('prod-title').value = p.title;
-            renderCategoryCheckboxes(p.categories || [p.category || '']);
-            renderColorCheckboxes(p.colors || []);
-            document.getElementById('prod-price').value = p.price;
-            document.getElementById('prod-saleprice').value = p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : '';
-            document.getElementById('prod-shipping').value = p.shipping !== undefined ? p.shipping : 5.00;
-            document.getElementById('prod-desc').value = p.shortDesc || '';
-            document.getElementById('prod-longdesc').value = p.longDesc || '';
-            document.getElementById('prod-featured').checked = p.featured || false;
-            document.getElementById('prod-combined-shipping').checked = p.combinedShipping !== false;
-            currentEditingImages = [...(p.images || [])];
-            mainImageIdx = p.mainImageIndex || 0;
-            renderImagesPreview();
-            currentStlFileName = p.stlFileName || '';
-            currentStlFile = null; currentStlUrl = p.stlUrl || '';
-            document.getElementById('prod-stl-name').value = currentStlFileName;
-            if (currentStlFileName) {
-                document.getElementById('stl-file-label').innerText = "File STL: " + currentStlFileName;
-                document.getElementById('stl-viewer-container').classList.remove('hidden');
-            } else {
-                document.getElementById('stl-viewer-container').classList.add('hidden');
-            }
-            document.getElementById('product-form-title').innerText = "Modifica Prodotto";
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function resetProductForm() {
-            document.getElementById('product-form').reset();
-            document.getElementById('edit-product-index').value = '';
-            document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-            renderCategoryCheckboxes();
-            renderColorCheckboxes();
-            currentEditingImages = []; mainImageIdx = 0; renderImagesPreview();
-            removeStlFile();
-        }
-
-        async function deleteProduct(idx) {
-            if (!confirm("Vuoi eliminare definitivamente questo prodotto?")) return;
-            const p = productsCache[idx];
-            const { error } = await lsSb.from('products').delete().eq('id', p.id);
-            if (error) { alert("Errore durante l'eliminazione: " + error.message); return; }
-            await fetchAll(); 
-            renderCategoryCheckboxes();
-            renderAdminProducts(); 
-            renderAdminReviews();
-            alert("Prodotto eliminato correttamente.");
-        }
-
-        function renderAdminProducts() {
-            const container = document.getElementById('admin-products-list');
-            if (!container) return;
-            const searchVal = document.getElementById('admin-search-input')?.value.toLowerCase() || '';
-            const products = getProducts().filter(p => p.title.toLowerCase().includes(searchVal));
-
-            if (products.length === 0) { 
-                container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">Nessun prodotto trovato nel database.</p>`; 
-                return; 
-            }
-
-            container.innerHTML = products.map((p) => {
-                const realIdx = productsCache.findIndex(item => item.id === p.id);
-                const catsText = (p.categories || [p.category || 'Generale']).join(', ');
-                const mainImg = p.images?.[p.mainImageIndex || 0] || '';
                 return `
-                    <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800 font-mono text-xs">
-                        <div class="flex items-center gap-3">
-                            <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150'">
-                            <div>
-                                <p class="font-bold text-white">${esc(p.title)} ${p.featured ? '<span class="text-brand-400">[Vetrina]</span>' : ''}</p>
-                                <p class="text-[10px] text-gray-400">Cat: ${esc(catsText)} | Prezzo: €${p.price} | Sped. Comb.: ${p.combinedShipping !== false ? 'Sì' : 'No'}</p>
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-gray-700 transition-all">
+                        <div onclick="openProductModal(${p.id})" class="cursor-pointer">
+                            <div class="h-48 overflow-hidden bg-dark-bg relative">
+                                <img src="${mainImg}" alt="${esc(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                ${salePrice !== null && salePrice < listPrice ? '<span class="absolute top-3 left-3 bg-red-500 text-black font-mono font-bold text-[10px] px-2 py-1 rounded-lg uppercase tracking-wider shadow-lg">In Offerta</span>' : ''}
+                                ${p.stlUrl ? '<span class="absolute bottom-3 right-3 bg-brand-500/90 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">Modello 3D</span>' : ''}
+                            </div>
+                            <div class="p-5 space-y-2">
+                                <h3 class="font-bold text-white text-base">${esc(p.title)}</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${esc(p.shortDesc || '')}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="editProduct(${realIdx})" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg cursor-pointer transition-all">Modifica</button>
-                            <button type="button" onclick="deleteProduct(${realIdx})" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer transition-all">Elimina</button>
+                        <div class="p-5 pt-0 border-t border-gray-800/60 mt-4 space-y-3 font-mono">
+                            <div class="flex items-center justify-between">
+                                <div>${priceHtml}</div>
+                                <button onclick="openProductModal(${p.id})" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs cursor-pointer">Dettagli</button>
+                            </div>
+                            <div class="text-[10px] text-gray-400 bg-dark-bg p-2 rounded-lg border border-gray-800/80 flex justify-between items-center">
+                                <span>Spedizione: <strong class="text-white">€${shippingPrice.toFixed(2)}</strong></span>
+                                <span class="text-brand-400" title="Dal 2° articolo +€2.00">+€2.00 per extra</span>
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-
-        // --- GESTIONE UTENTI REGISTRATI DA SUPABASE ---
-        async function renderAdminUsers() {
-            const container = document.getElementById('admin-users-list');
-            if (!container) return;
-            const { data: users, error } = await lsSb.from('users').select('*').order('created_at', { ascending: false });
-            if (error || !users || users.length === 0) {
-                container.innerHTML = `<p class="text-gray-500">Nessun utente registrato nel database.</p>`;
-                return;
-            }
-
-            container.innerHTML = users.map((u) => `
-                <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
-                    <div>
-                        <p class="font-bold text-white">${esc(u.username)}</p>
-                        <p class="text-[10px] text-gray-400">Email: ${esc(u.email)} | Registrato il: ${new Date(u.created_at).toLocaleDateString('it-IT')}</p>
-                    </div>
-                    <button type="button" onclick="deleteUser(${u.id})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina</button>
-                </div>
-            `).join('');
-        }
-
-        async function deleteUser(id) {
-            if (!confirm("Vuoi eliminare questo utente dal database?")) return;
-            const { error } = await lsSb.from('users').delete().eq('id', id);
-            if (error) { alert("Errore: " + error.message); return; }
-            renderAdminUsers();
-        }
-
-        // --- GESTIONE ORDINI E FATTURE DA SUPABASE ---
-        let ordersCache = [];
-        async function renderAdminOrders() {
-            const { data: orders, error } = await lsSb.from('orders').select('*').order('created_at', { ascending: false });
-            if (error) { console.error(error); return; }
-            ordersCache = orders || [];
-
-            const container = document.getElementById('admin-orders-list');
-            if (!container) return;
-            
-            if (ordersCache.length === 0) {
-                container.innerHTML = `<p class="text-gray-500">Nessun ordine o fattura nel database.</p>`;
-                return;
-            }
-            
-            container.innerHTML = ordersCache.map((o, idx) => `
-                <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
-                    <div class="flex justify-between text-white font-bold">
-                        <span>Fattura n. ${esc(o.order_number)} (${esc(o.order_id)})</span>
-                        <span class="text-brand-400">€${Number(o.total || 0).toFixed(2)}</span>
-                    </div>
-                    <p class="text-gray-400">Cliente: ${esc(o.customer_name)} (${esc(o.customer_email)}) - Pagamento: <strong class="text-white">${esc(o.gateway)}</strong></p>
-                    <div class="flex gap-2 pt-2">
-                        <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
-                        <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg cursor-pointer">📥 XML AdE</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function viewInvoiceModal(idx) {
-            const o = ordersCache[idx];
-            if (!o) return;
-
-            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.order_number}`;
-            document.getElementById('inv-modal-date').innerText = `Data: ${new Date(o.created_at).toLocaleDateString('it-IT')}`;
-            document.getElementById('inv-modal-client').innerText = o.customer_name;
-            document.getElementById('inv-modal-email').innerText = o.customer_email;
-            document.getElementById('inv-modal-address').innerText = o.customer_address || 'Indirizzo non specificato';
-            document.getElementById('inv-modal-total').innerText = `€${Number(o.total || 0).toFixed(2)}`;
-
-            const itemsContainer = document.getElementById('inv-modal-items');
-            itemsContainer.innerHTML = (o.items || []).map(item => `
-                <tr class="border-b border-gray-100">
-                    <td class="py-2">
-                        <p class="font-bold">${esc(item.title)}</p>
-                        <p class="text-[10px] text-gray-500">Colore: ${esc(item.color || 'Standard')}</p>
-                    </td>
-                    <td class="py-2 text-center">${item.quantity || item.qty || 1}</td>
-                    <td class="py-2 text-right font-mono">€${(((Number(item.price) || 0) * (Number(item.quantity || item.qty) || 1))).toFixed(2)}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('invoice-modal').classList.remove('hidden');
-        }
-
-        function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
-
-        function downloadXmlAdmin(idx) {
-            const o = ordersCache[idx];
-            if (!o) return;
-
-            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-<FatturaElettronica versione="FPR12">
-    <FatturaElettronicaHeader>
-        <DatiTrasmissione>
-            <IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdTrasmittente>
-            <ProgressivoInvio>${o.order_id}</ProgressivoInvio>
-            <FormatoTrasmissione>FPR12</FormatoTrasmissione>
-        </DatiTrasmissione>
-        <CedentePrestatore>
-            <DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3Dmaker</Denominazione></Anagrafica></DatiAnagrafici>
-        </CedentePrestatore>
-        <CessionarioCommittente>
-            <DatiAnagrafici><Anagrafica><Denominazione>${esc(o.customer_name)}</Denominazione></Anagrafica></DatiAnagrafici>
-        </CessionarioCommittente>
-    </FatturaElettronicaHeader>
-    <FatturaElettronicaBody>
-        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${new Date(o.created_at).toISOString().split('T')[0]}</Data><Numero>${o.order_number}</Numero><ImportoTotaleDocumento>${Number(o.total).toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
-    </FatturaElettronicaBody>
-</FatturaElettronica>`;
-
-            const blob = new Blob([xmlContent], { type: 'application/xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Fattura_${o.order_number.replace('/', '_')}.xml`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        async function deleteReview(id) {
-            const { error } = await lsSb.from('reviews').delete().eq('id', id);
-            if (error) { alert("Errore: " + error.message); return; }
-            reviewsCache = reviewsCache.filter(r => r.id !== id);
-            renderAdminReviews();
-        }
-
-        function renderAdminReviews() {
-            const container = document.getElementById('admin-reviews-list');
-            if (!container) return;
-            if (reviewsCache.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessuna recensione.</p>`; return; }
-            container.innerHTML = reviewsCache.map((r) => `
-                <div class="flex justify-between items-start bg-dark-bg p-4 rounded-xl border border-gray-800">
-                    <div>
-                        <p class="font-bold text-white">${esc(r.author)} <span class="text-brand-400">(${r.rating}/5 ★)</span> su ${esc(r.productTitle)}</p>
-                        <p class="text-gray-400 mt-1">${esc(r.comment)}</p>
-                    </div>
-                    <button type="button" onclick="deleteReview(${r.id})" class="text-red-400 hover:text-red-300 cursor-pointer">Elimina</button>
-                </div>
-            `).join('');
-        }
-
-        async function initAdminDashboard() {
-            try { await fetchAll(); } catch (e) { console.error(e); alert("Errore nel caricamento: " + e.message); }
-            renderCategoryCheckboxes();
-            renderColorCheckboxes();
-            renderAdminProducts();
-            renderAdminCategories();
-            renderAdminColors();
-            renderAdminUsers();
-            renderAdminOrders();
-            renderAdminReviews();
-            renderImagesPreview();
             try { lucide.createIcons(); } catch(e){}
         }
 
-        lsSb.auth.getSession().then(({ data }) => { if (data.session) revealAdminPanel(); });
+        function openProductModal(productId) {
+            const p = getProducts().find(prod => prod.id === productId);
+            if (!p) return;
+            const modal = document.getElementById('product-modal');
+            const content = document.getElementById('product-modal-content');
+            const images = p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"];
+            const shippingPrice = Number(p.shipping !== undefined ? p.shipping : 5.00);
+            
+            const productColors = p.colors && p.colors.length > 0 ? p.colors : ["Standard"];
+            const colorOptions = productColors.map(colorName => `<option value="${esc(colorName)}">● ${esc(colorName)}</option>`).join('');
+
+            const reviews = getReviews().filter(r => r.productTitle === p.title);
+            const currentUser = getCurrentUser();
+
+            let reviewFormHtml = currentUser ? `
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
+                    <p class="text-xs font-bold text-white">Lascia una recensione come <span class="text-brand-400">${esc(currentUser.name || currentUser.username)}</span></p>
+                    <select id="rev-rating" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                        <option value="5">5 Stelle - Eccellente</option>
+                        <option value="4">4 Stelle - Molto buono</option>
+                        <option value="3">3 Stelle - Buono</option>
+                        <option value="2">2 Stelle - Sufficiente</option>
+                        <option value="1">1 Stella - Scarsa</option>
+                    </select>
+                    <textarea id="rev-comment" placeholder="Scrivi il tuo commento..." rows="2" class="w-full bg-dark-card border border-gray-700/80 rounded-xl p-2.5 text-xs text-white focus:outline-none"></textarea>
+                    <button onclick="submitReview('${p.title.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs cursor-pointer">Invia Recensione</button>
+                </div>
+            ` : `
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 text-center space-y-2 font-mono">
+                    <p class="text-xs text-gray-400">Effettua l'accesso per poter lasciare recensioni.</p>
+                </div>
+            `;
+
+            content.innerHTML = `
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <h2 class="text-lg font-bold text-white font-mono">${esc(p.title)}</h2>
+                    <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <img id="main-modal-img" src="${images[p.mainImageIndex || 0]}" class="w-full h-64 object-cover rounded-xl border border-gray-800">
+                        <div class="flex gap-2 overflow-x-auto pb-2">
+                            ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
+                        </div>
+                        ${p.stlUrl ? `
+                            <div class="space-y-1 pt-2">
+                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
+                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
+                                    <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
+                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="space-y-4 font-mono text-xs">
+                        <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
+                        <p class="text-brand-400 font-bold text-base">€${(p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price).toFixed(2)}</p>
+                        
+                        <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 space-y-1 text-gray-300">
+                            <div class="flex justify-between"><span>Costo Spedizione Base:</span> <strong class="text-white">€${shippingPrice.toFixed(2)}</strong></div>
+                            <div class="flex justify-between text-brand-400"><span>Articoli successivi:</span> <strong>+€2.00 cad.</strong></div>
+                        </div>
+
+                        <div class="space-y-1 pt-2">
+                            <label class="text-gray-400">Colore Filamento:</label>
+                            <select id="modal-color" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-2.5 text-white focus:outline-none">${colorOptions}</select>
+                        </div>
+                        <button onclick="addModalToCart('${p.title.replace(/'/g, "\\'")}', ${p.salePrice !== null && p.salePrice !== undefined ? p.salePrice : p.price}, ${shippingPrice})" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Aggiungi al Carrello</button>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 pt-6 space-y-4 font-mono">
+                    <h3 class="text-sm font-bold text-white">Recensioni dei Clienti</h3>
+                    <div class="space-y-3 max-h-40 overflow-y-auto">
+                        ${reviews.length === 0 ? '<p class="text-gray-500 text-xs">Ancora nessuna recensione.</p>' : reviews.map(r => `
+                            <div class="bg-dark-bg p-3 rounded-xl border border-gray-800 text-xs">
+                                <div class="flex justify-between text-gray-400 text-[10px]">
+                                    <span class="font-bold text-white">${esc(r.author)}</span>
+                                    <span class="text-brand-400">${r.rating}/5 ★</span>
+                                </div>
+                                <p class="mt-1 text-gray-300">${esc(r.comment)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${reviewFormHtml}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            try { lucide.createIcons(); } catch(e){}
+            if (p.stlUrl) initCatalogStlViewer(p.stlUrl);
+        }
+
+        function initCatalogStlViewer(stlDataUrl) {
+            setTimeout(() => {
+                const canvas = document.getElementById('catalog-stl-canvas');
+                if (!canvas) return;
+                if (catalogStlRenderer) catalogStlRenderer.dispose();
+                const width = canvas.parentElement.clientWidth || 300;
+                const height = 192;
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x070b14);
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+                camera.position.set(0, 0, 150);
+                catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+                catalogStlRenderer.setSize(width, height);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(1, 1, 1).normalize();
+                scene.add(directionalLight);
+                let mesh;
+                const loader = new THREE.STLLoader();
+                loader.load(stlDataUrl, function (geometry) {
+                    geometry.computeVertexNormals();
+                    geometry.center();
+                    geometry.computeBoundingSphere();
+                    const r = geometry.boundingSphere.radius || 1;
+                    const scale = 40 / r;
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.scale.setScalar(scale);
+                    scene.add(mesh);
+                }, undefined, function () {
+                    const geometry = new THREE.BoxGeometry(50, 50, 50);
+                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+                });
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
+                    if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
+                }
+                animate();
+            }, 50);
+        }
+
+        function closeProductModal() {
+            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function addModalToCart(title, price, shipping) {
+            const colorSelect = document.getElementById('modal-color');
+            const selectedColor = colorSelect ? colorSelect.value : 'Standard';
+            const existingIndex = cart.findIndex(i => i.title === title && i.color === selectedColor);
+            if (existingIndex > -1) cart[existingIndex].qty += 1;
+            else cart.push({ title, price, shipping, color: selectedColor, qty: 1 });
+            saveCart();
+            updateCartUI();
+            closeProductModal();
+            toggleCartModal();
+        }
+
+        async function submitReview(productTitle) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) { alert("Devi effettuare l'accesso."); return; }
+            const rating = parseInt(document.getElementById('rev-rating').value);
+            const comment = document.getElementById('rev-comment').value.trim();
+            if (!comment) { alert("Scrivi un commento."); return; }
+            const p = productsCache.find(x => x.title === productTitle);
+            if (!p) return;
+            const row = { product_id: p.id, product_title: productTitle, author: String(currentUser.name || currentUser.username).slice(0, 60), rating, comment: comment.slice(0, 1000) };
+            const { data, error } = await lsSb.from('reviews').insert(row).select().single();
+            if (error) { alert("Errore nell'invio della recensione."); return; }
+            reviewsCache.unshift(mapReview(data));
+            alert("Recensione inviata con successo!");
+            openProductModal(p.id);
+        }
+
+        function updateCartUI() {
+            const counter = document.getElementById('cart-counter');
+            const container = document.getElementById('cart-items-container');
+            const totalModal = document.getElementById('cart-modal-total');
+            let totalQty = 0, productsPrice = 0, baseShipping = 0;
+
+            if (cart.length === 0) {
+                if (container) container.innerHTML = `<p class="text-gray-500 text-center py-6">Il carrello è vuoto.</p>`;
+                if (totalModal) totalModal.innerText = "€0.00";
+                if (counter) counter.innerText = "0";
+                return;
+            }
+
+            if (container) {
+                container.innerHTML = cart.map((item, index) => {
+                    const itemQty = Number(item.qty) || 1;
+                    totalQty += itemQty;
+                    const itemTotal = (Number(item.price) || 0) * itemQty;
+                    productsPrice += itemTotal;
+                    const itemShipping = Number(item.shipping !== undefined ? item.shipping : 5.00);
+                    if (itemShipping > baseShipping) baseShipping = itemShipping;
+
+                    return `
+                        <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
+                            <div>
+                                <p class="font-bold text-white">${itemQty}x ${esc(item.title)}</p>
+                                <p class="text-[10px] text-gray-400">Colore: <span class="text-brand-400">${esc(item.color)}</span></p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-brand-400">€${itemTotal.toFixed(2)}</span>
+                                <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const totalExtraItems = Math.max(0, totalQty - 1);
+            const finalShipping = baseShipping + (totalExtraItems * 2.00);
+
+            if (counter) counter.innerText = totalQty;
+            if (totalModal) totalModal.innerText = `€${(productsPrice + finalShipping).toFixed(2)}`;
+            try { lucide.createIcons(); } catch(e){}
+        }
+
+        function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartUI(); }
+        function saveCart() { try { localStorage.setItem('ls3d_cart', JSON.stringify(cart)); } catch (e) {} }
+        function toggleCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        function goToCheckout() { if (cart.length === 0) { alert("Il carrello è vuoto."); return; } window.location.href = "checkout.html"; }
+
+        async function loadData() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '<p class="col-span-full text-center text-gray-500 font-mono py-12">Caricamento prodotti...</p>';
+            try { await fetchAll(); renderCatalog(); }
+            catch (e) { console.error(e); grid.innerHTML = '<p class="col-span-full text-center text-red-400 font-mono py-12">Impossibile caricare il catalogo. Riprova più tardi.</p>'; }
+        }
+        updateCartUI();
+        loadData();
     </script>
 </body>
 </html>
