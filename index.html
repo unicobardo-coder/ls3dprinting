@@ -42,6 +42,7 @@
             <div class="hidden md:flex items-center gap-5 font-mono text-xs">
                 <a href="chisiamo.html" id="nav-chisiamo" class="text-gray-300 hover:text-white transition-colors">Chi Siamo</a>
                 <a href="catalog.html" id="nav-catalogo" class="text-gray-300 hover:text-white transition-colors">Catalogo 3D</a>
+                <a href="info.html" id="nav-info" class="text-brand-400 hover:text-brand-300 transition-colors font-bold">Info & Preventivi</a>
                 <a href="login.html" id="nav-accedi" class="text-gray-300 hover:text-white transition-colors">Accedi / Registrati</a>
                 
                 <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-dark-surface border border-gray-800 text-gray-400 rounded-lg p-1.5 focus:outline-none cursor-pointer">
@@ -80,6 +81,7 @@
             <nav class="flex flex-col space-y-3">
                 <a href="chisiamo.html" class="text-gray-300 hover:text-white transition-colors py-1">Chi Siamo</a>
                 <a href="catalog.html" class="text-gray-300 hover:text-white transition-colors py-1">Catalogo 3D</a>
+                <a href="info.html" class="text-brand-400 font-bold hover:text-brand-300 transition-colors py-1">Info & Preventivi</a>
                 <a href="login.html" class="text-gray-300 hover:text-white transition-colors py-1">Accedi / Registrati</a>
                 <a href="admin.html" class="text-brand-400 font-bold hover:text-brand-300 transition-colors py-1">Admin Panel</a>
             </nav>
@@ -90,9 +92,12 @@
         <div class="text-center space-y-4 py-8">
             <h1 id="hero-title" class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Stampa 3D di Alta Precisione</h1>
             <p id="hero-subtitle" class="text-xs sm:text-sm font-mono text-gray-400 max-w-2xl mx-auto">Realizziamo i tuoi progetti con materiali avanzati e finiture curate nei minimi dettagli.</p>
-            <div class="pt-4">
+            <div class="pt-4 flex flex-wrap justify-center gap-4">
                 <a href="catalog.html" id="hero-cta" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs font-mono transition-all shadow-lg inline-flex items-center gap-2">
                     Esplora il Catalogo <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+                <a href="info.html" class="px-6 py-3.5 bg-dark-surface hover:bg-gray-800 text-white font-bold rounded-xl text-xs font-mono border border-gray-700 transition-all shadow-lg inline-flex items-center gap-2">
+                    Informazioni e Preventivi <i data-lucide="help-circle" class="w-4 h-4 text-brand-400"></i>
                 </a>
             </div>
         </div>
@@ -109,6 +114,7 @@
         </div>
     </main>
 
+    <!-- CARRELLO MODALE -->
     <div id="cart-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex justify-end">
         <div class="bg-dark-card border-l border-gray-800 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
             <div class="space-y-6">
@@ -132,6 +138,7 @@
         </div>
     </div>
 
+    <!-- MODALE PRODOTTO -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-dark-card border border-gray-800 w-full max-w-3xl rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto" id="product-modal-content"></div>
     </div>
@@ -184,7 +191,6 @@
             if (!grid) return;
             const products = getProducts();
             
-            // Vetrina rigorosa basata sul flag featured impostato nell'admin
             const featuredProducts = products.filter(p => p.featured === true);
             const displayList = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 3);
 
@@ -269,15 +275,6 @@
                         <div class="flex gap-2 overflow-x-auto pb-2">
                             ${images.map(img => `<img src="${img}" onclick="document.getElementById('main-modal-img').src='${img}'" class="w-16 h-16 object-cover rounded-lg border border-gray-800 cursor-pointer hover:border-brand-500">`).join('')}
                         </div>
-                        ${p.stlFileName ? `
-                            <div class="space-y-1 pt-2">
-                                <p class="text-xs font-mono text-brand-400 font-bold">Modello 3D Disponibile</p>
-                                <div class="w-full h-48 bg-dark-bg rounded-xl border border-gray-800 relative flex items-center justify-center">
-                                    <canvas id="catalog-stl-canvas" class="w-full h-full rounded-xl"></canvas>
-                                    <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 px-2 py-0.5 rounded text-brand-400 font-mono">Anteprima 3D Interattiva</span>
-                                </div>
-                            </div>
-                        ` : ''}
                     </div>
                     <div class="space-y-4 font-mono text-xs">
                         <p class="text-gray-300 leading-relaxed">${esc(p.longDesc || p.shortDesc || '')}</p>
@@ -308,55 +305,9 @@
             `;
             modal.classList.remove('hidden');
             try { lucide.createIcons(); } catch(e){}
-            if (p.stlFileName && p.stlUrl) initCatalogStlViewer(p.stlUrl);
-        }
-
-        function initCatalogStlViewer(stlDataUrl) {
-            setTimeout(() => {
-                const canvas = document.getElementById('catalog-stl-canvas');
-                if (!canvas) return;
-                if (catalogStlRenderer) catalogStlRenderer.dispose();
-                const width = canvas.parentElement.clientWidth || 300;
-                const height = 192;
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x070b14);
-                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
-                camera.position.set(0, 0, 150);
-                catalogStlRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-                catalogStlRenderer.setSize(width, height);
-                scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-                directionalLight.position.set(1, 1, 1).normalize();
-                scene.add(directionalLight);
-                let mesh;
-                const loader = new THREE.STLLoader();
-                loader.load(stlDataUrl, function (geometry) {
-                    geometry.computeVertexNormals();
-                    geometry.center();
-                    geometry.computeBoundingSphere();
-                    const r = geometry.boundingSphere.radius || 1;
-                    const scale = 40 / r;
-                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                    mesh = new THREE.Mesh(geometry, material);
-                    mesh.scale.setScalar(scale);
-                    scene.add(mesh);
-                }, undefined, function () {
-                    const geometry = new THREE.BoxGeometry(50, 50, 50);
-                    const material = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4, metalness: 0.2 });
-                    mesh = new THREE.Mesh(geometry, material);
-                    scene.add(mesh);
-                });
-                function animate() {
-                    requestAnimationFrame(animate);
-                    if (mesh) { mesh.rotation.x += 0.005; mesh.rotation.y += 0.008; }
-                    if (catalogStlRenderer) catalogStlRenderer.render(scene, camera);
-                }
-                animate();
-            }, 50);
         }
 
         function closeProductModal() {
-            if (catalogStlRenderer) { catalogStlRenderer.dispose(); catalogStlRenderer = null; }
             document.getElementById('product-modal').classList.add('hidden');
         }
 
