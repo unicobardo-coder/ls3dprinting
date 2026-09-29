@@ -51,6 +51,14 @@ function sendInfoRequestEmail(infoData) {
         order_total: "0.00"
     };
 
+    emailjs.send('service_1nyj1gz', 'template_3xsmrsf', templateParams)
+        .then(function(response) {
+            console.log('Richiesta info inviata!', response.status, response.text);
+        }, function(error) {
+            console.error('Errore invio info:', error);
+        });
+}
+
     // Puoi usare lo stesso Service ID e Template ID (o crearne uno specifico su EmailJS)
     emailjs.send('service_1nyj1gz', 'template_ltm9vpm', templateParams)
         .then(function(response) {
