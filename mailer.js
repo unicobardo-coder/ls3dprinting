@@ -50,7 +50,7 @@ function sendInfoRequestEmail(infoData) {
         order_total: "0.00"
     };
 
-    emailjs.send('service_1nyj1gz', 'template_3xsmrsf', templateParams)
+    emailjs.send('service_1nyj1gz', 'template_ltm9vpm', templateParams)
         .then(function(response) {
             console.log('Richiesta info inviata!', response.status, response.text);
         }, function(error) {
