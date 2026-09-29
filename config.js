@@ -1,4 +1,4 @@
-const LS3D_CONFIG = {  
+window.LS3D_CONFIG = {  
     emailjs: {  
         publicKey: "hopoM4it_MqCl4KlT",  
         serviceId: "service_1nyj1gz",  
@@ -18,7 +18,6 @@ const LS3D_CONFIG = {
         storageKey: "ls3d_visit_counter",
         init: function() {
             if (!this.enabled) return 0;
-            // Parte da una base iniziale (es. 1250) e incrementa a ogni nuova sessione
             let count = parseInt(localStorage.getItem(this.storageKey) || "1250", 10);
             if (!sessionStorage.getItem("ls3d_visited")) {
                 count += 1;
@@ -30,8 +29,8 @@ const LS3D_CONFIG = {
     }
 };
 
-// Iniezione automatica del contatore nel footer di ogni pagina
-window.addEventListener('DOMContentLoaded', () => {
+// Funzione di iniezione automatica nel footer
+function injectVisitorCounter() {
     if (window.LS3D_CONFIG && LS3D_CONFIG.counter) {
         const totalVisits = LS3D_CONFIG.counter.init();
         const footer = document.querySelector('footer');
@@ -43,4 +42,11 @@ window.addEventListener('DOMContentLoaded', () => {
             footer.appendChild(badge);
         }
     }
-});
+}
+
+// Esecuzione immediata o al caricamento del DOM
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', injectVisitorCounter);
+} else {
+    injectVisitorCounter();
+}
