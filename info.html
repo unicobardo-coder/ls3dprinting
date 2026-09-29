@@ -11,9 +11,6 @@
     
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function() { emailjs.init("hopoM4it_MqCl4KlT"); })();
-    </script>
 
     <script>
         tailwind.config = {
@@ -65,7 +62,7 @@
                     </div>
                 </div>
                 <div class="flex items-start gap-3">
-                    <i data-lucide="Cpu" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                    <i data-lucide="cpu" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
                     <div>
                         <p class="font-bold text-white">Modellazione Custom</p>
                         <p class="text-gray-400 text-[11px]">Hai un file STL o un'idea da sviluppare da zero? Ti supportiamo dalla progettazione CAD fino al pezzo finito.</p>
@@ -113,38 +110,34 @@
         LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
 
+    <!-- SCRIPT CENTRALE DI INVIO (MAILER.JS) -->
+    <script src="mailer.js"></script>
+
     <script>
-        <!-- Include il file mailer.js centralizzato -->
-<script src="mailer.js"></script>
+        function submitInfoRequest(e) {
+            e.preventDefault();
+            const name = document.getElementById('info-name').value.trim();
+            const email = document.getElementById('info-email').value.trim();
+            const message = document.getElementById('info-message').value.trim();
 
-<script>
-    function submitInfoRequest(e) {
-        e.preventDefault();
-        const name = document.getElementById('info-name').value.trim();
-        const email = document.getElementById('info-email').value.trim();
-        const message = document.getElementById('info-message').value.trim();
+            if (!name || !email || !message) {
+                alert("Compila tutti i campi obbligatori.");
+                return;
+            }
 
-        if (!name || !email || !message) {
-            alert("Compila tutti i campi obbligatori.");
-            return;
+            if (typeof sendInfoRequestEmail === 'function') {
+                sendInfoRequestEmail({ name, email, message });
+                alert("Messaggio inviato con successo! Ti risponderemo al più presto.");
+                
+                document.getElementById('info-name').value = '';
+                document.getElementById('info-email').value = '';
+                document.getElementById('info-message').value = '';
+            } else {
+                alert("Errore: lo script mailer.js non è stato caricato correttamente.");
+            }
         }
 
-        // Chiamata alla funzione del file mailer.js
-        if (typeof sendInfoRequestEmail === 'function') {
-            sendInfoRequestEmail({ name, email, message });
-            alert("Messaggio inviato con successo! Ti risponderemo al più presto.");
-            
-            // Svuota i campi del form
-            document.getElementById('info-name').value = '';
-            document.getElementById('info-email').value = '';
-            document.getElementById('info-message').value = '';
-        } else {
-            alert("Errore: caricamento dello script di invio fallito.");
-        }
-    }
-
-    try { lucide.createIcons(); } catch(e){}
-</script>
+        try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
 </html>
