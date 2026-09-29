@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Info & Contatti | LS3Dmaker</title>
+    <title>Contatti & Informazioni | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <!-- Configurazione Globale -->
-    <script src="config.js"></script>
+    
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() { emailjs.init("hopoM4it_MqCl4KlT"); })();
+    </script>
 
     <script>
         tailwind.config = {
@@ -30,78 +31,125 @@
 </head>
 <body class="bg-dark-bg text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
 
+    <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="LS3Dmaker Logo" class="h-10 sm:h-12 object-contain" onerror="this.src='logo.svg'">
             </a>
-            <a href="index.html" class="text-xs font-mono text-gray-400 hover:text-white transition-colors">← Torna alla Home</a>
+            <div class="flex items-center gap-4 font-mono text-xs">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="catalog.html" class="text-gray-300 hover:text-white transition-colors">Catalogo 3D</a>
+            </div>
         </div>
     </header>
 
-    <main class="py-12 px-4 sm:px-6 max-w-4xl mx-auto w-full flex-grow space-y-12">
-        <div class="border-b border-gray-800 pb-6">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Informazioni & Contatti</h1>
-            <p class="text-xs font-mono text-gray-400 mt-1">Hai richieste per stampe 3D personalizzate? Contattaci direttamente.</p>
-        </div>
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
+        
+        <!-- SEZIONE INFO / CHI SIAMO -->
+        <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white tracking-tight font-sans">Chi Siamo & Progettazione 3D</h1>
+                <p class="text-gray-400 mt-2 leading-relaxed">
+                    <strong>LS3Dmaker</strong> nasce dalla passione per la tecnologia, l'ingegneria e la manifattura additiva. Basati a Bologna, realizziamo componenti tecnici, oggetti di design, gadget e prototipi personalizzati ad alta definizione.
+                </p>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-4 shadow-xl font-mono text-xs">
-                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Chi Siamo</h2>
-                <p class="text-gray-400 leading-relaxed">LS3Dmaker nasce dalla passione per la prototipazione rapida e la stampa 3D di precisione. Realizziamo componenti su misura, oggetti di design e accessori funzionali.</p>
-                <div class="pt-4 space-y-2 text-gray-300">
-                    <p>📍 Sede: Bologna, Italia</p>
-                    <p>✉️ Email: info@ls3dmaker.it</p>
+            <div class="space-y-4 pt-4 border-t border-gray-800">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="printer" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-white">Stampa 3D Avanzata</p>
+                        <p class="text-gray-400 text-[11px]">Utilizziamo stampanti di ultima generazione e materiali di prima scelta per garantire tolleranze precise e finiture impeccabili.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="Cpu" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-white">Modellazione Custom</p>
+                        <p class="text-gray-400 text-[11px]">Hai un file STL o un'idea da sviluppare da zero? Ti supportiamo dalla progettazione CAD fino al pezzo finito.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-white">Sede & Spedizioni</p>
+                        <p class="text-gray-400 text-[11px]">Operativi a Bologna (Italia) con spedizioni rapide e sicure in tutta Italia.</p>
+                    </div>
                 </div>
             </div>
-
-            <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-4 shadow-xl">
-                <h2 class="text-sm font-bold text-white font-mono uppercase tracking-wider">Invia un Messaggio</h2>
-                <form id="contact-form" onsubmit="handleContactSubmit(event)" class="space-y-4 text-xs font-mono">
-                    <div>
-                        <label class="block text-gray-400 mb-1">Nome *</label>
-                        <input type="text" id="contact-name" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 mb-1">Email *</label>
-                        <input type="email" id="contact-email" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 mb-1">Messaggio *</label>
-                        <textarea id="contact-message" required rows="4" placeholder="Descrivi il tuo progetto o richiesta..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
-                    </div>
-                    <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg cursor-pointer">Invia Messaggio</button>
-                </form>
-            </div>
         </div>
+
+        <!-- MODULO RICHIESTA INFORMAZIONI -->
+        <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white tracking-tight font-sans">Richiesta di Informazioni</h2>
+            <p class="text-xs font-mono text-gray-400">Compila il modulo sottostante per inviarci una domanda o richiedere un preventivo su misura.</p>
+            
+            <form onsubmit="submitInfoRequest(event)" class="space-y-4 text-xs font-mono">
+                <div>
+                    <label class="block text-gray-400 mb-1">Il tuo Nome *</label>
+                    <input type="text" id="info-name" required placeholder="Mario Rossi" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">La tua Email *</label>
+                    <input type="email" id="info-email" required placeholder="tuamail@esempio.it" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Messaggio / Richiesta *</label>
+                    <textarea id="info-message" required rows="4" placeholder="Scrivi qui i dettagli della tua richiesta o del progetto 3D..." class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-2">
+                    Invia Messaggio <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+
     </main>
 
-    <footer class="bg-[#05080e] border-t border-gray-800/80 py-8 text-xs text-gray-500 text-center font-mono">
+    <!-- FOOTER -->
+    <footer class="bg-[#05080e] border-t border-gray-800/80 py-6 text-xs text-gray-500 text-center font-mono">
         LS3DMAKER © 2026 - Tutti i diritti riservati
     </footer>
 
-    <script src="mailer.js"></script>
     <script>
-        function handleContactSubmit(e) {
+        function submitInfoRequest(e) {
             e.preventDefault();
-            const name = document.getElementById('contact-name').value.trim();
-            const email = document.getElementById('contact-email').value.trim();
-            const message = document.getElementById('contact-message').value.trim();
+            const name = document.getElementById('info-name').value.trim();
+            const email = document.getElementById('info-email').value.trim();
+            const message = document.getElementById('info-message').value.trim();
 
-            if (!name || !email || !message) { alert("Compila tutti i campi."); return; }
+            if (!name || !email || !message) {
+                alert("Compila tutti i campi obbligatori.");
+                return;
+            }
 
-            sendContactEmail(
-                { name, email, message },
-                () => {
-                    alert("Messaggio inviato con successo! Ti risponderemo presto.");
-                    document.getElementById('contact-form').reset();
-                },
-                (err) => {
+            // Parametri inviati tramite EmailJS (usa lo stesso template o uno dedicato configurato su EmailJS)
+            const templateParams = {
+                to_name: name,
+                to_email: email,
+                order_number: "INFO-REQ",
+                order_date: new Date().toLocaleDateString('it-IT'),
+                order_items: `Richiesta di Informazioni:\n\n${message}`,
+                shipping_address: "N/A (Richiesta Info)",
+                payment_method: "N/A",
+                order_total: "0.00"
+            };
+
+            // Sostituisci con i tuoi Service ID e Template ID di EmailJS
+            emailjs.send('IL_TUO_SERVICE_ID', 'IL_TUO_TEMPLATE_ID', templateParams)
+                .then(function(response) {
+                    alert("Messaggio inviato con successo! Ti risponderemo al più presto.");
+                    document.getElementById('info-name').value = '';
+                    document.getElementById('info-email').value = '';
+                    document.getElementById('info-message').value = '';
+                }, function(error) {
+                    console.error('Errore invio:', error);
                     alert("Errore durante l'invio del messaggio. Riprova più tardi.");
-                    console.error(err);
-                }
-            );
+                });
         }
+
         try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
