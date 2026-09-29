@@ -114,43 +114,37 @@
     </footer>
 
     <script>
-        function submitInfoRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('info-name').value.trim();
-            const email = document.getElementById('info-email').value.trim();
-            const message = document.getElementById('info-message').value.trim();
+        <!-- Include il file mailer.js centralizzato -->
+<script src="mailer.js"></script>
 
-            if (!name || !email || !message) {
-                alert("Compila tutti i campi obbligatori.");
-                return;
-            }
+<script>
+    function submitInfoRequest(e) {
+        e.preventDefault();
+        const name = document.getElementById('info-name').value.trim();
+        const email = document.getElementById('info-email').value.trim();
+        const message = document.getElementById('info-message').value.trim();
 
-            // Parametri inviati tramite EmailJS (usa lo stesso template o uno dedicato configurato su EmailJS)
-            const templateParams = {
-                to_name: name,
-                to_email: email,
-                order_number: "INFO-REQ",
-                order_date: new Date().toLocaleDateString('it-IT'),
-                order_items: `Richiesta di Informazioni:\n\n${message}`,
-                shipping_address: "N/A (Richiesta Info)",
-                payment_method: "N/A",
-                order_total: "0.00"
-            };
-
-            // Sostituisci con i tuoi Service ID e Template ID di EmailJS
-            emailjs.send('IL_TUO_SERVICE_ID', 'IL_TUO_TEMPLATE_ID', templateParams)
-                .then(function(response) {
-                    alert("Messaggio inviato con successo! Ti risponderemo al più presto.");
-                    document.getElementById('info-name').value = '';
-                    document.getElementById('info-email').value = '';
-                    document.getElementById('info-message').value = '';
-                }, function(error) {
-                    console.error('Errore invio:', error);
-                    alert("Errore durante l'invio del messaggio. Riprova più tardi.");
-                });
+        if (!name || !email || !message) {
+            alert("Compila tutti i campi obbligatori.");
+            return;
         }
 
-        try { lucide.createIcons(); } catch(e){}
+        // Chiamata alla funzione del file mailer.js
+        if (typeof sendInfoRequestEmail === 'function') {
+            sendInfoRequestEmail({ name, email, message });
+            alert("Messaggio inviato con successo! Ti risponderemo al più presto.");
+            
+            // Svuota i campi del form
+            document.getElementById('info-name').value = '';
+            document.getElementById('info-email').value = '';
+            document.getElementById('info-message').value = '';
+        } else {
+            alert("Errore: caricamento dello script di invio fallito.");
+        }
+    }
+
+    try { lucide.createIcons(); } catch(e){}
+</script>
     </script>
 </body>
 </html>
