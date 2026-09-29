@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout Sicuro | LS3Dmaker</title>
+    <title>Invia Richiesta Ordine | LS3Dmaker</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=IL_TUO_PAYPAL_CLIENT_ID&currency=EUR"></script>
-
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -44,50 +41,49 @@
         </div>
     </header>
 
-    <!-- CONTENUTO CHECKOUT -->
+    <!-- CONTENUTO CHECKOUT / INVIO RICHIESTA -->
     <main class="py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
         
-        <!-- SEZIONE DATI E PAGAMENTO -->
+        <!-- SEZIONE DATI E INVIO -->
         <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
-            <h1 class="text-xl font-bold text-white tracking-tight">Indirizzo di Spedizione & Pagamento</h1>
+            <h1 class="text-xl font-bold text-white tracking-tight">I tuoi Dati di Contatto & Spedizione</h1>
             
-            <div id="checkout-form" class="space-y-4 text-xs">
+            <form onsubmit="submitOrderRequest(event)" class="space-y-4 text-xs font-mono">
                 <div>
-                    <label class="block text-gray-400 mb-1 font-mono">Nome e Cognome *</label>
+                    <label class="block text-gray-400 mb-1">Nome e Cognome *</label>
                     <input type="text" id="cust-name" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1 font-mono">Email per Ricevuta/Fattura *</label>
+                    <label class="block text-gray-400 mb-1">Email per ricevere il recap *</label>
                     <input type="email" id="cust-email" required class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1 font-mono">Indirizzo di Spedizione *</label>
+                    <label class="block text-gray-400 mb-1">Indirizzo di Spedizione *</label>
                     <textarea id="cust-address" required rows="2" placeholder="Via, n. civico, Città, CAP, Provincia" class="w-full bg-dark-bg border border-gray-700/80 rounded-xl p-3 text-white focus:border-brand-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- BOX INVITO AL CONTATTO (AGGIUNTO) -->
-                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-2 font-mono text-xs text-gray-300">
+                <!-- BOX INFORMATIVO -->
+                <div class="bg-dark-bg p-4 rounded-xl border border-gray-800 space-y-2 text-gray-300">
                     <p class="font-bold text-white flex items-center gap-2">
-                        <i data-lucide="help-circle" class="w-4 h-4 text-brand-400"></i> Hai domande o un progetto 3D personalizzato?
+                        <i data-lucide="info" class="w-4 h-4 text-brand-400"></i> Come funziona l'ordine?
                     </p>
-                    <p class="text-gray-400 leading-relaxed">
-                        Se hai esigenze particolari o necessiti di supporto prima dell'acquisto, <a href="info.html" class="text-brand-400 underline hover:text-brand-300 font-bold">contattaci qui</a> o scrivici direttamente. Saremo felici di aiutarti!
+                    <p class="text-gray-400 leading-relaxed text-[11px]">
+                        Inviando la richiesta, riceverai un'email di riepilogo e verrai ricontattato direttamente per definire i dettagli di pagamento, eventuali personalizzazioni del modello 3D e la spedizione.
                     </p>
                 </div>
 
-                <!-- BOX PAGAMENTO -->
-                <div class="pt-6 space-y-4 border-t border-gray-800">
-                    <label class="block text-gray-300 font-bold font-mono text-xs uppercase tracking-wider">Completa il pagamento (PayPal o Carta):</label>
-                    
-                    <!-- Pulsante Ufficiale PayPal -->
-                    <div id="paypal-button-container" class="w-full min-h-[45px]"></div>
+                <!-- PULSANTE INVIO -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                        Invia Richiesta d'Ordine <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- RIEPILOGO CARRELLO -->
         <div class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl h-fit">
-            <h2 class="text-lg font-bold text-white tracking-tight border-b border-gray-800 pb-4">Riepilogo Ordine</h2>
+            <h2 class="text-lg font-bold text-white tracking-tight border-b border-gray-800 pb-4 font-mono">Riepilogo Carrello</h2>
             <div id="checkout-items-list" class="space-y-3 font-mono text-xs max-h-60 overflow-y-auto"></div>
             
             <div class="border-t border-gray-800 pt-4 space-y-2 font-mono text-xs">
@@ -96,11 +92,11 @@
                     <span id="checkout-subtotal">€0.00</span>
                 </div>
                 <div class="flex justify-between text-gray-400">
-                    <span>Spedizione corriere:</span>
+                    <span>Spedizione stimata:</span>
                     <span id="checkout-shipping">€0.00</span>
                 </div>
                 <div class="border-t border-gray-800 pt-2 flex justify-between items-center font-bold text-sm text-white">
-                    <span>Totale da Pagare:</span>
+                    <span>Totale Stimato:</span>
                     <span id="checkout-total" class="text-brand-400">€0.00</span>
                 </div>
             </div>
@@ -110,7 +106,7 @@
 
     <!-- FOOTER -->
     <footer class="bg-[#05080e] border-t border-gray-800/80 py-6 text-xs text-gray-500 text-center font-mono">
-        LS3DMAKER © 2026 - Transazioni Protette
+        LS3DMAKER © 2026 - Contatto Diretto & Produzione 3D
     </footer>
 
     <script src="mailer.js"></script>
@@ -160,57 +156,29 @@
             return { subtotal, shipping: maxShipping, total };
         }
 
-        function validateCustomerData() {
+        function submitOrderRequest(e) {
+            e.preventDefault();
             const name = document.getElementById('cust-name').value.trim();
             const email = document.getElementById('cust-email').value.trim();
             const address = document.getElementById('cust-address').value.trim();
 
             if (!name || !email || !address) {
-                alert("Per favore, compila Nome, Email e Indirizzo di spedizione prima di procedere al pagamento.");
-                return false;
+                alert("Compila tutti i campi obbligatori.");
+                return;
             }
-            return { name, email, address };
-        }
 
-        function initPayPal() {
+            if (cart.length === 0) {
+                alert("Il carrello è vuoto.");
+                return;
+            }
+
             const { total } = renderCheckoutSummary();
-            if (total <= 0 || typeof paypal === 'undefined') return;
-
-            try {
-                paypal.Buttons({
-                    createOrder: function(data, actions) {
-                        const customer = validateCustomerData();
-                        if (!customer) throw new Error("Dati cliente incompleti");
-                        return actions.order.create({
-                            purchase_units: [{ amount: { value: total.toFixed(2) } }]
-                        });
-                    },
-                    onApprove: function(data, actions) {
-                        return actions.order.capture().then(function(details) {
-                            const customer = {
-                                name: document.getElementById('cust-name').value || details.payer.name.given_name,
-                                email: document.getElementById('cust-email').value || details.payer.email_address,
-                                address: document.getElementById('cust-address').value || "Indirizzo PayPal"
-                            };
-                            finalizeOrderAndSave("PayPal", details.id, customer, total);
-                        });
-                    },
-                    onError: function(err) {
-                        alert("Errore durante la transazione.");
-                        console.error("PayPal Error:", err);
-                    }
-                }).render('#paypal-button-container');
-            } catch(e) { console.error("Errore inizializzazione PayPal:", e); }
-        }
-
-        function finalizeOrderAndSave(gateway, transactionId, customer, total) {
-            if (!cart || cart.length === 0) return;
+            const customer = { name, email, address };
 
             const newOrder = {
-                id: "ORD-" + Date.now(),
+                id: "REQ-" + Date.now(),
                 number: "2026/" + Math.floor(Math.random() * 1000),
-                gateway: gateway,
-                transactionId: transactionId,
+                gateway: "Contatto Diretto / Email",
                 name: customer.name,
                 email: customer.email,
                 address: customer.address,
@@ -219,24 +187,26 @@
                 total: total
             };
 
+            // Salvataggio locale degli ordini
             let orders = [];
             try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
             orders.push(newOrder);
             localStorage.setItem('ls3d_orders', JSON.stringify(orders));
 
+            // Invio email tramite mailer.js
             if (typeof sendOrderConfirmationEmail === 'function') {
                 sendOrderConfirmationEmail(newOrder);
             }
 
+            // Svuota il carrello
             localStorage.removeItem('ls3d_cart');
             cart = [];
 
-            alert(`Pagamento completato con successo! Ordine registrato e email inviata.`);
+            alert("Richiesta d'ordine inviata con successo! Riceverai una copia di riepilogo via email e verrai ricontattato al più presto.");
             window.location.href = "index.html";
         }
 
         renderCheckoutSummary();
-        initPayPal();
         try { lucide.createIcons(); } catch(e){}
     </script>
 </body>
