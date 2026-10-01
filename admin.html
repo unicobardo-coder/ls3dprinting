@@ -65,7 +65,7 @@
         <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, colori, prodotti, utenti da Supabase e fatture.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, colori, prodotti, utenti, ordini e fatture da Supabase.</p>
             </div>
             <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
@@ -206,9 +206,9 @@
             <div id="admin-users-list" class="space-y-3"></div>
         </section>
 
-        <!-- SEZIONE ORDINI -->
+        <!-- SEZIONE ORDINI E FATTURE (SUPABASE) -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Gestione Ordini & Fatture</h2>
+            <h2 class="text-lg font-bold text-white">Gestione Ordini & Fatture (Supabase)</h2>
             <div id="admin-orders-list" class="space-y-3"></div>
         </section>
 
@@ -302,7 +302,7 @@
                 renderColorCheckboxes();
                 renderAdminProducts();
                 await renderAdminUsers();
-                renderAdminOrders();
+                await renderAdminOrders();
                 renderAdminReviews();
                 alert("Sincronizzazione completata con successo!");
             } catch (e) {
@@ -742,38 +742,50 @@
             await renderAdminUsers();
         }
 
-        function renderAdminOrders() {
-            let orders = [];
-            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) { orders = []; }
+        // --- ORDINI E FATTURE DA SUPABASE ---
+        async function renderAdminOrders() {
             const container = document.getElementById('admin-orders-list');
             if (!container) return;
-            if (orders.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessun ordine o fattura registrata.</p>`; return; }
+
+            const { data: orders, error } = await lsSb.from('orders').select('*').order('created_at', { ascending: false });
+            if (error) {
+                container.innerHTML = `<p class="text-red-400 text-xs">Errore caricamento ordini da Supabase.</p>`;
+                return;
+            }
+            if (!orders || orders.length === 0) { 
+                container.innerHTML = `<p class="text-gray-500 text-xs">Nessun ordine o fattura registrata su Supabase.</p>`; 
+                return; 
+            }
+
+            window.currentAdminOrders = orders;
+
             container.innerHTML = orders.map((o, idx) => `
                 <div class="p-4 bg-dark-bg rounded-xl border border-gray-800 space-y-2">
                     <div class="flex justify-between text-white font-bold">
-                        <span>Fattura n. ${esc(o.number)} (${esc(o.id)})</span>
+                        <span>Fattura n. ${esc(o.order_number)}</span>
                         <span class="text-brand-400">€${Number(o.total || 0).toFixed(2)}</span>
                     </div>
-                    <p class="text-gray-400">Cliente: ${esc(o.name)} (${esc(o.email)}) - Pagamento: <strong class="text-white">${esc(o.gateway)}</strong></p>
+                    <p class="text-gray-400">Cliente: ${esc(o.client_name)} (${esc(o.client_email)}) - Pagamento: <strong class="text-white">${esc(o.gateway)}</strong></p>
                     <div class="flex gap-2 pt-2">
                         <button type="button" onclick="viewInvoiceModal(${idx})" class="px-3 py-1.5 bg-dark-surface hover:bg-gray-800 text-white rounded-lg cursor-pointer">👁️ Visualizza Fattura</button>
                         <button type="button" onclick="downloadXmlAdmin(${idx})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg cursor-pointer">📥 XML AdE</button>
+                        <button type="button" onclick="deleteOrder('${o.id}')" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">🗑️ Elimina</button>
                     </div>
                 </div>
             `).join('');
         }
 
         function viewInvoiceModal(idx) {
-            let orders = [];
-            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) {}
+            const orders = window.currentAdminOrders || [];
             const o = orders[idx];
             if (!o) return;
-            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.number}`;
-            document.getElementById('inv-modal-date').innerText = `Data: ${o.date || 'Data odierna'}`;
-            document.getElementById('inv-modal-client').innerText = o.name;
-            document.getElementById('inv-modal-email').innerText = o.email;
-            document.getElementById('inv-modal-address').innerText = o.address || 'Indirizzo non specificato';
+            document.getElementById('inv-modal-number').innerText = `Fattura N. ${o.order_number}`;
+            document.getElementById('inv-modal-date').innerText = `Data: ${o.order_date || 'Data odierna'}`;
+            document.getElementById('inv-modal-client').innerText = o.client_name;
+            document.getElementById('inv-modal-email').innerText = o.client_email;
+            document.getElementById('inv-modal-address').innerText = o.client_address || 'Indirizzo non specificato';
             document.getElementById('inv-modal-total').innerText = `€${Number(o.total || 0).toFixed(2)}`;
+            
             const itemsContainer = document.getElementById('inv-modal-items');
             itemsContainer.innerHTML = (o.items || []).map(item => `
                 <tr class="border-b border-gray-100">
@@ -791,8 +803,7 @@
         function closeInvoiceModal() { document.getElementById('invoice-modal').classList.add('hidden'); }
 
         function downloadXmlAdmin(idx) {
-            let orders = [];
-            try { orders = JSON.parse(localStorage.getItem('ls3d_orders')) || []; } catch (e) {}
+            const orders = window.currentAdminOrders || [];
             const o = orders[idx];
             if (!o) return;
             const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -807,22 +818,32 @@
             <DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>00000000000</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>LS3Dmaker</Denominazione></Anagrafica></DatiAnagrafici>
         </CedentePrestatore>
         <CessionarioCommittente>
-            <DatiAnagrafici><Anagrafica><Denominazione>${esc(o.name)}</Denominazione></Anagrafica></DatiAnagrafici>
+            <DatiAnagrafici><Anagrafica><Denominazione>${esc(o.client_name)}</Denominazione></Anagrafica></DatiAnagrafici>
         </CessionarioCommittente>
     </FatturaElettronicaHeader>
     <FatturaElettronicaBody>
-        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${o.date}</Data><Numero>${o.number}</Numero><ImportoTotaleDocumento>${o.total.toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
+        <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>${o.order_date}</Data><Numero>${o.order_number}</Numero><ImportoTotaleDocumento>${Number(o.total).toFixed(2)}</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali>
     </FatturaElettronicaBody>
 </FatturaElettronica>`;
             const blob = new Blob([xmlContent], { type: 'application/xml' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Fattura_${o.number.replace('/', '_')}.xml`;
+            a.download = `Fattura_${o.order_number.replace('/', '_')}.xml`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+
+        async function deleteOrder(orderId) {
+            if (!confirm("Vuoi eliminare questo ordine/fattura da Supabase?")) return;
+            const { error } = await lsSb.from('orders').delete().eq('id', orderId);
+            if (error) {
+                alert("Errore durante l'eliminazione: " + error.message);
+                return;
+            }
+            await renderAdminOrders();
         }
 
         function getReviews() { return reviewsCache; }
@@ -858,7 +879,7 @@
             renderColorCheckboxes();
             renderAdminProducts();
             await renderAdminUsers();
-            renderAdminOrders();
+            await renderAdminOrders();
             renderAdminReviews();
             renderImagesPreview();
             try { lucide.createIcons(); } catch(e){}
