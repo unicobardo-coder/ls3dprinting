@@ -119,31 +119,21 @@
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
-            // Tentativo di login tramite Supabase o fallback su localStorage
-            let loggedUser = null;
             try {
                 const { data, error } = await lsSb.auth.signInWithPassword({ email, password });
-                if (!error && data.user) {
-                    loggedUser = { id: data.user.id, email: data.user.email, username: data.user.user_metadata?.name || email.split('@')[0] };
+                if (error) {
+                    alert("Credenziali non valide o utente non registrato.");
+                    return;
                 }
-            } catch(err) {}
-
-            if (!loggedUser) {
-                // Controllo su utenti registrati in locale (localStorage)
-                let users = [];
-                try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch(err) {}
-                const found = users.find(u => u.email === email && u.password === password);
-                if (found) {
-                    loggedUser = { id: found.id || Date.now(), email: found.email, username: found.username || found.name };
+                if (data.user) {
+                    const loggedUser = { id: data.user.id, email: data.user.email, username: data.user.user_metadata?.name || email.split('@')[0] };
+                    localStorage.setItem('ls3d_logged_user', JSON.stringify(loggedUser));
+                    alert("Accesso effettuato con successo!");
+                    window.location.href = "index.html";
                 }
-            }
-
-            if (loggedUser) {
-                localStorage.setItem('ls3d_logged_user', JSON.stringify(loggedUser));
-                alert("Accesso effettuato con successo!");
-                window.location.href = "index.html";
-            } else {
-                alert("Credenziali non valide o utente non registrato.");
+            } catch(err) {
+                console.error(err);
+                alert("Errore durante l'accesso.");
             }
         }
 
@@ -153,27 +143,37 @@
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value;
 
-            let registered = false;
             try {
-                const { data, error } = await lsSb.auth.signUp({ email, password, options: { data: { name } } });
-                if (!error) registered = true;
-            } catch(err) {}
+                // 1. Registrazione su Supabase Auth
+                const { data, error } = await lsSb.auth.signUp({ 
+                    email, 
+                    password, 
+                    options: { data: { name } } 
+                });
+                
+                if (error) {
+                    alert("Errore di registrazione: " + error.message);
+                    return;
+                }
 
-            // Salvataggio di sicurezza anche nel localStorage per la gestione locale dell'admin
-            let users = [];
-            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch(err) {}
-            if (users.some(u => u.email === email)) {
-                alert("Questa email è già registrata.");
-                return;
+                // 2. Salvataggio automatico nella tabella pubblica 'users' per l'Admin
+                const { error: dbError } = await lsSb.from('users').insert([
+                    { username: name, email: email }
+                ]);
+
+                if (dbError) {
+                    console.error("Errore inserimento nella tabella users:", dbError.message);
+                }
+
+                const newUser = { id: data.user?.id || Date.now(), name, username: name, email };
+                localStorage.setItem('ls3d_logged_user', JSON.stringify(newUser));
+                alert("Registrazione completata con successo!");
+                window.location.href = "index.html";
+
+            } catch(err) {
+                console.error(err);
+                alert("Errore imprevisto durante la registrazione.");
             }
-
-            const newUser = { id: Date.now(), name, username: name, email, password };
-            users.push(newUser);
-            localStorage.setItem('ls3d_users', JSON.stringify(users));
-
-            localStorage.setItem('ls3d_logged_user', JSON.stringify(newUser));
-            alert("Registrazione completata con successo!");
-            window.location.href = "index.html";
         }
 
         try { lucide.createIcons(); } catch(e){}
