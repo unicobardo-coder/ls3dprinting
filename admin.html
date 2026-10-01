@@ -65,12 +65,22 @@
         <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di prodotti, utenti registrati e fatture.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, prodotti, utenti registrati e fatture.</p>
             </div>
             <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
             </button>
         </div>
+
+        <!-- SEZIONE GESTIONE CATEGORIE (RIPRISTINATA) -->
+        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <h2 class="text-lg font-bold text-white">Gestione Categorie</h2>
+            <div class="flex gap-2">
+                <input type="text" id="new-category-name" placeholder="Nuova categoria..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2.5 text-white focus:outline-none flex-grow">
+                <button type="button" onclick="addNewCategory()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer transition-all">Aggiungi Categoria</button>
+            </div>
+            <div id="admin-categories-list" class="flex flex-wrap gap-2 pt-2"></div>
+        </section>
 
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -226,7 +236,7 @@
     <script>
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
         let productsCache = [], reviewsCache = [];
-        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;min'}[c] || c));
         
         function mapProduct(r) {
             return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
@@ -253,6 +263,7 @@
             if (btn) btn.disabled = true;
             try {
                 await fetchAll();
+                renderCategoriesManager();
                 renderCategoryCheckboxes();
                 renderAdminProducts();
                 renderAdminUsers();
@@ -294,6 +305,10 @@
             return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
         }
 
+        function saveBaseCategories(cats) {
+            try { localStorage.setItem('ls3d_categories', JSON.stringify(cats)); } catch (e) {}
+        }
+
         function getCategories() {
             const s = new Set(getBaseCategories());
             productsCache.forEach(p => {
@@ -301,6 +316,44 @@
                 else if (p.category) s.add(p.category.trim());
             });
             return [...s];
+        }
+
+        function addNewCategory() {
+            const input = document.getElementById('new-category-name');
+            const val = input.value.trim();
+            if (!val) return;
+            const cats = getBaseCategories();
+            if (!cats.includes(val)) {
+                cats.push(val);
+                saveBaseCategories(cats);
+                input.value = '';
+                renderCategoriesManager();
+                renderCategoryCheckboxes();
+                alert("Categoria aggiunta con successo!");
+            } else {
+                alert("Questa categoria esiste già.");
+            }
+        }
+
+        function deleteCategory(catName) {
+            if (!confirm(`Vuoi eliminare la categoria "${catName}"?`)) return;
+            let cats = getBaseCategories();
+            cats = cats.filter(c => c !== catName);
+            saveBaseCategories(cats);
+            renderCategoriesManager();
+            renderCategoryCheckboxes();
+        }
+
+        function renderCategoriesManager() {
+            const container = document.getElementById('admin-categories-list');
+            if (!container) return;
+            const cats = getCategories();
+            container.innerHTML = cats.map(c => `
+                <div class="bg-dark-bg border border-gray-800 px-3 py-1.5 rounded-xl flex items-center gap-2 text-white">
+                    <span>${esc(c)}</span>
+                    <button type="button" onclick="deleteCategory('${esc(c)}')" class="text-red-400 hover:text-red-300 font-bold ml-1 cursor-pointer">×</button>
+                </div>
+            `).join('');
         }
 
         function renderCategoryCheckboxes(selectedCategories = []) {
@@ -445,6 +498,7 @@
                 
                 await fetchAll();
                 resetProductForm();
+                renderCategoriesManager();
                 renderCategoryCheckboxes();
                 renderAdminProducts();
                 alert("Prodotto salvato e sincronizzato con successo!");
@@ -460,6 +514,7 @@
             const p = getProducts()[idx];
             document.getElementById('edit-product-index').value = idx;
             document.getElementById('prod-title').value = p.title;
+            renderCategoriesManager();
             renderCategoryCheckboxes(p.categories || [p.category || '']);
             renderColorCheckboxes(p.colors || []);
             document.getElementById('prod-price').value = p.price;
@@ -491,6 +546,7 @@
             document.getElementById('edit-product-index').value = '';
             document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
             document.getElementById('cancel-edit-btn').classList.add('hidden');
+            renderCategoriesManager();
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             currentEditingImages = []; mainImageIdx = 0; renderImagesPreview();
@@ -503,6 +559,7 @@
             const { error } = await lsSb.from('products').delete().eq('id', p.id);
             if (error) { alert("Errore durante l'eliminazione: " + error.message); return; }
             await fetchAll(); 
+            renderCategoriesManager();
             renderCategoryCheckboxes();
             renderAdminProducts(); 
             renderAdminReviews();
@@ -678,6 +735,7 @@
 
         async function initAdminDashboard() {
             try { await fetchAll(); } catch (e) { console.error(e); alert("Errore nel caricamento: " + e.message); }
+            renderCategoriesManager();
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             renderAdminProducts();
