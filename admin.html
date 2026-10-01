@@ -65,23 +65,52 @@
         <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, prodotti, utenti registrati e fatture.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, colori, prodotti, utenti registrati e fatture.</p>
             </div>
             <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
             </button>
         </div>
 
-        <!-- SEZIONE GESTIONE CATEGORIE (RIPRISTINATA) -->
-        <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Gestione Categorie</h2>
-            <div class="flex gap-2">
-                <input type="text" id="new-category-name" placeholder="Nuova categoria..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-3 py-2.5 text-white focus:outline-none flex-grow">
-                <button type="button" onclick="addNewCategory()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer transition-all">Aggiungi Categoria</button>
+        <!-- SEZIONE GESTIONE CATEGORIE -->
+        <section class="bg-dark-card border border-brand-500/30 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="folder-kanban" class="w-5 h-5 text-brand-400"></i> Gestione Categorie Catalogo
+                </h2>
+                <span class="text-gray-400 text-[11px]">Aggiungi o rimuovi le categorie</span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="new-category-name" placeholder="Nome nuova categoria..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500 flex-grow">
+                <button type="button" onclick="addNewCategory()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer transition-all shadow-lg flex items-center justify-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi Categoria
+                </button>
             </div>
             <div id="admin-categories-list" class="flex flex-wrap gap-2 pt-2"></div>
         </section>
 
+        <!-- SEZIONE GESTIONE COLORI -->
+        <section class="bg-dark-card border border-brand-500/30 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="palette" class="w-5 h-5 text-brand-400"></i> Gestione Colori Filamenti
+                </h2>
+                <span class="text-gray-400 text-[11px]">Aggiungi o rimuovi i colori disponibili</span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 items-center">
+                <input type="text" id="new-color-name" placeholder="Nome colore (es. Blu Elettrico)..." class="bg-dark-bg border border-gray-700/80 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500 flex-grow w-full">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-gray-400 text-[10px]">Colore:</span>
+                    <input type="color" id="new-color-code" value="#3b82f6" class="bg-dark-bg border border-gray-700/80 rounded-xl px-2 py-1.5 h-12 w-20 cursor-pointer">
+                </div>
+                <button type="button" onclick="addNewColor()" class="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl cursor-pointer transition-all shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi Colore
+                </button>
+            </div>
+            <div id="admin-colors-manager-list" class="flex flex-wrap gap-2 pt-2"></div>
+        </section>
+
+        <!-- SEZIONE PRODOTTI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h2 class="text-lg font-bold text-white font-mono" id="product-form-title">Aggiungi / Modifica Prodotto</h2>
@@ -171,22 +200,26 @@
             </div>
         </section>
 
+        <!-- SEZIONE UTENTI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
             <h2 class="text-lg font-bold text-white">Controllo Utenti Registrati</h2>
             <div id="admin-users-list" class="space-y-3"></div>
         </section>
 
+        <!-- SEZIONE ORDINI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
             <h2 class="text-lg font-bold text-white">Gestione Ordini & Fatture</h2>
             <div id="admin-orders-list" class="space-y-3"></div>
         </section>
 
+        <!-- SEZIONE RECENSIONI -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
             <h2 class="text-lg font-bold text-white">Gestione Recensioni / Commenti</h2>
             <div id="admin-reviews-list" class="space-y-3"></div>
         </section>
     </main>
 
+    <!-- MODALE FATTURA -->
     <div id="invoice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 font-sans">
         <div class="bg-white text-gray-900 w-full max-w-2xl rounded-2xl p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start border-b pb-4">
@@ -236,7 +269,7 @@
     <script>
         const lsSb = window.supabase.createClient('https://afpurqovvtaexqvcptqm.supabase.co', 'sb_publishable_qiJxli3f8Lm9D36F1SWbsQ_3l2zV8y9');
         let productsCache = [], reviewsCache = [];
-        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;min'}[c] || c));
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] || c));
         
         function mapProduct(r) {
             return { id: r.id, title: r.title, categories: r.categories || [], category: (r.categories || [])[0],
@@ -264,7 +297,9 @@
             try {
                 await fetchAll();
                 renderCategoriesManager();
+                renderColorsManager();
                 renderCategoryCheckboxes();
+                renderColorCheckboxes();
                 renderAdminProducts();
                 renderAdminUsers();
                 renderAdminOrders();
@@ -300,6 +335,7 @@
         let mainImageIdx = 0;
         let currentStlFile = null, currentStlUrl = '', currentStlFileName = '';
 
+        // --- GESTIONE CATEGORIE ---
         function getBaseCategories() {
             try { const s = localStorage.getItem('ls3d_categories'); if (s) return JSON.parse(s); } catch (e) {}
             return ["Accessori", "Gadget", "Maker & Utensili", "Design & Arredo"];
@@ -349,9 +385,9 @@
             if (!container) return;
             const cats = getCategories();
             container.innerHTML = cats.map(c => `
-                <div class="bg-dark-bg border border-gray-800 px-3 py-1.5 rounded-xl flex items-center gap-2 text-white">
+                <div class="bg-dark-bg border border-gray-800 px-3 py-2 rounded-xl flex items-center gap-2 text-white">
                     <span>${esc(c)}</span>
-                    <button type="button" onclick="deleteCategory('${esc(c)}')" class="text-red-400 hover:text-red-300 font-bold ml-1 cursor-pointer">×</button>
+                    <button type="button" onclick="deleteCategory('${esc(c)}')" class="text-red-400 hover:text-red-300 font-bold ml-1 cursor-pointer" title="Elimina categoria">✕</button>
                 </div>
             `).join('');
         }
@@ -368,13 +404,78 @@
             `).join('');
         }
 
+        // --- GESTIONE COLORI ---
+        function getBaseColors() {
+            try {
+                const s = localStorage.getItem('ls3d_colors');
+                if (s) return JSON.parse(s);
+            } catch (e) {}
+            if (typeof filamentColors !== 'undefined' && Array.isArray(filamentColors)) {
+                return filamentColors;
+            }
+            return [
+                { name: "Nero", code: "#111827" },
+                { name: "Bianco", code: "#f9fafb" },
+                { name: "Grigio", code: "#6b7280" },
+                { name: "Rosso", code: "#ef4444" }
+            ];
+        }
+
+        function saveBaseColors(colors) {
+            try { localStorage.setItem('ls3d_colors', JSON.stringify(colors)); } catch (e) {}
+        }
+
+        function addNewColor() {
+            const nameInput = document.getElementById('new-color-name');
+            const codeInput = document.getElementById('new-color-code');
+            const name = nameInput.value.trim();
+            const code = codeInput.value;
+            if (!name) { alert("Inserisci il nome del colore."); return; }
+
+            let colors = getBaseColors();
+            if (!colors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+                colors.push({ name, code });
+                saveBaseColors(colors);
+                nameInput.value = '';
+                renderColorsManager();
+                renderColorCheckboxes();
+                alert("Colore aggiunto con successo!");
+            } else {
+                alert("Questo colore esiste già.");
+            }
+        }
+
+        function deleteColor(colorName) {
+            if (!confirm(`Vuoi eliminare il colore "${colorName}"?`)) return;
+            let colors = getBaseColors();
+            colors = colors.filter(c => c.name !== colorName);
+            saveBaseColors(colors);
+            renderColorsManager();
+            renderColorCheckboxes();
+        }
+
+        function renderColorsManager() {
+            const container = document.getElementById('admin-colors-manager-list');
+            if (!container) return;
+            const colors = getBaseColors();
+            container.innerHTML = colors.map(c => `
+                <div class="bg-dark-bg border border-gray-800 px-3 py-2 rounded-xl flex items-center gap-2 text-white">
+                    <span class="w-3.5 h-3.5 rounded-full border border-gray-700 shrink-0" style="background-color: ${c.code};"></span>
+                    <span>${esc(c.name)}</span>
+                    <span class="text-[10px] text-gray-500 font-mono">${c.code}</span>
+                    <button type="button" onclick="deleteColor('${esc(c.name)}')" class="text-red-400 hover:text-red-300 font-bold ml-2 cursor-pointer" title="Elimina colore">✕</button>
+                </div>
+            `).join('');
+        }
+
         function renderColorCheckboxes(selectedColors = []) {
             const container = document.getElementById('prod-colors-checkboxes');
             if (!container) return;
-            container.innerHTML = filamentColors.map(c => `
+            const colors = getBaseColors();
+            container.innerHTML = colors.map(c => `
                 <label class="flex items-center gap-2 text-white cursor-pointer bg-dark-card p-2 rounded-lg border border-gray-800">
                     <input type="checkbox" name="product-colors" value="${esc(c.name)}" ${selectedColors.includes(c.name) ? 'checked' : ''} class="w-4 h-4 accent-brand-500 rounded">
-                    <span class="w-3 h-3 rounded-full border border-gray-700" style="background-color: ${c.code};"></span>
+                    <span class="w-3 h-3 rounded-full border border-gray-700 shrink-0" style="background-color: ${c.code};"></span>
                     <span class="text-[11px]">${esc(c.name)}</span>
                 </label>
             `).join('');
@@ -499,7 +600,9 @@
                 await fetchAll();
                 resetProductForm();
                 renderCategoriesManager();
+                renderColorsManager();
                 renderCategoryCheckboxes();
+                renderColorCheckboxes();
                 renderAdminProducts();
                 alert("Prodotto salvato e sincronizzato con successo!");
             } catch (err) {
@@ -515,6 +618,7 @@
             document.getElementById('edit-product-index').value = idx;
             document.getElementById('prod-title').value = p.title;
             renderCategoriesManager();
+            renderColorsManager();
             renderCategoryCheckboxes(p.categories || [p.category || '']);
             renderColorCheckboxes(p.colors || []);
             document.getElementById('prod-price').value = p.price;
@@ -547,6 +651,7 @@
             document.getElementById('product-form-title').innerText = "Aggiungi / Modifica Prodotto";
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             renderCategoriesManager();
+            renderColorsManager();
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             currentEditingImages = []; mainImageIdx = 0; renderImagesPreview();
@@ -560,7 +665,9 @@
             if (error) { alert("Errore durante l'eliminazione: " + error.message); return; }
             await fetchAll(); 
             renderCategoriesManager();
+            renderColorsManager();
             renderCategoryCheckboxes();
+            renderColorCheckboxes();
             renderAdminProducts(); 
             renderAdminReviews();
             alert("Prodotto eliminato correttamente.");
@@ -736,6 +843,7 @@
         async function initAdminDashboard() {
             try { await fetchAll(); } catch (e) { console.error(e); alert("Errore nel caricamento: " + e.message); }
             renderCategoriesManager();
+            renderColorsManager();
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             renderAdminProducts();
