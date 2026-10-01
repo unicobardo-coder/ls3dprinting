@@ -65,7 +65,7 @@
         <div class="border-b border-gray-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pannello di Controllo Admin</h1>
-                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, colori, prodotti, utenti registrati e fatture.</p>
+                <p class="text-xs font-mono text-gray-400 mt-1">Gestione completa di categorie, colori, prodotti, utenti da Supabase e fatture.</p>
             </div>
             <button onclick="forceSyncData()" class="px-4 py-2.5 bg-dark-surface hover:bg-gray-800 text-brand-400 border border-brand-500/40 rounded-xl text-xs font-mono transition-all flex items-center gap-2 cursor-pointer shadow-lg">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sincronizza Dati
@@ -200,9 +200,9 @@
             </div>
         </section>
 
-        <!-- SEZIONE UTENTI -->
+        <!-- SEZIONE UTENTI (SUPABASE) -->
         <section class="bg-dark-card border border-gray-800 p-6 sm:p-8 rounded-2xl space-y-6 shadow-xl font-mono text-xs">
-            <h2 class="text-lg font-bold text-white">Controllo Utenti Registrati</h2>
+            <h2 class="text-lg font-bold text-white">Controllo Utenti Registrati (Supabase)</h2>
             <div id="admin-users-list" class="space-y-3"></div>
         </section>
 
@@ -301,7 +301,7 @@
                 renderCategoryCheckboxes();
                 renderColorCheckboxes();
                 renderAdminProducts();
-                renderAdminUsers();
+                await renderAdminUsers();
                 renderAdminOrders();
                 renderAdminReviews();
                 alert("Sincronizzazione completata con successo!");
@@ -706,30 +706,40 @@
             }).join('');
         }
 
-        function renderAdminUsers() {
+        // --- UTENTI DA SUPABASE ---
+        async function renderAdminUsers() {
             const container = document.getElementById('admin-users-list');
             if (!container) return;
-            let users = [];
-            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch (e) {}
-            if (users.length === 0) { container.innerHTML = `<p class="text-gray-500">Nessun utente registrato nel browser.</p>`; return; }
-            container.innerHTML = users.map((u, idx) => `
+            
+            const { data: users, error } = await lsSb.from('users').select('*').order('created_at', { ascending: false });
+            if (error) {
+                container.innerHTML = `<p class="text-red-400 text-xs">Errore caricamento utenti da Supabase.</p>`;
+                return;
+            }
+            if (!users || users.length === 0) { 
+                container.innerHTML = `<p class="text-gray-500 text-xs">Nessun utente registrato su Supabase.</p>`; 
+                return; 
+            }
+
+            container.innerHTML = users.map((u) => `
                 <div class="flex justify-between items-center bg-dark-bg p-3 rounded-xl border border-gray-800">
                     <div>
-                        <p class="font-bold text-white">${esc(u.username || u.name)}</p>
+                        <p class="font-bold text-white">${esc(u.username)}</p>
                         <p class="text-[10px] text-gray-400">Email: ${esc(u.email)}</p>
                     </div>
-                    <button type="button" onclick="deleteUser(${idx})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina Utente</button>
+                    <button type="button" onclick="deleteUser('${u.id}')" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg cursor-pointer">Elimina Utente</button>
                 </div>
             `).join('');
         }
 
-        function deleteUser(idx) {
-            if (!confirm("Vuoi eliminare questo utente registrato?")) return;
-            let users = [];
-            try { users = JSON.parse(localStorage.getItem('ls3d_users')) || []; } catch (e) {}
-            users.splice(idx, 1);
-            localStorage.setItem('ls3d_users', JSON.stringify(users));
-            renderAdminUsers();
+        async function deleteUser(userId) {
+            if (!confirm("Vuoi eliminare questo utente da Supabase?")) return;
+            const { error } = await lsSb.from('users').delete().eq('id', userId);
+            if (error) {
+                alert("Errore durante l'eliminazione: " + error.message);
+                return;
+            }
+            await renderAdminUsers();
         }
 
         function renderAdminOrders() {
@@ -847,7 +857,7 @@
             renderCategoryCheckboxes();
             renderColorCheckboxes();
             renderAdminProducts();
-            renderAdminUsers();
+            await renderAdminUsers();
             renderAdminOrders();
             renderAdminReviews();
             renderImagesPreview();
